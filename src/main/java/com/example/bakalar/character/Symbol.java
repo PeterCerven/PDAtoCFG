@@ -30,8 +30,7 @@ public abstract class Symbol {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Symbol)) return false;
-        Symbol symbol = (Symbol) o;
+        if (!(o instanceof Symbol symbol)) return false;
         return getName().equals(symbol.getName());
     }
 
