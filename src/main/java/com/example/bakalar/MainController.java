@@ -4,17 +4,22 @@ import com.example.bakalar.cfg.ContextFreeGrammar;
 import com.example.bakalar.cfg.Rule;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.ArcType;
 import javafx.util.Pair;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+
 
 public class MainController {
 
@@ -51,6 +56,11 @@ public class MainController {
     @FXML
     private TextField startSymbolInput;
 
+    @FXML
+    private Button circleBtn;
+
+    private boolean drawingOn;
+
     private Set<Rule> rules;
     private int takenRowsCFG = 1;
     private int takenRowsGNF = 0;
@@ -74,7 +84,7 @@ public class MainController {
         for (int i = 0; i < cfgTable.getChildren().size(); i += 3) {
 
             TextField left = (TextField) cfgTable.getChildren().get(i);
-            TextField right = (TextField) cfgTable.getChildren().get(i+2);
+            TextField right = (TextField) cfgTable.getChildren().get(i + 2);
             if (left.getText().isEmpty() || right.getText().isEmpty()) {
                 continue;
             }
@@ -115,8 +125,30 @@ public class MainController {
 
     }
 
+    public void drawCircleOn() {
+        if (drawingOn) {
+            this.drawingOn = false;
+            circleBtn.setText("Nakresli kruh");
+        } else {
+            this.drawingOn = true;
+            circleBtn.setText("Vypni kreslenie");
+        }
+
+    }
+
     public void showSteps() {
 
+    }
+
+    public void drawCircle(MouseEvent event) {
+        double x = event.getX();
+        double y = event.getY();
+        if (drawingOn) {
+            GraphicsContext gc = myCanvas.getGraphicsContext2D();
+            gc.setFill(Color.BLACK);
+            gc.fillArc(x, y, 50, 50, 0, 360, ArcType.ROUND);
+            System.out.println("ide to: " + x + " a y " + y);
+        }
     }
 
     public void step() {
@@ -126,8 +158,6 @@ public class MainController {
     public void createGraph() {
 
     }
-
-
 
 
 }
