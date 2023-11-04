@@ -1,9 +1,9 @@
 package com.example.bakalar.pda;
 
-import com.example.bakalar.pda.State;
+import com.example.bakalar.canvas.Node;
 
 public class TranFun {
-    private State state;
+    private Node node;
     private String input;
     private String stack;
 }

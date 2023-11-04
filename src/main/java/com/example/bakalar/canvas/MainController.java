@@ -1,4 +1,4 @@
-package com.example.bakalar;
+package com.example.bakalar.canvas;
 
 import com.example.bakalar.cfg.ContextFreeGrammar;
 import com.example.bakalar.cfg.Rule;
@@ -11,9 +11,9 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.ArcType;
 import javafx.util.Pair;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -42,7 +42,7 @@ public class MainController {
     private TextField inputTape;
 
     @FXML
-    private Canvas myCanvas;
+    private Canvas canvas;
 
     @FXML
     private GridPane pdaTable;
@@ -57,15 +57,32 @@ public class MainController {
     private TextField startSymbolInput;
 
     @FXML
-    private Button circleBtn;
+    private Button nodeBtn;
 
-    private boolean drawingOn;
+    @FXML
+    private Button arrowBtn;
+
+    @FXML
+    private Button resetBtn;
+
+    private boolean nodeBtnOn;
+
+    private boolean arrowBtnOn;
 
     private Set<Rule> rules;
     private int takenRowsCFG = 1;
     private int takenRowsGNF = 0;
     private int takenRowsProd = 0;
     private Character startSymbol;
+
+    private Board board;
+
+    private static final Logger logger = LogManager.getLogger(MainController.class.getName());
+
+    public MainController() {
+        this.board = new Board();
+        logger.info("test");
+    }
 
     public void addNewRow() {
         TextField left = new TextField();
@@ -126,37 +143,74 @@ public class MainController {
     }
 
     public void drawCircleOn() {
-        if (drawingOn) {
-            this.drawingOn = false;
-            circleBtn.setText("Nakresli kruh");
+        if (nodeBtnOn) {
+            this.nodeBtnOn = false;
+            nodeBtn.setText("Nakresli kruh");
         } else {
-            this.drawingOn = true;
-            circleBtn.setText("Vypni kreslenie");
+            this.nodeBtnOn = true;
+            this.arrowBtnOn = false;
+            nodeBtn.setText("Vypni kreslenie");
         }
+    }
 
+    public void drawArrowOn() {
+        if (arrowBtnOn) {
+            this.arrowBtnOn = false;
+            arrowBtn.setText("Nakresli arrow");
+        } else {
+            this.arrowBtnOn = true;
+            this.nodeBtnOn = false;
+            arrowBtn.setText("Vypni kreslenie");
+        }
     }
 
     public void showSteps() {
 
     }
 
-    public void drawCircle(MouseEvent event) {
+    public void createCircle(MouseEvent event) {
         double x = event.getX();
         double y = event.getY();
-        if (drawingOn) {
-            GraphicsContext gc = myCanvas.getGraphicsContext2D();
-            gc.setFill(Color.BLACK);
-            gc.fillArc(x, y, 50, 50, 0, 360, ArcType.ROUND);
-            System.out.println("ide to: " + x + " a y " + y);
+        double radius = 50;
+        if (nodeBtnOn) {
+            board.addNode(new Node(x, y, radius));
+            drawBoard();
         }
+    }
+
+    public void drawBoard() {
+        GraphicsContext gc = canvas.getGraphicsContext2D();
+        gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
+        List<Node> nodes = board.getNodes();
+        for (Node node : nodes) {
+            drawNode(node, gc);
+        }
+    }
+
+    public void drawNode(Node node, GraphicsContext gc) {
+        List<Arrow> arrows = node.getArrows();
+        double x = node.getxCord();
+        double y = node.getyCord();
+        double radius = node.getRadius();
+        gc.strokeOval(x - radius, y - radius, 2 * radius, 2 * radius);
+        arrows.forEach(this::drawArrow);
+    }
+
+    public void drawArrow(Arrow arrow) {
+        // TODO
     }
 
     public void step() {
 
     }
 
-    public void createGraph() {
+    public void reset() {
+        GraphicsContext gc = canvas.getGraphicsContext2D();
+        board.reset();
+        drawBoard();
+    }
 
+    public void createGraph() {
     }
 
 
