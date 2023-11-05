@@ -13,7 +13,7 @@
             <Button fx:id="nodeBtn" mnemonicParsing="false" onAction="#drawNodeOn" text="Zvol kruh" />
             <Button fx:id="arrowBtn" mnemonicParsing="false" onAction="#drawArrowOn" text="Zvol sip" />
             <Button fx:id="resetBtn" mnemonicParsing="false" onAction="#resetAll" text="Vymaz vsetko" />
-            <Button fx:id="eraseBtn" mnemonicParsing="false" onAction="#erase" text="Zvol zmizik" />
+            <Button fx:id="eraseBtn" mnemonicParsing="false" onAction="#eraseFunctionOn" text="Zvol zmizik" />
             <Button fx:id="undoBtn" mnemonicParsing="false" onAction="#undo" text="Naspat" />
             <Button fx:id="reUndoBtn" mnemonicParsing="false" onAction="#reUndo" text="Vrat naspat" />
          </children>

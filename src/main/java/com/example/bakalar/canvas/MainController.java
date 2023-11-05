@@ -44,7 +44,7 @@ public class MainController {
     private boolean arrowBtnOn;
     private boolean selectBtnOn;
     private boolean eraseBtnOn;
-//    private Set<Rule> rules;
+    //    private Set<Rule> rules;
 //    private int takenRowsCFG = 1;
 //    private int takenRowsGNF = 0;
 //    private int takenRowsProd = 0;
@@ -116,15 +116,22 @@ public class MainController {
 
 
     public void createNode(MouseEvent event) {
+        double x = event.getX();
+        double y = event.getY();
         if (nodeBtnOn) {
             log.info("creating node");
-            double x = event.getX();
             log.info("X coordinate: " + x);
-            double y = event.getY();
             log.info("Y coordinate: " + y);
             double radius = 50;
             MyNode myNode = new MyNode(x, y, radius);
             myNode.setFill(Color.BLACK);
+            myNode.setOnMouseClicked(e -> {
+                        if (eraseBtnOn) {
+                            mySecondAnchor.getChildren().remove(myNode);
+                            board.remove(myNode);
+                        }
+                    }
+            );
             board.addNode(myNode);
             mySecondAnchor.getChildren().add(myNode);
         }
@@ -137,7 +144,7 @@ public class MainController {
         double y = myNode.getY();
         double radius = myNode.getRadius();
         gc.strokeOval(x - radius, y - radius, 2 * radius, 2 * radius);
-        for (Arrow arrow: arrows) {
+        for (Arrow arrow : arrows) {
             drawArrow(arrow, gc);
         }
     }
@@ -156,8 +163,8 @@ public class MainController {
     }
 
     public void drawArrow(Arrow arrow, GraphicsContext gc) {
-        Pair<Double, Double>  start = arrow.getStart();
-        Pair<Double, Double>  finish = arrow.getFinish();
+        Pair<Double, Double> start = arrow.getStart();
+        Pair<Double, Double> finish = arrow.getFinish();
         gc.moveTo(start.getKey(), start.getValue());
         gc.lineTo(finish.getKey(), finish.getValue());
     }
@@ -190,7 +197,7 @@ public class MainController {
         }
     }
 
-    public void erase() {
+    public void eraseFunctionOn() {
         turnOffAll();
         if (eraseBtnOn) {
             turnOffAll();

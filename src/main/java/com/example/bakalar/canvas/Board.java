@@ -38,4 +38,8 @@ public class Board {
     public void reset() {
         this.MyNodes = new ArrayList<>();
     }
+
+    public void remove(MyNode myNode) {
+        this.MyNodes.remove(myNode);
+    }
 }
