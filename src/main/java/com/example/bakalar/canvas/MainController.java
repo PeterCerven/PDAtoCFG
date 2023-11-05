@@ -2,6 +2,7 @@ package com.example.bakalar.canvas;
 
 import com.example.bakalar.cfg.ContextFreeGrammar;
 import com.example.bakalar.cfg.Rule;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -23,61 +24,54 @@ import java.util.Set;
 
 public class MainController {
 
+    private static final Logger logger = LogManager.getLogger(MainController.class.getName());
     @FXML
     private Button addRuleBtn;
-
     @FXML
     private GridPane cfgTable;
-
     @FXML
     private Button convertBtn;
-
     @FXML
     private GridPane gnfTable;
-
     @FXML
     private Button inputBtn;
-
     @FXML
     private TextField inputTape;
-
     @FXML
     private Canvas canvas;
-
     @FXML
     private GridPane pdaTable;
-
     @FXML
     private Button showSteps;
-
     @FXML
     private VBox stack;
-
     @FXML
     private TextField startSymbolInput;
-
     @FXML
     private Button nodeBtn;
-
     @FXML
     private Button arrowBtn;
-
     @FXML
     private Button resetBtn;
+    @FXML
+    private Button eraseBtn;
+    @FXML
+    private Button undoBtn;
+    @FXML
+    private Button reUndoBtn;
+    @FXML
+    private Button selectBtn;
 
     private boolean nodeBtnOn;
-
     private boolean arrowBtnOn;
-
+    private boolean selectBtnOn;
+    private boolean eraseBtnOn;
     private Set<Rule> rules;
     private int takenRowsCFG = 1;
     private int takenRowsGNF = 0;
     private int takenRowsProd = 0;
     private Character startSymbol;
-
     private Board board;
-
-    private static final Logger logger = LogManager.getLogger(MainController.class.getName());
 
     public MainController() {
         this.board = new Board();
@@ -142,33 +136,13 @@ public class MainController {
 
     }
 
-    public void drawCircleOn() {
-        if (nodeBtnOn) {
-            this.nodeBtnOn = false;
-            nodeBtn.setText("Nakresli kruh");
-        } else {
-            this.nodeBtnOn = true;
-            this.arrowBtnOn = false;
-            nodeBtn.setText("Vypni kreslenie");
-        }
-    }
 
-    public void drawArrowOn() {
-        if (arrowBtnOn) {
-            this.arrowBtnOn = false;
-            arrowBtn.setText("Nakresli arrow");
-        } else {
-            this.arrowBtnOn = true;
-            this.nodeBtnOn = false;
-            arrowBtn.setText("Vypni kreslenie");
-        }
-    }
 
     public void showSteps() {
 
     }
 
-    public void createCircle(MouseEvent event) {
+    public void createNode(MouseEvent event) {
         double x = event.getX();
         double y = event.getY();
         double radius = 50;
@@ -189,29 +163,105 @@ public class MainController {
 
     public void drawNode(Node node, GraphicsContext gc) {
         List<Arrow> arrows = node.getArrows();
-        double x = node.getxCord();
-        double y = node.getyCord();
+        double x = node.getX();
+        double y = node.getY();
         double radius = node.getRadius();
         gc.strokeOval(x - radius, y - radius, 2 * radius, 2 * radius);
-        arrows.forEach(this::drawArrow);
+        for (Arrow arrow: arrows) {
+            drawArrow(arrow, gc);
+        }
     }
 
-    public void drawArrow(Arrow arrow) {
-        // TODO
+    public void moveNode(MouseEvent event) {
+        double x = event.getX();
+        double y = event.getY();
+        Node node = board.getSelectedNode(x, y);
+        if (node == null) {
+            return;
+        }
+
+
+    }
+
+    public void drawArrow(Arrow arrow, GraphicsContext gc) {
+        Pair<Double, Double>  start = arrow.getStart();
+        Pair<Double, Double>  finish = arrow.getFinish();
+        gc.moveTo(start.getKey(), start.getValue());
+        gc.lineTo(finish.getKey(), finish.getValue());
     }
 
     public void step() {
 
     }
 
-    public void reset() {
-        GraphicsContext gc = canvas.getGraphicsContext2D();
+    public void resetAll() {
         board.reset();
+        turnOffAll();
         drawBoard();
     }
 
-    public void createGraph() {
+
+    public void drawNodeOn() {
+        if (nodeBtnOn) {
+            turnOffAll();
+        } else {
+            turnOffAll();
+            nodeBtnOn = true;
+            nodeBtn.setText("Vypni");
+        }
+    }
+
+    public void drawArrowOn() {
+        turnOffAll();
+        if (arrowBtnOn) {
+            turnOffAll();
+        } else {
+            turnOffAll();
+            arrowBtnOn = true;
+            arrowBtn.setText("Vypni");
+        }
+    }
+
+    public void erase() {
+        turnOffAll();
+        if (eraseBtnOn) {
+            turnOffAll();
+        } else {
+            turnOffAll();
+            eraseBtnOn = true;
+            eraseBtn.setText("Vypni");
+        }
+    }
+
+    public void selectOn() {
+        turnOffAll();
+        if (selectBtnOn) {
+            turnOffAll();
+        } else {
+            turnOffAll();
+            selectBtnOn = true;
+            selectBtn.setText("Vypni");
+        }
+    }
+
+    public void undo() {
+        turnOffAll();
+        // TODO undo
+    }
+
+    private void turnOffAll() {
+        this.eraseBtnOn = false;
+        this.nodeBtnOn = false;
+        this.arrowBtnOn = false;
+        this.selectBtnOn = false;
+        this.selectBtn.setText("Zvol vyber");
+        this.arrowBtn.setText("Zvol sip");
+        this.nodeBtn.setText("Zvol kruh");
+        this.eraseBtn.setText("Zvol zmizik");
     }
 
 
+    public void reUndo(ActionEvent actionEvent) {
+        // TODO reUndo
+    }
 }

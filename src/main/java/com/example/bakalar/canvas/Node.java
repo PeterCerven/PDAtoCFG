@@ -5,16 +5,22 @@ import java.util.ArrayList;
 public class Node {
     private String name;
     private ArrayList<Arrow> arrows;
-    private double xCord;
-    private double yCord;
+    private double x;
+    private double y;
     private double radius;
 
-    public Node(double xCord, double yCord, double radius) {
+    private boolean selected;
+
+    public Node(double x, double y, double radius) {
         this.name = "Node";
-        this.xCord = xCord;
-        this.yCord = yCord;
+        this.x = x;
+        this.y = y;
         this.radius = radius;
         this.arrows = new ArrayList<>();
+    }
+
+    public boolean isIn(double x, double y) {
+        return x >= this.x && x - radius <= this.x && y >= this.y && y - radius <= this.y;
     }
 
     public String getName() {
@@ -33,20 +39,20 @@ public class Node {
         this.arrows = arrows;
     }
 
-    public double getxCord() {
-        return xCord;
+    public double getX() {
+        return x;
     }
 
-    public void setxCord(double xCord) {
-        this.xCord = xCord;
+    public void setX(double x) {
+        this.x = x;
     }
 
-    public double getyCord() {
-        return yCord;
+    public double getY() {
+        return y;
     }
 
-    public void setyCord(double yCord) {
-        this.yCord = yCord;
+    public void setY(double y) {
+        this.y = y;
     }
 
     public double getRadius() {
@@ -57,4 +63,11 @@ public class Node {
         this.radius = radius;
     }
 
+    public boolean isSelected() {
+        return selected;
+    }
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
+    }
 }

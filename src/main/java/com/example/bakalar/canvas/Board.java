@@ -19,7 +19,16 @@ public class Board {
         this.nodes = nodes;
     }
 
-    public void draw() {
+    public Node getSelectedNode(double x, double y) {
+        Node node;
+        for (int i = this.nodes.size() - 1; i >= 0; i--) {
+            node = nodes.get(i);
+            if (node.isIn(x, y)) {
+                node.setSelected(true);
+                return node;
+            }
+        }
+        return null;
     }
 
     public void addNode(Node node) {
