@@ -6,32 +6,32 @@ import javafx.util.Pair;
 import java.util.ArrayList;
 
 public class Arrow {
-    private Node from;
-    private Node to;
+    private MyNode from;
+    private MyNode to;
     private ArrayList<TranFun> tranFun;
     private Pair<Double, Double> start;
     private Pair<Double, Double> finish;
 
-    public Arrow(Node from, Node to, Pair<Double, Double> start,Pair<Double, Double> finish) {
+    public Arrow(MyNode from, MyNode to, Pair<Double, Double> start, Pair<Double, Double> finish) {
         this.from = from;
         this.to = to;
         this.start =start;
         this.finish = finish;
     }
 
-    public Node getFrom() {
+    public MyNode getFrom() {
         return from;
     }
 
-    public void setFrom(Node from) {
+    public void setFrom(MyNode from) {
         this.from = from;
     }
 
-    public Node getTo() {
+    public MyNode getTo() {
         return to;
     }
 
-    public void setTo(Node to) {
+    public void setTo(MyNode to) {
         this.to = to;
     }
 

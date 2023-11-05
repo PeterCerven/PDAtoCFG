@@ -1,8 +1,10 @@
 package com.example.bakalar.canvas;
 
+import javafx.scene.shape.Circle;
+
 import java.util.ArrayList;
 
-public class Node {
+public class MyNode extends Circle {
     private String name;
     private ArrayList<Arrow> arrows;
     private double x;
@@ -11,17 +13,16 @@ public class Node {
 
     private boolean selected;
 
-    public Node(double x, double y, double radius) {
-        this.name = "Node";
+    public MyNode(double x, double y, double radius) {
+        super(x, y, radius);
+        this.name = "myNode";
         this.x = x;
         this.y = y;
         this.radius = radius;
         this.arrows = new ArrayList<>();
     }
 
-    public boolean isIn(double x, double y) {
-        return x >= this.x && x - radius <= this.x && y >= this.y && y - radius <= this.y;
-    }
+
 
     public String getName() {
         return name;
@@ -55,13 +56,6 @@ public class Node {
         this.y = y;
     }
 
-    public double getRadius() {
-        return radius;
-    }
-
-    public void setRadius(double radius) {
-        this.radius = radius;
-    }
 
     public boolean isSelected() {
         return selected;

@@ -4,38 +4,38 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Board {
-    private List<Node> nodes;
+    private List<MyNode> MyNodes;
 
     public Board() {
-        this.nodes = new ArrayList<>();
+        this.MyNodes = new ArrayList<>();
     }
 
 
-    public List<Node> getNodes() {
-        return nodes;
+    public List<MyNode> getNodes() {
+        return MyNodes;
     }
 
-    public void setNodes(List<Node> nodes) {
-        this.nodes = nodes;
+    public void setNodes(List<MyNode> MyNodes) {
+        this.MyNodes = MyNodes;
     }
 
-    public Node getSelectedNode(double x, double y) {
-        Node node;
-        for (int i = this.nodes.size() - 1; i >= 0; i--) {
-            node = nodes.get(i);
-            if (node.isIn(x, y)) {
-                node.setSelected(true);
-                return node;
-            }
-        }
+    public MyNode getSelectedNode(double x, double y) {
+        MyNode myNode;
+//        for (int i = this.MyNodes.size() - 1; i >= 0; i--) {
+//            myNode = MyNodes.get(i);
+//            if (myNode.isIn(x, y)) {
+//                myNode.setSelected(true);
+//                return myNode;
+//            }
+//        }
         return null;
     }
 
-    public void addNode(Node node) {
-        this.nodes.add(node);
+    public void addNode(MyNode myNode) {
+        this.MyNodes.add(myNode);
     }
 
     public void reset() {
-        this.nodes = new ArrayList<>();
+        this.MyNodes = new ArrayList<>();
     }
 }

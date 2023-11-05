@@ -1,9 +1,9 @@
 package com.example.bakalar.pda;
 
-import com.example.bakalar.canvas.Node;
+import com.example.bakalar.canvas.MyNode;
 
 public class TranFun {
-    private Node node;
+    private MyNode myNode;
     private String input;
     private String stack;
 }
