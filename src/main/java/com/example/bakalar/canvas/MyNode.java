@@ -1,5 +1,6 @@
 package com.example.bakalar.canvas;
 
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 
 import java.util.ArrayList;
@@ -15,6 +16,7 @@ public class MyNode extends Circle {
 
     public MyNode(double x, double y, double radius) {
         super(x, y, radius);
+        this.setFill(Color.BLACK);
         this.name = "myNode";
         this.x = x;
         this.y = y;

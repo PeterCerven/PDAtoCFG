@@ -20,7 +20,7 @@
       </HBox>
       <ScrollPane fx:id="myScrollPane" layoutX="226.0" layoutY="112.0" prefHeight="461.0" prefWidth="781.0">
         <content>
-          <AnchorPane fx:id="mySecondAnchor" minHeight="0.0" minWidth="0.0" onMouseClicked="#createNode" prefHeight="1500.0" prefWidth="2000.0" />
+          <AnchorPane fx:id="mySecondAnchor" minHeight="0.0" minWidth="0.0" onMouseClicked="#createObject" prefHeight="1500.0" prefWidth="2000.0" />
         </content>
       </ScrollPane>
    </children>
