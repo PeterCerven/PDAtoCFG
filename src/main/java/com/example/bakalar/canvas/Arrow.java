@@ -11,8 +11,9 @@ public class Arrow extends Line {
     private ArrayList<TranFun> tranFun;
 
 
-    public Arrow(MyNode from, MyNode to, double startX, double startY, double endX, double endY, int nodeRadius) {
-        super(startX, startY, endX, endY);
+    public Arrow(MyNode from, MyNode to, LineCoordinates lineCr) {
+        super(lineCr.getStartX(), lineCr.getStartY(), lineCr.getEndX(), lineCr.getEndY());
+        this.setStrokeWidth(10);
         this.from = from;
         this.to = to;
         this.tranFun = new ArrayList<>();

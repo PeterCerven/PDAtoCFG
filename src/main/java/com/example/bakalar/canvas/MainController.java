@@ -2,24 +2,19 @@ package com.example.bakalar.canvas;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.util.Pair;
+import javafx.scene.paint.Color;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import java.util.List;
 
 
 public class MainController {
 
-    private static final Logger log = LogManager.getLogger(MainController.class.getName());
-
     public static final int NODE_RADIUS = 50;
-
+    private static final Logger log = LogManager.getLogger(MainController.class.getName());
     @FXML
     private ScrollPane myScrollPane;
 
@@ -61,12 +56,12 @@ public class MainController {
     }
 
     private void createArrow(MyNode node) {
-        if (currentNode != null) {
+        if (currentNode != null && currentNode != node) {
             log.info("Arrow created: startX:{} startY:{} | finishX:{} finishY:{}",
                     node.getX(), node.getY(), currentNode.getX(), currentNode.getY());
-            Arrow arrow = new Arrow(currentNode, node,
-                    currentNode.getX(), currentNode.getY(),
-                    node.getX(), node.getY(), NODE_RADIUS);
+            LineCoordinates lineCoordinates = getEdgePoints(currentNode.getX(), currentNode.getY(), node.getX(), node.getY());
+            Arrow arrow = new Arrow(currentNode, node, lineCoordinates);
+            arrow.setStroke(Color.RED);
             arrow.setOnMouseClicked(e -> {
                         if (eraseBtnOn) {
                             mySecondAnchor.getChildren().remove(arrow);
@@ -80,6 +75,27 @@ public class MainController {
             currentNode = node;
         }
     }
+
+    private LineCoordinates getEdgePoints(double startX, double startY, double endX, double endY) {
+        log.info("Start X:{} Y:{}", startX, startY);
+        log.info("End X:{} Y:{}", endX, endY);
+        double side1 = startX - endX;
+        double side2 = startY - endY;
+
+        double angle1 = Math.atan(side1 / side2);
+
+        double newDiffX = Math.sin(angle1) * (double) MainController.NODE_RADIUS;
+        double newDiffY = Math.cos(angle1) * (double) MainController.NODE_RADIUS;
+
+        if (startX > endX && startY > endY) {
+            newDiffX = -newDiffX;
+            newDiffY = -newDiffY;
+        } else if (startX < endX && startY > endY) {
+            newDiffY = -newDiffY;
+        }
+        return new LineCoordinates(startX + newDiffX, startY + newDiffY, endX - newDiffX, endY - newDiffY);
+    }
+
 
     private void createNode(double x, double y) {
         log.info("Node created: X:{} Y:{}", x, y);
