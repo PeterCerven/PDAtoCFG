@@ -20,7 +20,7 @@ public class MainController {
     private ScrollPane myScrollPane;
 
     @FXML
-    private AnchorPane mySecondAnchor;
+    private AnchorPane mainPane;
 
     @FXML
     private Button nodeBtn;
@@ -65,10 +65,8 @@ public class MainController {
                     node.getAbsoluteCentrePosX(), node.getAbsoluteCentrePosY());
             LineCoordinates lineCoordinates = getEdgePoints(currentNode.getAbsoluteCentrePosX(), currentNode.getAbsoluteCentrePosY(),
                     node.getAbsoluteCentrePosX(), node.getAbsoluteCentrePosY());
-            Arrow arrow = new Arrow(currentNode, node, lineCoordinates);
-            arrow.setStroke(Color.RED);
+            Arrow arrow = new Arrow(currentNode, node, lineCoordinates, mainPane);
             makeErasable(arrow);
-            mySecondAnchor.getChildren().add(arrow);
             currentNode = null;
         } else {
             log.info("Starting point for arrow");
@@ -122,7 +120,7 @@ public class MainController {
     private void makeErasable(Node node) {
         node.setOnMouseClicked(n -> {
             if (eraseBtnOn) {
-                mySecondAnchor.getChildren().remove(node);
+                mainPane.getChildren().remove(node);
             }
         });
     }
@@ -134,11 +132,11 @@ public class MainController {
         makeDraggable(myNode);
         makeErasable(myNode);
         enableArrowCreation(myNode);
-        mySecondAnchor.getChildren().add(myNode);
+        mainPane.getChildren().add(myNode);
     }
 
     public void resetAll() {
-        mySecondAnchor.getChildren().clear();
+        mainPane.getChildren().clear();
         turnOffAll();
     }
 
