@@ -3,6 +3,7 @@ package com.example.bakalar.canvas;
 import java.util.ArrayList;
 import java.util.List;
 
+
 public class Board {
     private List<MyNode> MyNodes;
 

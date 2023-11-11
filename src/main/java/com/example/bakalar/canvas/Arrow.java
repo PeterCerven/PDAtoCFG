@@ -2,13 +2,14 @@ package com.example.bakalar.canvas;
 
 import com.example.bakalar.pda.TranFun;
 import javafx.scene.shape.Line;
+import lombok.Data;
 
 import java.util.ArrayList;
 
+@Data
 public class Arrow extends Line {
     private MyNode from;
     private MyNode to;
-    private ArrayList<TranFun> tranFun;
 
 
     public Arrow(MyNode from, MyNode to, LineCoordinates lineCr) {
@@ -16,7 +17,8 @@ public class Arrow extends Line {
         this.setStrokeWidth(10);
         this.from = from;
         this.to = to;
-        this.tranFun = new ArrayList<>();
     }
+
+
 
 }

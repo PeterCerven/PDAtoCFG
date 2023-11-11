@@ -6,6 +6,7 @@ module com.example.bakalar {
     requires org.kordamp.bootstrapfx.core;
     requires org.apache.logging.log4j.core;
     requires org.apache.logging.log4j;
+    requires lombok;
 
     opens com.example.bakalar to javafx.fxml;
     exports com.example.bakalar;
@@ -14,10 +15,10 @@ module com.example.bakalar {
 
     opens com.example.bakalar.pda to javafx.fxml;
 
+    opens com.example.bakalar.cfg to all;
     exports com.example.bakalar.cfg;
-    opens com.example.bakalar.cfg to tests;
+
+    opens com.example.bakalar.canvas to lombok, javafx.fxml; // Open the package to Lombok
+
     exports com.example.bakalar.canvas;
-    opens com.example.bakalar.canvas to javafx.fxml;
-
-
 }
