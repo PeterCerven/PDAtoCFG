@@ -58,7 +58,7 @@ public class MainController {
     private void createArrow(MyNode node) {
         if (currentNode != null && currentNode != node) {
             log.info("Arrow created: startX:{} startY:{} | finishX:{} finishY:{}",
-                    node.getX(), node.getY(), currentNode.getX(), currentNode.getY());
+                    currentNode.getX(), currentNode.getY(), node.getX(), node.getY());
             LineCoordinates lineCoordinates = getEdgePoints(currentNode.getX(), currentNode.getY(), node.getX(), node.getY());
             Arrow arrow = new Arrow(currentNode, node, lineCoordinates);
             arrow.setStroke(Color.RED);
@@ -87,12 +87,11 @@ public class MainController {
         double newDiffX = Math.sin(angle1) * (double) MainController.NODE_RADIUS;
         double newDiffY = Math.cos(angle1) * (double) MainController.NODE_RADIUS;
 
-        if (startX > endX && startY > endY) {
+        if (startX > endX && startY > endY || startX < endX && startY > endY) {
             newDiffX = -newDiffX;
             newDiffY = -newDiffY;
-        } else if (startX < endX && startY > endY) {
-            newDiffY = -newDiffY;
         }
+
         return new LineCoordinates(startX + newDiffX, startY + newDiffY, endX - newDiffX, endY - newDiffY);
     }
 
