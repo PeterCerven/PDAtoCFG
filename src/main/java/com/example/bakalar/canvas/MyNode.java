@@ -8,8 +8,6 @@ import java.util.ArrayList;
 public class MyNode extends Circle {
     private String name;
     private ArrayList<Arrow> arrows;
-    private double x;
-    private double y;
     private double radius;
 
     private boolean selected;
@@ -18,14 +16,18 @@ public class MyNode extends Circle {
         super(x, y, radius);
         this.setFill(Color.BLACK);
         this.name = "myNode";
-        this.x = x;
-        this.y = y;
         this.radius = radius;
         this.arrows = new ArrayList<>();
     }
 
 
+    public double getAbsoluteCentrePosX() {
+        return this.getCenterX() + this.getTranslateX();
+    }
 
+    public double getAbsoluteCentrePosY() {
+        return this.getCenterY() + this.getTranslateY();
+    }
     public String getName() {
         return name;
     }
@@ -40,22 +42,6 @@ public class MyNode extends Circle {
 
     public void setArrows(ArrayList<Arrow> arrows) {
         this.arrows = arrows;
-    }
-
-    public double getX() {
-        return x;
-    }
-
-    public void setX(double x) {
-        this.x = x;
-    }
-
-    public double getY() {
-        return y;
-    }
-
-    public void setY(double y) {
-        this.y = y;
     }
 
 

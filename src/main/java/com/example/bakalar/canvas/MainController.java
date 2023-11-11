@@ -2,6 +2,7 @@ package com.example.bakalar.canvas;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.input.MouseEvent;
@@ -41,6 +42,8 @@ public class MainController {
     private boolean selectBtnOn;
     private boolean eraseBtnOn;
     private MyNode currentNode;
+    private double startX;
+    private double startY;
 
 
     public MainController() {
@@ -58,16 +61,13 @@ public class MainController {
     private void createArrow(MyNode node) {
         if (currentNode != null && currentNode != node) {
             log.info("Arrow created: startX:{} startY:{} | finishX:{} finishY:{}",
-                    currentNode.getX(), currentNode.getY(), node.getX(), node.getY());
-            LineCoordinates lineCoordinates = getEdgePoints(currentNode.getX(), currentNode.getY(), node.getX(), node.getY());
+                    currentNode.getAbsoluteCentrePosX(), currentNode.getAbsoluteCentrePosY(),
+                    node.getAbsoluteCentrePosX(), node.getAbsoluteCentrePosY());
+            LineCoordinates lineCoordinates = getEdgePoints(currentNode.getAbsoluteCentrePosX(), currentNode.getAbsoluteCentrePosY(),
+                    node.getAbsoluteCentrePosX(), node.getAbsoluteCentrePosY());
             Arrow arrow = new Arrow(currentNode, node, lineCoordinates);
             arrow.setStroke(Color.RED);
-            arrow.setOnMouseClicked(e -> {
-                        if (eraseBtnOn) {
-                            mySecondAnchor.getChildren().remove(arrow);
-                        }
-                    }
-            );
+            makeErasable(arrow);
             mySecondAnchor.getChildren().add(arrow);
             currentNode = null;
         } else {
@@ -95,19 +95,45 @@ public class MainController {
         return new LineCoordinates(startX + newDiffX, startY + newDiffY, endX - newDiffX, endY - newDiffY);
     }
 
+    private void makeDraggable(MyNode node) {
+        node.setOnMousePressed(e -> {
+            if (selectBtnOn) {
+                startX = e.getSceneX() - node.getTranslateX();
+                startY = e.getSceneY() - node.getTranslateY();
+            }
+        });
+
+        node.setOnMouseDragged(e -> {
+            if (selectBtnOn) {
+                node.setTranslateX(e.getSceneX() - startX);
+                node.setTranslateY(e.getSceneY() - startY);
+            }
+        });
+    }
+
+    private void enableArrowCreation(MyNode node) {
+        node.setOnMouseClicked(n -> {
+            if (arrowBtnOn) {
+                createArrow(node);
+            }
+        });
+    }
+
+    private void makeErasable(Node node) {
+        node.setOnMouseClicked(n -> {
+            if (eraseBtnOn) {
+                mySecondAnchor.getChildren().remove(node);
+            }
+        });
+    }
+
 
     private void createNode(double x, double y) {
         log.info("Node created: X:{} Y:{}", x, y);
         MyNode myNode = new MyNode(x, y, NODE_RADIUS);
-        myNode.setOnMouseClicked(e -> {
-                    if (eraseBtnOn) {
-                        mySecondAnchor.getChildren().remove(myNode);
-                    }
-                    if (arrowBtnOn) {
-                        createArrow(myNode);
-                    }
-                }
-        );
+        makeDraggable(myNode);
+        makeErasable(myNode);
+        enableArrowCreation(myNode);
         mySecondAnchor.getChildren().add(myNode);
     }
 

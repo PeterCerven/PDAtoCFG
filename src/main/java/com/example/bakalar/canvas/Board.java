@@ -19,17 +19,6 @@ public class Board {
         this.MyNodes = MyNodes;
     }
 
-    public MyNode getSelectedNode(double x, double y) {
-        MyNode myNode;
-//        for (int i = this.MyNodes.size() - 1; i >= 0; i--) {
-//            myNode = MyNodes.get(i);
-//            if (myNode.isIn(x, y)) {
-//                myNode.setSelected(true);
-//                return myNode;
-//            }
-//        }
-        return null;
-    }
 
     public void addNode(MyNode myNode) {
         this.MyNodes.add(myNode);
