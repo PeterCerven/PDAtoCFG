@@ -44,9 +44,15 @@ public class MainController {
     private MyNode currentNode;
     private double startX;
     private double startY;
+    private Board board;
 
 
     public MainController() {
+    }
+
+    @FXML
+    private void initialize() {
+        board = new Board(mainPane);
     }
 
 
@@ -63,7 +69,7 @@ public class MainController {
             log.info("Arrow created: startX:{} startY:{} | finishX:{} finishY:{}",
                     currentNode.getAbsoluteCentrePosX(), currentNode.getAbsoluteCentrePosY(),
                     node.getAbsoluteCentrePosX(), node.getAbsoluteCentrePosY());
-            Arrow arrow = new Arrow(currentNode, node, mainPane);
+            Arrow arrow = new Arrow(currentNode, node, board);
             arrow.setFrom(currentNode);
             arrow.setTo(node);
             currentNode.addArrow(arrow);
@@ -91,7 +97,7 @@ public class MainController {
                 double y = e.getSceneY() - startY;
                 node.setTranslateX(x);
                 node.setTranslateY(y);
-                node.moveAllArrows(x, y);
+                node.moveAllArrows();
             }
         });
     }
@@ -107,7 +113,7 @@ public class MainController {
     private void makeErasable(Node node) {
         node.setOnMouseClicked(n -> {
             if (eraseBtnOn) {
-                mainPane.getChildren().remove(node);
+                board.removeObject(node);
             }
         });
     }
@@ -119,11 +125,11 @@ public class MainController {
         makeDraggable(myNode);
         makeErasable(myNode);
         enableArrowCreation(myNode);
-        mainPane.getChildren().add(myNode);
+        board.addObject(myNode);
     }
 
     public void resetAll() {
-        mainPane.getChildren().clear();
+        board.clearBoard();
         turnOffAll();
     }
 

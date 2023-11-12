@@ -5,8 +5,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Polygon;
 import javafx.scene.shape.StrokeType;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.logging.log4j.LogManager;
@@ -22,7 +20,7 @@ public class Arrow extends Line {
     private Polygon arrowHead;
 
 
-    public Arrow(MyNode from, MyNode to, AnchorPane mainPane) {
+    public Arrow(MyNode from, MyNode to, Board board) {
         super();
         LineCoordinates lineCr = getNodeEdgePoints(from.getAbsoluteCentrePosX(), from.getAbsoluteCentrePosY(),
                 to.getAbsoluteCentrePosX(), to.getAbsoluteCentrePosY());
@@ -36,8 +34,8 @@ public class Arrow extends Line {
         this.from = from;
         this.to = to;
         arrowHead = createArrowhead(lineCr.startX, lineCr.startY, lineCr.getEndX(), lineCr.getEndY());
-        mainPane.getChildren().add(this);
-        mainPane.getChildren().add(arrowHead);
+        board.addObject(this);
+        board.addObject(arrowHead);
     }
 
     private LineCoordinates getNodeEdgePoints(double startX, double startY, double endX, double endY) {
