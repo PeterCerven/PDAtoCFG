@@ -1,5 +1,6 @@
 package com.example.bakalar.canvas;
 
+import javafx.scene.Group;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
@@ -12,30 +13,44 @@ import org.apache.logging.log4j.Logger;
 
 @Getter
 @Setter
-public class Arrow extends Line {
+public class Arrow extends Group {
     private static final Logger log = LogManager.getLogger(Arrow.class.getName());
     public static int ARROW_HEAD_SZIE = 20;
     private MyNode from;
     private MyNode to;
+    private Line line;
     private Polygon arrowHead;
 
 
     public Arrow(MyNode from, MyNode to, Board board) {
-        super();
-        LineCoordinates lineCr = getNodeEdgePoints(from.getAbsoluteCentrePosX(), from.getAbsoluteCentrePosY(),
-                to.getAbsoluteCentrePosX(), to.getAbsoluteCentrePosY());
-        super.setStartX(lineCr.getStartX());
-        super.setStartY(lineCr.getStartY());
-        super.setEndX(lineCr.getEndX());
-        super.setEndY(lineCr.getEndY());
-        this.setStrokeType(StrokeType.OUTSIDE);
-        this.setStrokeWidth(2);
-        this.setStroke(Color.BLACK);
         this.from = from;
         this.to = to;
-        arrowHead = createArrowhead(lineCr.startX, lineCr.startY, lineCr.getEndX(), lineCr.getEndY());
+
+        line = new Line();
+        updateLineAndArrowHead();
+
+        line.setStrokeType(StrokeType.OUTSIDE);
+        line.setStrokeWidth(2);
+        line.setStroke(Color.BLACK);
+
+        this.getChildren().addAll(line, arrowHead);
         board.addObject(this);
-        board.addObject(arrowHead);
+    }
+
+    private void updateLineAndArrowHead() {
+        LineCoordinates lineCr = getNodeEdgePoints(from.getAbsoluteCentrePosX(), from.getAbsoluteCentrePosY(),
+                to.getAbsoluteCentrePosX(), to.getAbsoluteCentrePosY());
+
+        line.setStartX(lineCr.getStartX());
+        line.setStartY(lineCr.getStartY());
+        line.setEndX(lineCr.getEndX());
+        line.setEndY(lineCr.getEndY());
+
+        if (arrowHead == null) {
+            arrowHead = createArrowhead(lineCr.startX, lineCr.startY, lineCr.getEndX(), lineCr.getEndY());
+        } else {
+            updateArrowHead(lineCr.startX, lineCr.startY, lineCr.getEndX(), lineCr.getEndY());
+        }
     }
 
     private LineCoordinates getNodeEdgePoints(double startX, double startY, double endX, double endY) {
@@ -49,7 +64,7 @@ public class Arrow extends Line {
         double newDiffX = Math.sin(angle1) * (double) MainController.NODE_RADIUS;
         double newDiffY = Math.cos(angle1) * (double) MainController.NODE_RADIUS;
 
-        if (startX > endX && startY > endY || startX < endX && startY > endY) {
+        if (startX >= endX && startY > endY || startX < endX && startY >= endY) {
             newDiffX = -newDiffX;
             newDiffY = -newDiffY;
         }
@@ -85,25 +100,18 @@ public class Arrow extends Line {
         return arrowhead;
     }
 
+    private void updateArrowHead(double startX, double startY, double endX, double endY) {
+        ArrowHeadPoints arrowHeadPoints = getArrowHeadPoints(startX, startY, endX, endY);
+        arrowHead.getPoints().setAll(
+                endX, endY,
+                arrowHeadPoints.getSecondPointX(), arrowHeadPoints.getSecondPointY(),
+                arrowHeadPoints.getThirdPointX(), arrowHeadPoints.getThirdPointY()
+        );
+    }
+
 
     public void move() {
-        // move arrow
-        LineCoordinates lineCoordinates = getNodeEdgePoints(this.from.getAbsoluteCentrePosX(), this.from.getAbsoluteCentrePosY(),
-                this.to.getAbsoluteCentrePosX(), this.to.getAbsoluteCentrePosY());
-        super.setStartX(lineCoordinates.getStartX());
-        super.setStartY(lineCoordinates.getStartY());
-        super.setEndX(lineCoordinates.getEndX());
-        super.setEndY(lineCoordinates.getEndY());
-
-        // move arrow head
-        ArrowHeadPoints arrowHeadPoints = getArrowHeadPoints(lineCoordinates.getStartX(), lineCoordinates.getStartY(),
-                lineCoordinates.getEndX(), lineCoordinates.getEndY());
-        this.arrowHead.getPoints().set(0, arrowHeadPoints.getFirstPointX());
-        this.arrowHead.getPoints().set(1, arrowHeadPoints.getFirstPointY());
-        this.arrowHead.getPoints().set(2, arrowHeadPoints.getSecondPointX());
-        this.arrowHead.getPoints().set(3, arrowHeadPoints.getSecondPointY());
-        this.arrowHead.getPoints().set(4, arrowHeadPoints.getThirdPointX());
-        this.arrowHead.getPoints().set(5, arrowHeadPoints.getThirdPointY());
+        updateLineAndArrowHead();
     }
 
 

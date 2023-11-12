@@ -1,5 +1,6 @@
 package com.example.bakalar.canvas;
 
+import com.example.bakalar.utils.State;
 import javafx.scene.Node;
 import javafx.scene.layout.AnchorPane;
 import lombok.Getter;
@@ -36,7 +37,9 @@ public class Board {
         if (node instanceof Arrow arrow) {
             arrows.add(arrow);
         } else if (node instanceof MyNode myNode) {
+            myNode.setName("Q" + nodes.size());
             nodes.add(myNode);
+
         }
         mainPane.getChildren().add(node);
     }
