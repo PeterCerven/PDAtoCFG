@@ -63,9 +63,11 @@ public class MainController {
             log.info("Arrow created: startX:{} startY:{} | finishX:{} finishY:{}",
                     currentNode.getAbsoluteCentrePosX(), currentNode.getAbsoluteCentrePosY(),
                     node.getAbsoluteCentrePosX(), node.getAbsoluteCentrePosY());
-            LineCoordinates lineCoordinates = getEdgePoints(currentNode.getAbsoluteCentrePosX(), currentNode.getAbsoluteCentrePosY(),
-                    node.getAbsoluteCentrePosX(), node.getAbsoluteCentrePosY());
-            Arrow arrow = new Arrow(currentNode, node, lineCoordinates, mainPane);
+            Arrow arrow = new Arrow(currentNode, node, mainPane);
+            arrow.setFrom(currentNode);
+            arrow.setTo(node);
+            currentNode.addArrow(arrow);
+            node.addArrow(arrow);
             makeErasable(arrow);
             currentNode = null;
         } else {
@@ -74,24 +76,6 @@ public class MainController {
         }
     }
 
-    private LineCoordinates getEdgePoints(double startX, double startY, double endX, double endY) {
-        log.info("Start X:{} Y:{}", startX, startY);
-        log.info("End X:{} Y:{}", endX, endY);
-        double side1 = startX - endX;
-        double side2 = startY - endY;
-
-        double angle1 = Math.atan(side1 / side2);
-
-        double newDiffX = Math.sin(angle1) * (double) MainController.NODE_RADIUS;
-        double newDiffY = Math.cos(angle1) * (double) MainController.NODE_RADIUS;
-
-        if (startX > endX && startY > endY || startX < endX && startY > endY) {
-            newDiffX = -newDiffX;
-            newDiffY = -newDiffY;
-        }
-
-        return new LineCoordinates(startX + newDiffX, startY + newDiffY, endX - newDiffX, endY - newDiffY);
-    }
 
     private void makeDraggable(MyNode node) {
         node.setOnMousePressed(e -> {
@@ -103,8 +87,11 @@ public class MainController {
 
         node.setOnMouseDragged(e -> {
             if (selectBtnOn) {
-                node.setTranslateX(e.getSceneX() - startX);
-                node.setTranslateY(e.getSceneY() - startY);
+                double x = e.getSceneX() - startX;
+                double y = e.getSceneY() - startY;
+                node.setTranslateX(x);
+                node.setTranslateY(y);
+                node.moveAllArrows(x, y);
             }
         });
     }
