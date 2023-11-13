@@ -5,16 +5,16 @@ import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.paint.Color;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 
 public class MainController {
 
-    public static final int NODE_RADIUS = 50;
+    public static final int NODE_RADIUS = 30;
     private static final Logger log = LogManager.getLogger(MainController.class.getName());
     @FXML
     private ScrollPane myScrollPane;
@@ -56,11 +56,9 @@ public class MainController {
     }
 
 
-    public void createObject(MouseEvent event) {
-        double x = event.getX();
-        double y = event.getY();
+    public void createNode(MouseEvent event) {
         if (nodeBtnOn) {
-            createNode(x, y);
+            createNode(event.getX(), event.getY());
         }
     }
 
@@ -69,9 +67,7 @@ public class MainController {
             log.info("Arrow created: startX:{} startY:{} | finishX:{} finishY:{}",
                     currentNode.getAbsoluteCentrePosX(), currentNode.getAbsoluteCentrePosY(),
                     node.getAbsoluteCentrePosX(), node.getAbsoluteCentrePosY());
-            Arrow arrow = new Arrow(currentNode, node, board);
-            arrow.setFrom(currentNode);
-            arrow.setTo(node);
+            Arrow arrow = new Arrow(currentNode, node, board, "S", "S", "S");
             currentNode.addArrow(arrow);
             node.addArrow(arrow);
             makeErasable(arrow);
@@ -84,19 +80,24 @@ public class MainController {
 
 
     private void makeDraggable(MyNode node) {
-        node.setOnMousePressed(e -> {
+        node.setOnMousePressed(event -> {
             if (selectBtnOn) {
-                startX = e.getSceneX() - node.getTranslateX();
-                startY = e.getSceneY() - node.getTranslateY();
+                if (event.getButton() == MouseButton.SECONDARY) {
+                    log.info("secondary button");
+                    node.showDialog();
+                } else if (event.getButton() == MouseButton.PRIMARY) {
+                    startX = event.getSceneX() - node.getTranslateX();
+                    startY = event.getSceneY() - node.getTranslateY();
+                }
             }
         });
 
+
+
         node.setOnMouseDragged(e -> {
             if (selectBtnOn) {
-                double x = e.getSceneX() - startX;
-                double y = e.getSceneY() - startY;
-                node.setTranslateX(x);
-                node.setTranslateY(y);
+                node.setTranslateX(e.getSceneX() - startX);
+                node.setTranslateY(e.getSceneY() - startY);
                 node.moveAllArrows();
             }
         });
@@ -121,7 +122,7 @@ public class MainController {
 
     private void createNode(double x, double y) {
         log.info("Node created: X:{} Y:{}", x, y);
-        MyNode myNode = new MyNode(x, y, NODE_RADIUS);
+        MyNode myNode = new MyNode(x, y, NODE_RADIUS, board);
         makeDraggable(myNode);
         makeErasable(myNode);
         enableArrowCreation(myNode);
@@ -130,59 +131,54 @@ public class MainController {
 
     public void resetAll() {
         board.clearBoard();
-        turnOffAll();
+        turnOffAllButtons();
     }
 
 
     public void drawNodeOn() {
         if (nodeBtnOn) {
-            turnOffAll();
+            turnOffAllButtons();
         } else {
-            turnOffAll();
+            turnOffAllButtons();
             nodeBtnOn = true;
             nodeBtn.setText("Vypni");
         }
     }
 
     public void drawArrowOn() {
-        turnOffAll();
+        turnOffAllButtons();
         if (arrowBtnOn) {
-            turnOffAll();
+            turnOffAllButtons();
         } else {
-            turnOffAll();
+            turnOffAllButtons();
             arrowBtnOn = true;
             arrowBtn.setText("Vypni");
         }
     }
 
     public void eraseFunctionOn() {
-        turnOffAll();
+        turnOffAllButtons();
         if (eraseBtnOn) {
-            turnOffAll();
+            turnOffAllButtons();
         } else {
-            turnOffAll();
+            turnOffAllButtons();
             eraseBtnOn = true;
             eraseBtn.setText("Vypni");
         }
     }
 
     public void selectOn() {
-        turnOffAll();
+        turnOffAllButtons();
         if (selectBtnOn) {
-            turnOffAll();
+            turnOffAllButtons();
         } else {
-            turnOffAll();
+            turnOffAllButtons();
             selectBtnOn = true;
             selectBtn.setText("Vypni");
         }
     }
 
-    public void undo() {
-        turnOffAll();
-        // TODO undo
-    }
-
-    private void turnOffAll() {
+    private void turnOffAllButtons() {
         eraseBtnOn = false;
         nodeBtnOn = false;
         arrowBtnOn = false;
@@ -197,5 +193,10 @@ public class MainController {
 
     public void reUndo(ActionEvent actionEvent) {
         // TODO reUndo
+    }
+
+    public void undo() {
+        turnOffAllButtons();
+        // TODO undo
     }
 }

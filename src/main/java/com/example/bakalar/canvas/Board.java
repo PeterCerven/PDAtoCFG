@@ -1,6 +1,5 @@
 package com.example.bakalar.canvas;
 
-import com.example.bakalar.utils.State;
 import javafx.scene.Node;
 import javafx.scene.layout.AnchorPane;
 import lombok.Getter;
@@ -49,8 +48,10 @@ public class Board {
     }
 
 
-
-
-
-
+    public void removeStartingFromOtherNodes() {
+        for (MyNode node : nodes) {
+            node.unSetStarting();
+            node.getStartingCheckBox().setSelected(false);
+        }
+    }
 }

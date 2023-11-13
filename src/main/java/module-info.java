@@ -18,9 +18,6 @@ module com.example.bakalar {
     opens com.example.bakalar.cfg to lombok, javafx.fxml;
     exports com.example.bakalar.cfg;
 
-    opens com.example.bakalar.utils to lombok, javafx.fxml;
-    exports  com.example.bakalar.utils;
-
     opens com.example.bakalar.canvas to lombok, javafx.fxml; // Open the package to Lombok
 
     exports com.example.bakalar.canvas;
