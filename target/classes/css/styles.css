@@ -5,3 +5,9 @@ GridPane {
     -fx-border-radius: 5px;
 }
 
+HBox {
+    -fx-border-color: black;
+    -fx-border-width: 3px;
+    -fx-border-style: solid;
+}
+

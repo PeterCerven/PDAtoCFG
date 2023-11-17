@@ -1,7 +1,6 @@
 package com.example.bakalar.canvas;
 
 import javafx.scene.Group;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
@@ -36,25 +35,42 @@ public class Arrow extends Group {
         this.pop = pop;
         this.push = push;
 
-        line = new Line();
+        createLine();
+        createArrowHead();
+        createSymbolContainer();
 
+        this.getChildren().addAll(line, arrowHead, symbolContainer);
+        board.addObject(this);
+        updateObjects();
+    }
+
+    private void createLine() {
+        line = new Line();
         line.setStrokeType(StrokeType.OUTSIDE);
         line.setStrokeWidth(2);
         line.setStroke(Color.BLACK);
+    }
 
+    private void createArrowHead() {
+        arrowHead = new Polygon();
+        arrowHead.setStroke(Color.BLUE);
+        arrowHead.setStrokeWidth(5);
+    }
+
+    private void createSymbolContainer() {
         symbolContainer = new HBox(5);
         Text readSymbol = new Text(read);
         Text popSymbol = new Text(pop);
         Text pushSymbol = new Text(push);
-
         symbolContainer.getChildren().addAll(readSymbol, popSymbol, pushSymbol);
-        updateLineAndArrowHead();
-        this.getChildren().addAll(line, arrowHead, symbolContainer);
-
-        board.addObject(this);
+        symbolContainer.layoutBoundsProperty().addListener((observable, oldValue, newValue) -> {
+            symbolContainer.setLayoutX(newValue.getWidth());
+            symbolContainer.setLayoutX(newValue.getHeight());
+            updateSymbolContainerPosition();
+        });
     }
 
-    private void updateLineAndArrowHead() {
+    private void updateObjects() {
         LineCoordinates lineCr = getNodeEdgePoints(from.getAbsoluteCentrePosX(), from.getAbsoluteCentrePosY(),
                 to.getAbsoluteCentrePosX(), to.getAbsoluteCentrePosY());
 
@@ -63,32 +79,28 @@ public class Arrow extends Group {
         line.setEndX(lineCr.getEndX());
         line.setEndY(lineCr.getEndY());
 
-        if (arrowHead == null) {
-            arrowHead = createArrowhead(lineCr.startX, lineCr.startY, lineCr.getEndX(), lineCr.getEndY());
-        } else {
-            updateArrowHead(lineCr.startX, lineCr.startY, lineCr.getEndX(), lineCr.getEndY());
-        }
+        log.info("Line Start X:{} Y:{}", line.getStartX(), line.getEndX());
+        log.info("Line End X:{} Y:{}", line.getStartY(), line.getEndY());
+
+        updateArrowHead(lineCr.startX, lineCr.startY, lineCr.getEndX(), lineCr.getEndY());
         updateSymbolContainerPosition();
     }
 
     private void updateSymbolContainerPosition() {
-        log.info("Start X:{} Y:{}", line.getStartX(), line.getEndX());
-        log.info("End X:{} Y:{}", line.getStartY(), line.getEndY());
-        double midX = (line.getStartX() + line.getEndX()) / 2;
-        double midY = (line.getStartY() + line.getEndY()) / 2;
+        double midX = (line.getStartX() + line.getEndX()) / 2.0;
+        double midY = (line.getStartY() + line.getEndY()) / 2.0;
 
-        // Apply rotation to the container
-        double deltaX = line.getEndX() - line.getStartX();
-        double deltaY = line.getEndY() - line.getStartY();
-        double angle = Math.toDegrees(Math.atan2(deltaY, deltaX));
+        // Adjust position to place container above the line
+        symbolContainer.setLayoutX(midX - symbolContainer.getWidth() / 2.0);
+        symbolContainer.setLayoutY(midY - symbolContainer.getHeight()); // 10 is the offset above the line
 
-        // Position the container
-        symbolContainer.setLayoutX(midX - symbolContainer.getWidth() / 2);
-        symbolContainer.setLayoutY(midY - symbolContainer.getHeight() - 10); // 10 is the offset above the line
+        log.info("Symbol X:{} Y:{}", symbolContainer.getLayoutX(), symbolContainer.getLayoutY());
+        // Calculate the angle for rotation
+        double angle = Math.toDegrees(Math.atan2(line.getEndY() - line.getStartY(),
+                line.getEndX() - line.getStartX()));
 
-        // Set pivot points to the center of the container for rotation
-        Rotate rotate = new Rotate(angle, symbolContainer.getWidth() / 2, symbolContainer.getHeight() / 2);
-        symbolContainer.getTransforms().clear();
+        Rotate rotate = new Rotate(angle, 0, 0); // Rotate around the top-left corner of the container
+        symbolContainer.getTransforms().clear(); // Clear any previous transformations
         symbolContainer.getTransforms().add(rotate);
     }
 
@@ -125,22 +137,10 @@ public class Arrow extends Group {
         return new ArrowHeadPoints(endX, endY, x1, y1, x2, y2);
     }
 
-    private Polygon createArrowhead(double startX, double startY, double endX, double endY) {
-        Polygon arrowhead = new Polygon();
-        ArrowHeadPoints arrowHeadPoints = getArrowHeadPoints(startX, startY, endX, endY);
-
-        arrowhead.setStroke(Color.BLUE);
-        arrowhead.setStrokeWidth(5);
-        arrowhead.getPoints().addAll(
-                endX, endY,
-                arrowHeadPoints.getSecondPointX(), arrowHeadPoints.getSecondPointY(),
-                arrowHeadPoints.getThirdPointX(), arrowHeadPoints.getThirdPointY()
-        );
-        return arrowhead;
-    }
 
     private void updateArrowHead(double startX, double startY, double endX, double endY) {
         ArrowHeadPoints arrowHeadPoints = getArrowHeadPoints(startX, startY, endX, endY);
+
         arrowHead.getPoints().setAll(
                 endX, endY,
                 arrowHeadPoints.getSecondPointX(), arrowHeadPoints.getSecondPointY(),
@@ -150,7 +150,7 @@ public class Arrow extends Group {
 
 
     public void move() {
-        updateLineAndArrowHead();
+        updateObjects();
     }
 
 
