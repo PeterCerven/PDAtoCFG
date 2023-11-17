@@ -66,7 +66,7 @@ public class Arrow extends Group {
         symbolContainer.layoutBoundsProperty().addListener((observable, oldValue, newValue) -> {
             symbolContainer.setLayoutX(newValue.getWidth());
             symbolContainer.setLayoutX(newValue.getHeight());
-            updateSymbolContainerPosition();
+            updateSymbolContainerPosition(line.getStartX(), line.getStartY(), line.getEndX(), line.getEndY());
         });
     }
 
@@ -79,28 +79,30 @@ public class Arrow extends Group {
         line.setEndX(lineCr.getEndX());
         line.setEndY(lineCr.getEndY());
 
-        log.info("Line Start X:{} Y:{}", line.getStartX(), line.getEndX());
-        log.info("Line End X:{} Y:{}", line.getStartY(), line.getEndY());
+//        log.info("Line Start X:{} Y:{}", line.getStartX(), line.getEndX());
+//        log.info("Line End X:{} Y:{}", line.getStartY(), line.getEndY());
 
         updateArrowHead(lineCr.startX, lineCr.startY, lineCr.getEndX(), lineCr.getEndY());
-        updateSymbolContainerPosition();
+        updateSymbolContainerPosition(lineCr.startX, lineCr.startY, lineCr.getEndX(), lineCr.getEndY());
     }
 
-    private void updateSymbolContainerPosition() {
-        double midX = (line.getStartX() + line.getEndX()) / 2.0;
-        double midY = (line.getStartY() + line.getEndY()) / 2.0;
+    private void updateSymbolContainerPosition(double startX, double startY, double endX, double endY) {
+        double midX = (startX + endX) / 2.0;
+        double midY = (startY + endY) / 2.0;
 
         // Adjust position to place container above the line
-        symbolContainer.setLayoutX(midX - symbolContainer.getWidth() / 2.0);
-        symbolContainer.setLayoutY(midY - symbolContainer.getHeight()); // 10 is the offset above the line
+        double offsetX = -symbolContainer.getWidth() / 2.0;
+        double offsetY = -symbolContainer.getHeight(); // 10 is the offset above the line
 
-        log.info("Symbol X:{} Y:{}", symbolContainer.getLayoutX(), symbolContainer.getLayoutY());
+        symbolContainer.setLayoutX(midX + offsetX);
+        symbolContainer.setLayoutY(midY + offsetY);
+
         // Calculate the angle for rotation
-        double angle = Math.toDegrees(Math.atan2(line.getEndY() - line.getStartY(),
-                line.getEndX() - line.getStartX()));
+        double angle = Math.toDegrees(Math.atan2(endY - startY, endX - startX));
 
-        Rotate rotate = new Rotate(angle, 0, 0); // Rotate around the top-left corner of the container
-        symbolContainer.getTransforms().clear(); // Clear any previous transformations
+        // Rotate around the center of the container
+        Rotate rotate = new Rotate(angle, symbolContainer.getWidth() / 2.0, symbolContainer.getHeight());
+        symbolContainer.getTransforms().clear();
         symbolContainer.getTransforms().add(rotate);
     }
 
