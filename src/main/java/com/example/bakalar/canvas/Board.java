@@ -50,6 +50,12 @@ public class Board {
         mainPane.getChildren().add(node);
     }
 
+    public void unSelectAllNodes() {
+        for (MyNode node : nodes) {
+            node.unselectNode();
+        }
+    }
+
     public void clearBoard() {
         mainPane.getChildren().clear();
     }

@@ -51,6 +51,16 @@ public class MyNode extends Group {
         this.board = board;
     }
 
+    public void selectNode() {
+        this.selected = true;
+        this.circle.setFill(Color.BLUE);
+    }
+
+    public void unselectNode() {
+        this.selected = false;
+        this.circle.setFill(Color.WHITE);
+    }
+
 
     public double getAbsoluteCentrePosX() {
         return this.circle.getCenterX() + this.getTranslateX();

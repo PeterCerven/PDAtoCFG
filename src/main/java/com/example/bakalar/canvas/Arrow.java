@@ -1,6 +1,10 @@
 package com.example.bakalar.canvas;
 
 import javafx.scene.Group;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
@@ -13,11 +17,14 @@ import lombok.Setter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.Optional;
+
 @Getter
 @Setter
 public class Arrow extends Group {
     private static final Logger log = LogManager.getLogger(Arrow.class.getName());
     public static int ARROW_HEAD_SZIE = 20;
+    private static final String LAMDA = "λ";
     private MyNode from;
     private MyNode to;
     private Line line;
@@ -28,12 +35,14 @@ public class Arrow extends Group {
     private HBox symbolContainer;
 
 
-    public Arrow(MyNode from, MyNode to, Board board, String read, String pop, String push) {
+    public Arrow(MyNode from, MyNode to, Board board) {
         this.from = from;
         this.to = to;
-        this.read = read;
-        this.pop = pop;
-        this.push = push;
+        this.read = LAMDA;
+        this.pop = LAMDA;
+        this.push = LAMDA;
+
+        createTransitions();
 
         createLine();
         createArrowHead();
@@ -155,5 +164,43 @@ public class Arrow extends Group {
         updateObjects();
     }
 
+    public void createTransitions() {
+        Dialog<ButtonType> dialog = new Dialog<>();
+        dialog.setTitle("Custom Dialog");
+        dialog.setHeaderText("Enter Three Values");
+
+        // Add buttons
+        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+
+        // Create the input fields
+        TextField input1 = new TextField();
+        input1.setPromptText("Read");
+        TextField input2 = new TextField();
+        input2.setPromptText("Pop");
+        TextField input3 = new TextField();
+        input3.setPromptText("Push");
+
+        // Layout the dialog's fields
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.add(input1, 0, 0);
+        grid.add(input2, 0, 1);
+        grid.add(input3, 0, 2);
+
+        dialog.getDialogPane().setContent(grid);
+
+        Optional<ButtonType> result = dialog.showAndWait();
+        result.ifPresent(buttonType -> {
+            if (buttonType == ButtonType.OK) {
+                this.read = input1.getText();
+                this.pop = input2.getText();
+                this.push = input3.getText();
+            }
+        });
+    }
 
 }
+
+
+

@@ -67,14 +67,16 @@ public class MainController {
             log.info("Arrow created: startX:{} startY:{} | finishX:{} finishY:{}",
                     currentNode.getAbsoluteCentrePosX(), currentNode.getAbsoluteCentrePosY(),
                     node.getAbsoluteCentrePosX(), node.getAbsoluteCentrePosY());
-            Arrow arrow = new Arrow(currentNode, node, board, "S", "S", "S");
+            Arrow arrow = new Arrow(currentNode, node, board);
             currentNode.addArrow(arrow);
             node.addArrow(arrow);
             makeErasable(arrow);
+            currentNode.unselectNode();
             currentNode = null;
         } else {
             log.info("Starting point for arrow");
             currentNode = node;
+            node.selectNode();
         }
     }
 
@@ -91,8 +93,6 @@ public class MainController {
                 }
             }
         });
-
-
 
         node.setOnMouseDragged(e -> {
             if (selectBtnOn) {
