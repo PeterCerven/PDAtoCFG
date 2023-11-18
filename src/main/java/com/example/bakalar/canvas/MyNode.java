@@ -26,11 +26,16 @@ public class MyNode extends Group {
     private CheckBox startingCheckBox;
     private CheckBox endingCheckBox;
     private Board board;
+    private StartNodeArrow startNodeArrow;
+    private EndNode endNode;
 
     public MyNode(double x, double y, double radius, Board board) {
         circle = new Circle(x, y, radius);
         circle.setFill(Color.WHITE);
         circle.setStroke(Color.BLACK);
+
+        endNode = new EndNode(x, y, radius);
+        endNode.setVisible(false);
 
         this.startingCheckBox = new CheckBox("Starting Node");
         this.endingCheckBox = new CheckBox("End Node");
@@ -40,7 +45,8 @@ public class MyNode extends Group {
         nameText.setX(circle.getCenterX() - nameText.getBoundsInLocal().getWidth() / 2);
         nameText.setY(circle.getCenterY() + nameText.getBoundsInLocal().getHeight() / 4);
 
-        this.getChildren().addAll(circle, nameText);
+
+        this.getChildren().addAll(circle, endNode, nameText);
         this.arrows = new ArrayList<>();
         this.board = board;
     }
@@ -54,11 +60,6 @@ public class MyNode extends Group {
         return this.circle.getCenterY() + this.getTranslateY();
     }
 
-    public void moveAllArrows() {
-        for (Arrow arrow : arrows) {
-            arrow.move();
-        }
-    }
 
     public void addArrow(Arrow arrow) {
         this.arrows.add(arrow);
@@ -74,34 +75,23 @@ public class MyNode extends Group {
     private void setStarting() {
         this.setStarting(true);
         this.startingCheckBox.setSelected(true);
-        circle.setFill(Color.YELLOW);
-        if (ending) {
-            circle.setFill(Color.RED);
-        }
+        this.startNodeArrow.moveStartArrow(getAbsoluteCentrePosX(), getAbsoluteCentrePosY(), this.circle.getRadius());
     }
 
     public void unSetStarting() {
         this.setStarting(false);
-        circle.setFill(Color.WHITE);
-        if (ending) {
-            circle.setFill(Color.BLUE);
-        }
+        this.startNodeArrow = null;
+
     }
 
     private void setEnding() {
         this.setEnding(true);
-        circle.setFill(Color.BLUE);
-        if (starting) {
-            circle.setFill(Color.RED);
-        }
+        endNode.setVisible(true);
     }
 
     private void unSetEnding() {
         this.setEnding(false);
-        circle.setFill(Color.WHITE);
-        if (starting) {
-            circle.setFill(Color.YELLOW);
-        }
+        endNode.setVisible(false);
     }
 
     public void showDialog() {
@@ -123,7 +113,7 @@ public class MyNode extends Group {
         result.ifPresent(buttonType -> {
             if (buttonType == ButtonType.OK) {
                 if (startingCheckBox.isSelected()) {
-                    board.removeStartingFromOtherNodes();
+                    this.startNodeArrow = board.removeStartingFromOtherNodes();
                     setStarting();
                 } else {
                     unSetStarting();
@@ -135,5 +125,17 @@ public class MyNode extends Group {
                 }
             }
         });
+    }
+
+    public void move(double x, double y) {
+        this.setTranslateX(x);
+        this.setTranslateY(y);
+        for (Arrow arrow : arrows) {
+            arrow.move();
+        }
+        if (startNodeArrow != null) {
+            startNodeArrow.moveStartArrow(getAbsoluteCentrePosX(), getAbsoluteCentrePosY(), this.getCircle().getRadius());
+        }
+        this.endNode.moveEndNode(this.circle.getCenterX(), this.circle.getCenterY());
     }
 }

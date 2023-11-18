@@ -13,15 +13,22 @@ import java.util.List;
 public class Board {
     private List<MyNode> nodes;
     private List<Arrow> arrows;
+    private List<EndNode> endNodes;
     private MyNode startNode;
     private MyNode endNode;
     private AnchorPane mainPane;
+    private StartNodeArrow startNodeArrow;
 
     public Board(AnchorPane mainPane) {
         this.nodes = new ArrayList<>();
         this.arrows = new ArrayList<>();
         this.mainPane = mainPane;
+        this.startNodeArrow = new StartNodeArrow(0,0,0);
+        this.addObject(startNodeArrow);
+        this.startNodeArrow.setVisible(false);
+        this.endNodes = new ArrayList<>();
     }
+
 
     public void removeObject(Node node) {
         if (node instanceof Arrow arrow) {
@@ -48,10 +55,12 @@ public class Board {
     }
 
 
-    public void removeStartingFromOtherNodes() {
+    public StartNodeArrow removeStartingFromOtherNodes() {
         for (MyNode node : nodes) {
             node.unSetStarting();
             node.getStartingCheckBox().setSelected(false);
         }
+        this.startNodeArrow.setVisible(true);
+        return this.startNodeArrow;
     }
 }

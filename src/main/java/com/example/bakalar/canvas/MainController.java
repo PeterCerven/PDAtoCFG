@@ -96,9 +96,7 @@ public class MainController {
 
         node.setOnMouseDragged(e -> {
             if (selectBtnOn) {
-                node.setTranslateX(e.getSceneX() - startX);
-                node.setTranslateY(e.getSceneY() - startY);
-                node.moveAllArrows();
+                node.move(e.getSceneX() - startX, e.getSceneY() - startY);
             }
         });
     }
