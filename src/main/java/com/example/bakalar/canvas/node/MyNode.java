@@ -1,5 +1,7 @@
-package com.example.bakalar.canvas;
+package com.example.bakalar.canvas.node;
 
+import com.example.bakalar.canvas.Board;
+import com.example.bakalar.canvas.arrow.Arrow;
 import javafx.geometry.Insets;
 import javafx.scene.Group;
 import javafx.scene.control.*;

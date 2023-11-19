@@ -21,4 +21,8 @@ module com.example.bakalar {
     opens com.example.bakalar.canvas to lombok, javafx.fxml; // Open the package to Lombok
 
     exports com.example.bakalar.canvas;
+    exports com.example.bakalar.canvas.arrow;
+    opens com.example.bakalar.canvas.arrow to javafx.fxml, lombok;
+    exports com.example.bakalar.canvas.node;
+    opens com.example.bakalar.canvas.node to javafx.fxml, lombok;
 }

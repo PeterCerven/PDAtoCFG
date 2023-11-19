@@ -1,4 +1,4 @@
-package com.example.bakalar.canvas;
+package com.example.bakalar.canvas.node;
 
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;

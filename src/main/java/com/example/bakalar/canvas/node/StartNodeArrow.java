@@ -1,4 +1,4 @@
-package com.example.bakalar.canvas;
+package com.example.bakalar.canvas.node;
 
 import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;

@@ -1,4 +1,4 @@
-package com.example.bakalar.canvas;
+package com.example.bakalar.canvas.arrow;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

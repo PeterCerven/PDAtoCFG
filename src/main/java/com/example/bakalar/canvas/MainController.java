@@ -1,5 +1,9 @@
 package com.example.bakalar.canvas;
 
+import com.example.bakalar.canvas.arrow.Arrow;
+import com.example.bakalar.canvas.arrow.LineArrow;
+import com.example.bakalar.canvas.arrow.SelfLoopArrow;
+import com.example.bakalar.canvas.node.MyNode;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -63,11 +67,16 @@ public class MainController {
     }
 
     private void createArrow(MyNode node) {
-        if (currentNode != null && currentNode != node) {
+        if (currentNode != null) {
             log.info("Arrow created: startX:{} startY:{} | finishX:{} finishY:{}",
                     currentNode.getAbsoluteCentrePosX(), currentNode.getAbsoluteCentrePosY(),
                     node.getAbsoluteCentrePosX(), node.getAbsoluteCentrePosY());
-            Arrow arrow = new Arrow(currentNode, node, board);
+            Arrow arrow;
+            if (currentNode == node) {
+                arrow = new SelfLoopArrow(currentNode, node, board);
+            } else {
+                arrow = new LineArrow(currentNode, node, board);
+            }
             currentNode.addArrow(arrow);
             node.addArrow(arrow);
             makeErasable(arrow);
