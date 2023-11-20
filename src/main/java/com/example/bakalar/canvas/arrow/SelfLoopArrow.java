@@ -6,6 +6,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Arc;
 import javafx.scene.shape.ArcType;
+import javafx.scene.shape.Circle;
 import javafx.scene.shape.StrokeType;
 import javafx.scene.text.Text;
 import javafx.scene.transform.Rotate;
@@ -77,7 +78,7 @@ public class SelfLoopArrow extends Arrow {
         double startY = arc.getCenterY() + arc.getRadiusY() * Math.sin(startAngleRadians);
 
         // Arrowhead size parameters
-        double arrowHeadLength = 8; // Length of the arrowhead sides
+        double arrowHeadLength = 4; // Length of the arrowhead sides
         double arrowHeadAngle = Math.toRadians(30); // Angle at the arrowhead tip
 
         // Calculate the angle towards the node from the start of the arc
@@ -85,8 +86,8 @@ public class SelfLoopArrow extends Arrow {
 
         // Calculate the intersection point with the node's circumference
         double radius = from.getCircle().getRadius();
-        double intersectX = from.getAbsoluteCentrePosX() + radius * Math.cos(angleToNode);
-        double intersectY = from.getAbsoluteCentrePosY() + radius * Math.sin(angleToNode);
+        double intersectX = from.getAbsoluteCentrePosX() + (radius + 2) * Math.cos(angleToNode);
+        double intersectY = from.getAbsoluteCentrePosY() + (radius + 4) * Math.sin(angleToNode);
 
         // Adjust the arrowhead position to the intersection point
 
@@ -98,13 +99,14 @@ public class SelfLoopArrow extends Arrow {
 
         // Update the arrowhead polygon points
         arrowHead = super.getArrowHead();
+        arrowHead.setStrokeType(StrokeType.OUTSIDE);
         arrowHead.getPoints().setAll(
                 intersectX, intersectY,            // Tip of the arrowhead (intersection point)
                 baseLeftX, baseLeftY,  // Left base point
                 baseRightX, baseRightY // Right base point
         );
 
-        double angleToNodeDegrees = Math.toDegrees(angleToNode) - 90;
+        double angleToNodeDegrees = Math.toDegrees(angleToNode) + 20;
         arrowHead.setRotate(angleToNodeDegrees);
 
         // Translate the arrowhead to the intersection position

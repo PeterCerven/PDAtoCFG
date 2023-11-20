@@ -51,7 +51,7 @@ public abstract class Arrow extends Group {
     private void createArrowHead() {
         arrowHead = new Polygon();
         arrowHead.setStroke(Color.BLUE);
-        arrowHead.setStrokeWidth(5);
+        arrowHead.setStrokeWidth(3);
     }
 
     protected void createSymbolContainer() {
@@ -80,8 +80,8 @@ public abstract class Arrow extends Group {
 
         double angle1 = Math.atan(side1 / side2);
 
-        double newDiffX = Math.sin(angle1) * (double) (MainController.NODE_RADIUS + 3);
-        double newDiffY = Math.cos(angle1) * (double) (MainController.NODE_RADIUS + 3);
+        double newDiffX = Math.sin(angle1) * (double) (MainController.NODE_RADIUS);
+        double newDiffY = Math.cos(angle1) * (double) (MainController.NODE_RADIUS);
 
         if (startX >= endX && startY >= endY || startX < endX && startY >= endY) {
             newDiffX = -newDiffX;
