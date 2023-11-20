@@ -7,6 +7,8 @@ import javafx.scene.Group;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.TextField;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
@@ -60,6 +62,11 @@ public abstract class Arrow extends Group {
         Text popSymbol = new Text(pop);
         Text pushSymbol = new Text(push);
         symbolContainer.getChildren().addAll(readSymbol, popSymbol, pushSymbol);
+        symbolContainer.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
+            if (event.getButton() == MouseButton.SECONDARY) {
+                createTransitions();
+            }
+        });
         symbolContainer.layoutBoundsProperty().addListener((observable, oldValue, newValue) -> {
             symbolContainer.setLayoutX(newValue.getWidth());
             symbolContainer.setLayoutX(newValue.getHeight());
@@ -142,6 +149,9 @@ public abstract class Arrow extends Group {
                 this.read = input1.getText();
                 this.pop = input2.getText();
                 this.push = input3.getText();
+                if (symbolContainer != null) {
+                    this.symbolContainer.getChildren().setAll(new Text(read), new Text(pop), new Text(push));
+                }
             }
         });
     }
