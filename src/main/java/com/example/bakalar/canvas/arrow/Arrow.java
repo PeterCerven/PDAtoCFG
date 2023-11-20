@@ -146,9 +146,9 @@ public abstract class Arrow extends Group {
         Optional<ButtonType> result = dialog.showAndWait();
         result.ifPresent(buttonType -> {
             if (buttonType == ButtonType.OK) {
-                this.read = input1.getText();
-                this.pop = input2.getText();
-                this.push = input3.getText();
+                this.read = input1.getText().isBlank() ? LAMDA : input1.getText();
+                this.pop = input2.getText().isBlank() ? LAMDA : input2.getText();
+                this.push = input3.getText().isBlank() ? LAMDA : input3.getText();
                 if (symbolContainer != null) {
                     this.symbolContainer.getChildren().setAll(new Text(read), new Text(pop), new Text(push));
                 }

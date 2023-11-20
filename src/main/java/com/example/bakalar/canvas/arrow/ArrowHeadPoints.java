@@ -14,6 +14,4 @@ public class ArrowHeadPoints {
     private double secondPointY;
     private double thirdPointX;
     private double thirdPointY;
-
-
 }

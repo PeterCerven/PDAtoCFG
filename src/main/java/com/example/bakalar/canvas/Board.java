@@ -22,6 +22,7 @@ public class Board {
     private MyNode endNode;
     private AnchorPane mainPane;
     private StartNodeArrow startNodeArrow;
+    private int nodeCounter;
 
     public Board(AnchorPane mainPane) {
         this.nodes = new ArrayList<>();
@@ -31,6 +32,7 @@ public class Board {
         this.addObject(startNodeArrow);
         this.startNodeArrow.setVisible(false);
         this.endNodes = new ArrayList<>();
+        this.nodeCounter = 0;
     }
 
 
@@ -47,7 +49,7 @@ public class Board {
         if (node instanceof Arrow arrow) {
             arrows.add(arrow);
         } else if (node instanceof MyNode myNode) {
-            myNode.setName("Q" + nodes.size());
+            myNode.setName("Q" + nodeCounter++);
             nodes.add(myNode);
 
         }

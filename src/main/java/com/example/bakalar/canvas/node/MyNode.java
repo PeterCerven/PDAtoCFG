@@ -108,15 +108,18 @@ public class MyNode extends Group {
 
     public void showDialog() {
         Dialog<ButtonType> dialog = new Dialog<>();
-        dialog.setTitle("Edit Circle");
+        dialog.setTitle("Edit Node");
 
         GridPane gridPane = new GridPane();
         gridPane.setHgap(10);
         gridPane.setVgap(10);
         gridPane.setPadding(new Insets(20, 150, 10, 10));
 
+        TextField nameField = new TextField(this.getName());
+
         gridPane.add(startingCheckBox, 0, 0);
         gridPane.add(endingCheckBox, 0, 1);
+        gridPane.add(nameField, 0, 2);
 
         dialog.getDialogPane().setContent(gridPane);
         dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
@@ -124,6 +127,7 @@ public class MyNode extends Group {
         Optional<ButtonType> result = dialog.showAndWait();
         result.ifPresent(buttonType -> {
             if (buttonType == ButtonType.OK) {
+                this.setNodeName(nameField.getText());
                 if (startingCheckBox.isSelected()) {
                     this.startNodeArrow = board.removeStartingFromOtherNodes();
                     setStarting();
@@ -137,6 +141,11 @@ public class MyNode extends Group {
                 }
             }
         });
+    }
+
+    private void setNodeName(String text) {
+        this.name = text;
+        this.getNameText().setText(text);
     }
 
     public void move(double x, double y) {

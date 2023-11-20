@@ -61,7 +61,7 @@ public class MainController {
 
 
     public void createNode(MouseEvent event) {
-        if (nodeBtnOn) {
+        if (nodeBtnOn && event.getButton() == MouseButton.PRIMARY) {
             createNode(event.getX(), event.getY());
         }
     }
@@ -111,16 +111,16 @@ public class MainController {
     }
 
     private void enableArrowCreation(MyNode node) {
-        node.setOnMouseClicked(n -> {
-            if (arrowBtnOn) {
+        node.setOnMouseClicked(event -> {
+            if (arrowBtnOn && event.getButton() == MouseButton.PRIMARY) {
                 createArrow(node);
             }
         });
     }
 
     private void makeErasable(Node node) {
-        node.setOnMouseClicked(n -> {
-            if (eraseBtnOn) {
+        node.setOnMouseClicked(event -> {
+            if (eraseBtnOn && event.getButton() == MouseButton.PRIMARY) {
                 board.removeObject(node);
             }
         });
