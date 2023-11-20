@@ -3,20 +3,25 @@ package com.example.bakalar.canvas.arrow;
 import com.example.bakalar.canvas.Board;
 import com.example.bakalar.canvas.node.MyNode;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Line;
+import javafx.scene.shape.Circle;
+import javafx.scene.shape.QuadCurve;
 import javafx.scene.shape.StrokeType;
 import javafx.scene.transform.Rotate;
+import lombok.Getter;
 
+@Getter
 public class LineArrow extends Arrow {
 
-    private Line line;
+    private QuadCurve curve;
+    private Circle controlIndicator;
 
     public LineArrow(MyNode from, MyNode to, Board board) {
         super(from, to, board);
 
         createLine();
         createSymbolContainer();
-        this.getChildren().addAll(line, super.getArrowHead(), super.getSymbolContainer());
+        createControlIndicator();
+        this.getChildren().addAll(curve, super.getArrowHead(), super.getSymbolContainer(), controlIndicator);
         board.addObject(this);
         this.updateObjects();
     }
@@ -26,24 +31,43 @@ public class LineArrow extends Arrow {
         LineCoordinates lineCr = getNodeEdgePoints(from.getAbsoluteCentrePosX(), from.getAbsoluteCentrePosY(),
                 to.getAbsoluteCentrePosX(), to.getAbsoluteCentrePosY());
 
-        line.setStartX(lineCr.getStartX());
-        line.setStartY(lineCr.getStartY());
-        line.setEndX(lineCr.getEndX());
-        line.setEndY(lineCr.getEndY());
+
+        double controlX = (lineCr.getStartX() + lineCr.getEndX()) / 2.0;
+        double controlY = (lineCr.getStartY() + lineCr.getEndY()) / 2.0;
+
+
+        curve.setStartX(lineCr.getStartX());
+        curve.setStartY(lineCr.getStartY());
+        curve.setControlX(controlX);
+        curve.setControlY(controlY);
+        curve.setEndX(lineCr.getEndX());
+        curve.setEndY(lineCr.getEndY());
+        curve.setTranslateZ(140);
 
 //        log.info("Line Start X:{} Y:{}", line.getStartX(), line.getEndX());
 //        log.info("Line End X:{} Y:{}", line.getStartY(), line.getEndY());
 
+        updateControlIndicator();
         updateArrowHead();
         updateSymbolContainerPosition();
     }
 
+    private void updateControlIndicator() {
+        this.controlIndicator.setCenterX(curve.getControlX());
+        this.controlIndicator.setCenterY(curve.getControlY());
+    }
+
+    public void moveControlPoint(double controlX, double controlY) {
+        curve.setControlX(controlX);
+        curve.setControlY(controlY);
+    }
+
     @Override
     public void updateArrowHead() {
-        double startX = line.getStartX();
-        double startY = line.getStartY();
-        double endX = line.getEndX();
-        double endY = line.getEndY();
+        double startX = curve.getStartX();
+        double startY = curve.getStartY();
+        double endX = curve.getEndX();
+        double endY = curve.getEndY();
         ArrowHeadPoints arrowHeadPoints = getArrowHeadPoints(startX, startY, endX, endY);
 
         arrowHead.getPoints().setAll(
@@ -55,10 +79,10 @@ public class LineArrow extends Arrow {
 
     @Override
     public void updateSymbolContainerPosition() {
-        double startX = line.getStartX();
-        double startY = line.getStartY();
-        double endX = line.getEndX();
-        double endY = line.getEndY();
+        double startX = curve.getStartX();
+        double startY = curve.getStartY();
+        double endX = curve.getEndX();
+        double endY = curve.getEndY();
 
         double midX = (startX + endX) / 2.0;
         double midY = (startY + endY) / 2.0;
@@ -85,10 +109,15 @@ public class LineArrow extends Arrow {
     }
 
     private void createLine() {
-        line = new Line();
-        line.setStrokeType(StrokeType.OUTSIDE);
-        line.setStrokeWidth(2);
-        line.setStroke(Color.BLACK);
+        curve = new QuadCurve();
+        curve.setStrokeType(StrokeType.OUTSIDE);
+        curve.setStrokeWidth(2);
+        curve.setFill(Color.TRANSPARENT);
+        curve.setStroke(Color.BLACK);
+    }
+
+    private void createControlIndicator() {
+        controlIndicator = new Circle(5, Color.RED);
     }
 
 }

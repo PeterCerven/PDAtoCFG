@@ -76,6 +76,7 @@ public class MainController {
                 arrow = new SelfLoopArrow(currentNode, node, board);
             } else {
                 arrow = new LineArrow(currentNode, node, board);
+                makeCurveDraggable((LineArrow) arrow);
             }
             currentNode.addArrow(arrow);
             node.addArrow(arrow);
@@ -87,6 +88,23 @@ public class MainController {
             currentNode = node;
             node.selectNode();
         }
+    }
+
+    private void makeCurveDraggable(LineArrow arrow) {
+        arrow.getCurve().setOnMousePressed(event -> {
+            if (selectBtnOn) {
+                if (event.getButton() == MouseButton.PRIMARY) {
+                    startX = event.getSceneX() - arrow.getCurve().getTranslateX();
+                    startY = event.getSceneY() - arrow.getCurve().getTranslateY();
+                }
+            }
+        });
+
+        arrow.getCurve().setOnMouseDragged(e -> {
+            if (selectBtnOn) {
+                arrow.moveControlPoint(e.getSceneX() - startX, e.getSceneY() - startY);
+            }
+        });
     }
 
 

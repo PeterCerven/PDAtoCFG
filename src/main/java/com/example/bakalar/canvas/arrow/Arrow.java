@@ -44,7 +44,7 @@ public abstract class Arrow extends Group {
         this.pop = LAMDA;
         this.push = LAMDA;
         this.board = board;
-        this.setViewOrder(3);
+        this.setViewOrder(1);
         createTransitions();
         createArrowHead();
     }
@@ -149,6 +149,7 @@ public abstract class Arrow extends Group {
                 this.read = input1.getText().isBlank() ? LAMDA : input1.getText();
                 this.pop = input2.getText().isBlank() ? LAMDA : input2.getText();
                 this.push = input3.getText().isBlank() ? LAMDA : input3.getText();
+
                 if (symbolContainer != null) {
                     this.symbolContainer.getChildren().setAll(new Text(read), new Text(pop), new Text(push));
                 }
