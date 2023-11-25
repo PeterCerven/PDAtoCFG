@@ -91,16 +91,18 @@ public class MainController {
     }
 
     private void makeCurveDraggable(LineArrow arrow) {
-        arrow.getCurve().setOnMousePressed(event -> {
+        arrow.getControlIndicator().setOnMousePressed(event -> {
             if (selectBtnOn) {
                 if (event.getButton() == MouseButton.PRIMARY) {
-                    startX = event.getSceneX() - arrow.getCurve().getTranslateX();
-                    startY = event.getSceneY() - arrow.getCurve().getTranslateY();
+                    startX = event.getSceneX() - arrow.getControlIndicator().getTranslateX();
+                    startY = event.getSceneY() - arrow.getControlIndicator().getTranslateY();
+                } else if (event.getButton() == MouseButton.SECONDARY) {
+                    arrow.resetControlPoint();
                 }
             }
         });
 
-        arrow.getCurve().setOnMouseDragged(e -> {
+        arrow.getControlIndicator().setOnMouseDragged(e -> {
             if (selectBtnOn) {
                 arrow.moveControlPoint(e.getSceneX() - startX, e.getSceneY() - startY);
             }

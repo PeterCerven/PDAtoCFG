@@ -33,8 +33,8 @@ public abstract class Arrow extends Group {
     protected String pop;
     protected String push;
     protected HBox symbolContainer;
-    private Board board;
     protected Polygon arrowHead;
+    private Board board;
 
 
     public Arrow(MyNode from, MyNode to, Board board) {
@@ -87,8 +87,8 @@ public abstract class Arrow extends Group {
 
         double angle1 = Math.atan(side1 / side2);
 
-        double newDiffX = Math.sin(angle1) * (double) (MainController.NODE_RADIUS);
-        double newDiffY = Math.cos(angle1) * (double) (MainController.NODE_RADIUS);
+        double newDiffX = Math.sin(angle1) * (double) (MainController.NODE_RADIUS - 1);
+        double newDiffY = Math.cos(angle1) * (double) (MainController.NODE_RADIUS - 1);
 
         if (startX >= endX && startY >= endY || startX < endX && startY >= endY) {
             newDiffX = -newDiffX;

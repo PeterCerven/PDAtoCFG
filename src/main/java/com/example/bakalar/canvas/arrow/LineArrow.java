@@ -12,8 +12,10 @@ import lombok.Getter;
 @Getter
 public class LineArrow extends Arrow {
 
-    private QuadCurve curve;
+    private QuadCurve line;
     private Circle controlIndicator;
+    private double controlX;
+    private double controlY;
 
     public LineArrow(MyNode from, MyNode to, Board board) {
         super(from, to, board);
@@ -21,9 +23,19 @@ public class LineArrow extends Arrow {
         createLine();
         createSymbolContainer();
         createControlIndicator();
-        this.getChildren().addAll(curve, super.getArrowHead(), super.getSymbolContainer(), controlIndicator);
+        createControlPoint();
+        this.getChildren().addAll(line, super.getArrowHead(), super.getSymbolContainer(), controlIndicator);
         board.addObject(this);
         this.updateObjects();
+    }
+
+    private void createControlPoint() {
+        LineCoordinates lineCr = getNodeEdgePoints(from.getAbsoluteCentrePosX(), from.getAbsoluteCentrePosY(),
+                to.getAbsoluteCentrePosX(), to.getAbsoluteCentrePosY());
+        this.controlX = (lineCr.getStartX() + lineCr.getEndX()) / 2.0;
+        this.controlY = (lineCr.getStartY() + lineCr.getEndY()) / 2.0;
+        this.line.setControlX(controlX);
+        this.line.setControlY(controlY);
     }
 
     @Override
@@ -31,43 +43,46 @@ public class LineArrow extends Arrow {
         LineCoordinates lineCr = getNodeEdgePoints(from.getAbsoluteCentrePosX(), from.getAbsoluteCentrePosY(),
                 to.getAbsoluteCentrePosX(), to.getAbsoluteCentrePosY());
 
+        this.controlX = (lineCr.getStartX() + lineCr.getEndX()) / 2.0;
+        this.controlY = (lineCr.getStartY() + lineCr.getEndY()) / 2.0;
 
-        double controlX = (lineCr.getStartX() + lineCr.getEndX()) / 2.0;
-        double controlY = (lineCr.getStartY() + lineCr.getEndY()) / 2.0;
+        line.setStartX(lineCr.getStartX());
+        line.setStartY(lineCr.getStartY());
+        this.line.setControlX(controlX);
+        this.line.setControlY(controlY);
+        line.setEndX(lineCr.getEndX());
+        line.setEndY(lineCr.getEndY());
 
-
-        curve.setStartX(lineCr.getStartX());
-        curve.setStartY(lineCr.getStartY());
-        curve.setControlX(controlX);
-        curve.setControlY(controlY);
-        curve.setEndX(lineCr.getEndX());
-        curve.setEndY(lineCr.getEndY());
-        curve.setTranslateZ(140);
 
 //        log.info("Line Start X:{} Y:{}", line.getStartX(), line.getEndX());
 //        log.info("Line End X:{} Y:{}", line.getStartY(), line.getEndY());
 
-        updateControlIndicator();
+        updateControlIndicator(controlX, controlY);
         updateArrowHead();
         updateSymbolContainerPosition();
     }
 
-    private void updateControlIndicator() {
-        this.controlIndicator.setCenterX(curve.getControlX());
-        this.controlIndicator.setCenterY(curve.getControlY());
+    private void updateControlIndicator(double controlX, double controlY) {
+        this.controlIndicator.setTranslateX(controlX);
+        this.controlIndicator.setTranslateY(controlY);
     }
 
     public void moveControlPoint(double controlX, double controlY) {
-        curve.setControlX(controlX);
-        curve.setControlY(controlY);
+        updateControlIndicator(controlX, controlY);
+        this.controlX = controlX;
+        this.controlY = controlY;
+        this.line.setControlX(controlX);
+        this.line.setControlY(controlY);
+        updateArrowHead();
+        updateSymbolContainerPosition();
     }
 
     @Override
     public void updateArrowHead() {
-        double startX = curve.getStartX();
-        double startY = curve.getStartY();
-        double endX = curve.getEndX();
-        double endY = curve.getEndY();
+        double startX = line.getStartX();
+        double startY = line.getStartY();
+        double endX = line.getEndX();
+        double endY = line.getEndY();
         ArrowHeadPoints arrowHeadPoints = getArrowHeadPoints(startX, startY, endX, endY);
 
         arrowHead.getPoints().setAll(
@@ -79,13 +94,14 @@ public class LineArrow extends Arrow {
 
     @Override
     public void updateSymbolContainerPosition() {
-        double startX = curve.getStartX();
-        double startY = curve.getStartY();
-        double endX = curve.getEndX();
-        double endY = curve.getEndY();
+        double startX = line.getStartX();
+        double startY = line.getStartY();
+        double endX = line.getEndX();
+        double endY = line.getEndY();
 
+        double highestY = findHighestPointY(startX, startY, controlX, controlY, endX, endY);
         double midX = (startX + endX) / 2.0;
-        double midY = (startY + endY) / 2.0;
+        double midY = highestY;
 
         // Adjust position to place container above the line
         double offsetX = -symbolContainer.getWidth() / 2.0;
@@ -103,21 +119,45 @@ public class LineArrow extends Arrow {
         symbolContainer.getTransforms().add(rotate);
     }
 
+    private double findHighestPointY(double startX, double startY, double controlX, double controlY, double endX, double endY) {
+        // Calculate the t value at which the derivative of y-coordinate is zero
+        double t = (startY - controlY) / (startY - 2 * controlY + endY);
+
+        // Check if t is within the valid range
+        if (t < 0 || t > 1) {
+            // The highest point is one of the end points
+            return Math.min(startY, endY);
+        }
+
+        // Calculate the y-coordinate of the highest point using the Bezier curve equation
+        return Math.pow(1 - t, 2) * startY + 2 * (1 - t) * t * controlY + Math.pow(t, 2) * endY;
+    }
+
+
     @Override
     public void move() {
         this.updateObjects();
     }
 
     private void createLine() {
-        curve = new QuadCurve();
-        curve.setStrokeType(StrokeType.OUTSIDE);
-        curve.setStrokeWidth(2);
-        curve.setFill(Color.TRANSPARENT);
-        curve.setStroke(Color.BLACK);
+        line = new QuadCurve();
+        line.setStrokeType(StrokeType.OUTSIDE);
+        line.setStrokeWidth(2);
+        line.setFill(Color.TRANSPARENT);
+        line.setStroke(Color.BLACK);
+    }
+
+    public void resetControlPoint() {
+        LineCoordinates lineCr = getNodeEdgePoints(from.getAbsoluteCentrePosX(), from.getAbsoluteCentrePosY(),
+                to.getAbsoluteCentrePosX(), to.getAbsoluteCentrePosY());
+        this.controlX = (lineCr.getStartX() + lineCr.getEndX()) / 2.0;
+        this.controlY = (lineCr.getStartY() + lineCr.getEndY()) / 2.0;
+        moveControlPoint(controlX, controlY);
     }
 
     private void createControlIndicator() {
-        controlIndicator = new Circle(5, Color.RED);
+        controlIndicator = new Circle(5, Color.WHITE);
+        controlIndicator.setStroke(Color.BLACK);
     }
 
 }
