@@ -19,6 +19,8 @@ import lombok.Setter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Getter
@@ -32,7 +34,7 @@ public abstract class Arrow extends Group {
     protected String read;
     protected String pop;
     protected String push;
-    protected HBox symbolContainer;
+    protected List<HBox> symbolContainers;
     protected Polygon arrowHead;
     private Board board;
 
@@ -44,8 +46,8 @@ public abstract class Arrow extends Group {
         this.pop = LAMDA;
         this.push = LAMDA;
         this.board = board;
+        this.symbolContainers = new ArrayList<>();
         this.setViewOrder(1);
-        createTransitions();
         createArrowHead();
     }
 
@@ -56,22 +58,23 @@ public abstract class Arrow extends Group {
         arrowHead.setStrokeWidth(3);
     }
 
-    protected void createSymbolContainer() {
-        symbolContainer = new HBox(5);
+    public void addSymbolContainer() {
+        HBox container = new HBox(5);
         Text readSymbol = new Text(read);
         Text popSymbol = new Text(pop);
         Text pushSymbol = new Text(push);
-        symbolContainer.getChildren().addAll(readSymbol, popSymbol, pushSymbol);
-        symbolContainer.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
+        container.getChildren().addAll(readSymbol, popSymbol, pushSymbol);
+        container.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
             if (event.getButton() == MouseButton.SECONDARY) {
-                createTransitions();
+                createTransitions(container);
             }
         });
-        symbolContainer.layoutBoundsProperty().addListener((observable, oldValue, newValue) -> {
-            symbolContainer.setLayoutX(newValue.getWidth());
-            symbolContainer.setLayoutX(newValue.getHeight());
+        container.layoutBoundsProperty().addListener((observable, oldValue, newValue) -> {
+            container.setLayoutX(newValue.getWidth());
+            container.setLayoutX(newValue.getHeight());
             updateSymbolContainerPosition();
         });
+        this.symbolContainers.add(container);
     }
 
     public abstract void updateObjects();
@@ -117,7 +120,7 @@ public abstract class Arrow extends Group {
 
     public abstract void move();
 
-    public void createTransitions() {
+    public void createTransitions(HBox container) {
         Dialog<ButtonType> dialog = new Dialog<>();
         dialog.setTitle("Custom Dialog");
         dialog.setHeaderText("Enter Three Values");
@@ -150,8 +153,8 @@ public abstract class Arrow extends Group {
                 this.pop = input2.getText().isBlank() ? LAMDA : input2.getText();
                 this.push = input3.getText().isBlank() ? LAMDA : input3.getText();
 
-                if (symbolContainer != null) {
-                    this.symbolContainer.getChildren().setAll(new Text(read), new Text(pop), new Text(push));
+                if (container != null) {
+                    container.getChildren().setAll(new Text(read), new Text(pop), new Text(push));
                 }
             }
         });

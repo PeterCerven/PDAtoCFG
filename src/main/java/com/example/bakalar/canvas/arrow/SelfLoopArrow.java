@@ -6,10 +6,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Arc;
 import javafx.scene.shape.ArcType;
-import javafx.scene.shape.Circle;
 import javafx.scene.shape.StrokeType;
-import javafx.scene.text.Text;
-import javafx.scene.transform.Rotate;
 
 public class SelfLoopArrow extends Arrow {
 
@@ -18,12 +15,14 @@ public class SelfLoopArrow extends Arrow {
     public static int ARC_START_ANGLE = 20;
     public static int ARC_LENGTH = 140;
     private Arc arc;
+
     public SelfLoopArrow(MyNode from, MyNode to, Board board) {
         super(from, to, board);
 
         createArc();
-        createSymbolContainer();
-        this.getChildren().addAll(arc, super.getArrowHead(), super.getSymbolContainer());
+        addSymbolContainer();
+        this.getChildren().addAll(arc, super.getArrowHead());
+        this.getChildren().addAll(super.getSymbolContainers());
         board.addObject(this);
         this.updateObjects();
     }
@@ -47,7 +46,6 @@ public class SelfLoopArrow extends Arrow {
         arc.setType(ArcType.OPEN);
 
 
-
 //        log.info("Line Start X:{} Y:{}", line.getStartX(), line.getEndX());
 //        log.info("Line End X:{} Y:{}", line.getStartY(), line.getEndY());
 
@@ -57,16 +55,18 @@ public class SelfLoopArrow extends Arrow {
 
     @Override
     public void updateSymbolContainerPosition() {
+        for (HBox container : symbolContainers) {
 
-        double midX = from.getAbsoluteCentrePosX();
-        double midY = from.getAbsoluteCentrePosY() - (from.getCircle().getRadius() + ARC_HEIGHT);
+            double midX = from.getAbsoluteCentrePosX();
+            double midY = from.getAbsoluteCentrePosY() - (from.getCircle().getRadius() + ARC_HEIGHT);
 
-        // Adjust position to place container above the line
-        double offsetX = -symbolContainer.getWidth() / 2.0;
-        double offsetY = -symbolContainer.getHeight(); // 10 is the offset above the line
+            // Adjust position to place container above the line
+            double offsetX = -container.getWidth() / 2.0;
+            double offsetY = -container.getHeight(); // 10 is the offset above the line
 
-        symbolContainer.setLayoutX(midX + offsetX);
-        symbolContainer.setLayoutY(midY + offsetY);
+            container.setLayoutX(midX + offsetX);
+            container.setLayoutY(midY + offsetY);
+        }
     }
 
     @Override

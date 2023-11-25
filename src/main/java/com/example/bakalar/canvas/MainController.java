@@ -71,15 +71,7 @@ public class MainController {
             log.info("Arrow created: startX:{} startY:{} | finishX:{} finishY:{}",
                     currentNode.getAbsoluteCentrePosX(), currentNode.getAbsoluteCentrePosY(),
                     node.getAbsoluteCentrePosX(), node.getAbsoluteCentrePosY());
-            Arrow arrow;
-            if (currentNode == node) {
-                arrow = new SelfLoopArrow(currentNode, node, board);
-            } else {
-                arrow = new LineArrow(currentNode, node, board);
-                makeCurveDraggable((LineArrow) arrow);
-            }
-            currentNode.addArrow(arrow);
-            node.addArrow(arrow);
+            Arrow arrow = board.createArrow(currentNode, node);
             makeErasable(arrow);
             currentNode.unselectNode();
             currentNode = null;

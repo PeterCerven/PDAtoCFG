@@ -1,6 +1,8 @@
 package com.example.bakalar.canvas;
 
 import com.example.bakalar.canvas.arrow.Arrow;
+import com.example.bakalar.canvas.arrow.LineArrow;
+import com.example.bakalar.canvas.arrow.SelfLoopArrow;
 import com.example.bakalar.canvas.node.EndNode;
 import com.example.bakalar.canvas.node.MyNode;
 import com.example.bakalar.canvas.node.StartNodeArrow;
@@ -45,6 +47,23 @@ public class Board {
         mainPane.getChildren().remove(node);
     }
 
+    public Arrow createArrow(MyNode from, MyNode to) {
+        from.unselectNode();
+        Arrow arrow = sameArrowExists(from, to);
+        if (arrow != null) {
+            arrow.addSymbolContainer();
+            return arrow;
+        }
+        if (from == to) {
+            arrow = new SelfLoopArrow(from, to, this);
+        } else {
+          arrow = new LineArrow(from, to, this);
+        }
+        arrows.add(arrow);
+        mainPane.getChildren().add(arrow);
+        return arrow;
+    }
+
     public void addObject(Node node) {
         if (node instanceof Arrow arrow) {
             arrows.add(arrow);
@@ -56,11 +75,15 @@ public class Board {
         mainPane.getChildren().add(node);
     }
 
-    public void unSelectAllNodes() {
-        for (MyNode node : nodes) {
-            node.unselectNode();
+    private Arrow sameArrowExists(MyNode from, MyNode to) {
+        for (Arrow arrow : arrows) {
+            if (arrow.getFrom() == from && arrow.getTo() == to) {
+                return arrow;
+            }
         }
+        return null;
     }
+
 
     public void clearBoard() {
         mainPane.getChildren().clear();

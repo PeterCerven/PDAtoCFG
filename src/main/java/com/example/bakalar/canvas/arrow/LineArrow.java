@@ -2,6 +2,7 @@ package com.example.bakalar.canvas.arrow;
 
 import com.example.bakalar.canvas.Board;
 import com.example.bakalar.canvas.node.MyNode;
+import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.QuadCurve;
@@ -21,10 +22,11 @@ public class LineArrow extends Arrow {
         super(from, to, board);
 
         createLine();
-        createSymbolContainer();
+        addSymbolContainer();
         createControlIndicator();
         createControlPoint();
-        this.getChildren().addAll(line, super.getArrowHead(), super.getSymbolContainer(), controlIndicator);
+        this.getChildren().addAll(line, super.getArrowHead(), controlIndicator);
+        this.getChildren().addAll(super.getSymbolContainers());
         board.addObject(this);
         this.updateObjects();
     }
@@ -103,20 +105,22 @@ public class LineArrow extends Arrow {
         double midX = (startX + endX) / 2.0;
         double midY = highestY;
 
-        // Adjust position to place container above the line
-        double offsetX = -symbolContainer.getWidth() / 2.0;
-        double offsetY = -symbolContainer.getHeight(); // 10 is the offset above the line
+        for (HBox container : symbolContainers) {
 
-        symbolContainer.setLayoutX(midX + offsetX);
-        symbolContainer.setLayoutY(midY + offsetY);
+            double offsetX = -container.getWidth() / 2.0;
+            double offsetY = -container.getHeight();
 
-        // Calculate the angle for rotation
-        double angle = Math.toDegrees(Math.atan2(endY - startY, endX - startX));
+            container.setLayoutX(midX + offsetX);
+            container.setLayoutY(midY + offsetY);
 
-        // Rotate around the center of the container
-        Rotate rotate = new Rotate(angle, symbolContainer.getWidth() / 2.0, symbolContainer.getHeight());
-        symbolContainer.getTransforms().clear();
-        symbolContainer.getTransforms().add(rotate);
+
+            double angle = Math.toDegrees(Math.atan2(endY - startY, endX - startX));
+            Rotate rotate = new Rotate(angle, container.getWidth() / 2.0, container.getHeight());
+            container.getTransforms().clear();
+            container.getTransforms().add(rotate);
+
+        }
+
     }
 
     private double findHighestPointY(double startX, double startY, double controlX, double controlY, double endX, double endY) {
