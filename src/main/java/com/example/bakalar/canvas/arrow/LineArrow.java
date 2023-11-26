@@ -2,6 +2,8 @@ package com.example.bakalar.canvas.arrow;
 
 import com.example.bakalar.canvas.Board;
 import com.example.bakalar.canvas.node.MyNode;
+import javafx.collections.ObservableList;
+import javafx.scene.Node;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -9,6 +11,8 @@ import javafx.scene.shape.QuadCurve;
 import javafx.scene.shape.StrokeType;
 import javafx.scene.transform.Rotate;
 import lombok.Getter;
+
+import java.util.List;
 
 @Getter
 public class LineArrow extends Arrow {
@@ -18,16 +22,14 @@ public class LineArrow extends Arrow {
     private double controlX;
     private double controlY;
 
-    public LineArrow(MyNode from, MyNode to, Board board) {
-        super(from, to, board);
+    public LineArrow(MyNode from, MyNode to) {
+        super(from, to);
 
         createLine();
         addSymbolContainer();
         createControlIndicator();
         createControlPoint();
-        this.getChildren().addAll(line, super.getArrowHead(), controlIndicator);
-        this.getChildren().addAll(super.getSymbolContainers());
-        board.addObject(this);
+        this.getChildren().addAll(line, super.getArrowHead(), controlIndicator, super.getSymbolContainers());
         this.updateObjects();
     }
 
@@ -50,8 +52,8 @@ public class LineArrow extends Arrow {
 
         line.setStartX(lineCr.getStartX());
         line.setStartY(lineCr.getStartY());
-        this.line.setControlX(controlX);
-        this.line.setControlY(controlY);
+        line.setControlX(controlX);
+        line.setControlY(controlY);
         line.setEndX(lineCr.getEndX());
         line.setEndY(lineCr.getEndY());
 
@@ -101,26 +103,24 @@ public class LineArrow extends Arrow {
         double endX = line.getEndX();
         double endY = line.getEndY();
 
-        double highestY = findHighestPointY(startX, startY, controlX, controlY, endX, endY);
+//        double highestY = findHighestPointY(startX, startY, controlX, controlY, endX, endY);
         double midX = (startX + endX) / 2.0;
-        double midY = highestY;
+        double midY = (startY + endY) / 2.0;
 
-        for (HBox container : symbolContainers) {
-
+        ObservableList<Node> children = this.symbolContainers.getChildren();
+        for (Node node : children) {
+            HBox container = (HBox) node;
             double offsetX = -container.getWidth() / 2.0;
             double offsetY = -container.getHeight();
 
             container.setLayoutX(midX + offsetX);
             container.setLayoutY(midY + offsetY);
 
-
             double angle = Math.toDegrees(Math.atan2(endY - startY, endX - startX));
             Rotate rotate = new Rotate(angle, container.getWidth() / 2.0, container.getHeight());
             container.getTransforms().clear();
             container.getTransforms().add(rotate);
-
         }
-
     }
 
     private double findHighestPointY(double startX, double startY, double controlX, double controlY, double endX, double endY) {

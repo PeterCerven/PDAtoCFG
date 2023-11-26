@@ -10,6 +10,8 @@ import javafx.scene.Node;
 import javafx.scene.layout.AnchorPane;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +19,7 @@ import java.util.List;
 @Getter
 @Setter
 public class Board {
+    private static final Logger log = LogManager.getLogger(Board.class.getName());
     private List<MyNode> nodes;
     private List<Arrow> arrows;
     private List<EndNode> endNodes;
@@ -30,7 +33,7 @@ public class Board {
         this.nodes = new ArrayList<>();
         this.arrows = new ArrayList<>();
         this.mainPane = mainPane;
-        this.startNodeArrow = new StartNodeArrow(0,0,0);
+        this.startNodeArrow = new StartNodeArrow(0, 0, 0);
         this.addObject(startNodeArrow);
         this.startNodeArrow.setVisible(false);
         this.endNodes = new ArrayList<>();
@@ -55,16 +58,18 @@ public class Board {
             return arrow;
         }
         if (from == to) {
-            arrow = new SelfLoopArrow(from, to, this);
+            arrow = new SelfLoopArrow(from, to);
         } else {
-          arrow = new LineArrow(from, to, this);
+            arrow = new LineArrow(from, to);
         }
-        arrows.add(arrow);
-        mainPane.getChildren().add(arrow);
+        from.addArrow(arrow);
+        to.addArrow(arrow);
+        this.addObject(arrow);
         return arrow;
     }
 
     public void addObject(Node node) {
+        log.info("Adding object: " + node);
         if (node instanceof Arrow arrow) {
             arrows.add(arrow);
         } else if (node instanceof MyNode myNode) {

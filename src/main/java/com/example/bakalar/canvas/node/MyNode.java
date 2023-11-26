@@ -11,6 +11,8 @@ import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.Optional;
@@ -18,6 +20,7 @@ import java.util.Optional;
 @Getter
 @Setter
 public class MyNode extends Group {
+    private static final Logger log = LogManager.getLogger(MyNode.class.getName());
     private Circle circle;
     private Text nameText;
     private String name;
@@ -97,7 +100,8 @@ public class MyNode extends Group {
     }
 
     private void setEnding() {
-        this.setEnding(true);
+        setEnding(true);
+        endNode.moveEndNode(this.circle.getCenterX(), this.circle.getCenterY());
         endNode.setVisible(true);
     }
 
@@ -148,15 +152,22 @@ public class MyNode extends Group {
         this.getNameText().setText(text);
     }
 
-    public void move(double x, double y) {
+    public void move(double x, double y, double prevX, double prevY ) {
         this.setTranslateX(x);
         this.setTranslateY(y);
+        if (startNodeArrow != null && starting) {
+            startNodeArrow.moveStartArrow(getAbsoluteCentrePosX(), getAbsoluteCentrePosY(), this.getCircle().getRadius());
+        }
+        if (endNode != null && ending) {
+            endNode.moveEndNode(this.circle.getCenterX(), this.circle.getCenterY());
+        }
+        log.info("Node moved: X:{} Y:{}", x, y);
+
+    }
+
+    public void updateArrows() {
         for (Arrow arrow : arrows) {
             arrow.move();
         }
-        if (startNodeArrow != null) {
-            startNodeArrow.moveStartArrow(getAbsoluteCentrePosX(), getAbsoluteCentrePosY(), this.getCircle().getRadius());
-        }
-        this.endNode.moveEndNode(this.circle.getCenterX(), this.circle.getCenterY());
     }
 }

@@ -2,6 +2,8 @@ package com.example.bakalar.canvas.arrow;
 
 import com.example.bakalar.canvas.Board;
 import com.example.bakalar.canvas.node.MyNode;
+import javafx.collections.ObservableList;
+import javafx.scene.Node;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Arc;
@@ -16,14 +18,13 @@ public class SelfLoopArrow extends Arrow {
     public static int ARC_LENGTH = 140;
     private Arc arc;
 
-    public SelfLoopArrow(MyNode from, MyNode to, Board board) {
-        super(from, to, board);
+    public SelfLoopArrow(MyNode from, MyNode to) {
+        super(from, to);
 
         createArc();
         addSymbolContainer();
         this.getChildren().addAll(arc, super.getArrowHead());
         this.getChildren().addAll(super.getSymbolContainers());
-        board.addObject(this);
         this.updateObjects();
     }
 
@@ -55,8 +56,9 @@ public class SelfLoopArrow extends Arrow {
 
     @Override
     public void updateSymbolContainerPosition() {
-        for (HBox container : symbolContainers) {
-
+        ObservableList<Node> children = this.symbolContainers.getChildren();
+        for (Node node : children) {
+            HBox container = (HBox) node;
             double midX = from.getAbsoluteCentrePosX();
             double midY = from.getAbsoluteCentrePosY() - (from.getCircle().getRadius() + ARC_HEIGHT);
 

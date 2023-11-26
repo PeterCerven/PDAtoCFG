@@ -11,6 +11,7 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
 import javafx.scene.text.Text;
@@ -19,8 +20,6 @@ import lombok.Setter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 @Getter
@@ -34,19 +33,18 @@ public abstract class Arrow extends Group {
     protected String read;
     protected String pop;
     protected String push;
-    protected List<HBox> symbolContainers;
+    protected VBox symbolContainers;
     protected Polygon arrowHead;
     private Board board;
 
 
-    public Arrow(MyNode from, MyNode to, Board board) {
+    public Arrow(MyNode from, MyNode to) {
         this.from = from;
         this.to = to;
         this.read = LAMDA;
         this.pop = LAMDA;
         this.push = LAMDA;
-        this.board = board;
-        this.symbolContainers = new ArrayList<>();
+        this.symbolContainers = new VBox();
         this.setViewOrder(1);
         createArrowHead();
     }
@@ -74,7 +72,7 @@ public abstract class Arrow extends Group {
             container.setLayoutX(newValue.getHeight());
             updateSymbolContainerPosition();
         });
-        this.symbolContainers.add(container);
+        this.symbolContainers.getChildren().add(container);
     }
 
     public abstract void updateObjects();

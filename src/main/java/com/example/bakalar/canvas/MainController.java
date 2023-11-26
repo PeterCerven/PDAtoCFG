@@ -2,8 +2,8 @@ package com.example.bakalar.canvas;
 
 import com.example.bakalar.canvas.arrow.Arrow;
 import com.example.bakalar.canvas.arrow.LineArrow;
-import com.example.bakalar.canvas.arrow.SelfLoopArrow;
 import com.example.bakalar.canvas.node.MyNode;
+import javafx.animation.AnimationTimer;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -20,6 +20,9 @@ public class MainController {
 
     public static final int NODE_RADIUS = 30;
     private static final Logger log = LogManager.getLogger(MainController.class.getName());
+    private static final long UPDATE_DELAY = 50_000_000; // Delay in nanoseconds
+    private AnimationTimer updateTimer;
+    private long lastUpdate = 0;
     @FXML
     private ScrollPane myScrollPane;
 
@@ -41,13 +44,9 @@ public class MainController {
     @FXML
     private Button selectBtn;
 
-    private boolean nodeBtnOn;
-    private boolean arrowBtnOn;
-    private boolean selectBtnOn;
-    private boolean eraseBtnOn;
-    private MyNode currentNode;
-    private double startX;
-    private double startY;
+    private boolean nodeBtnOn, arrowBtnOn, selectBtnOn, eraseBtnOn;
+    private MyNode selectedNode, draggedNode;
+    private double startX, startY;
     private Board board;
 
 
@@ -67,17 +66,19 @@ public class MainController {
     }
 
     private void createArrow(MyNode node) {
-        if (currentNode != null) {
+        if (selectedNode != null) {
             log.info("Arrow created: startX:{} startY:{} | finishX:{} finishY:{}",
-                    currentNode.getAbsoluteCentrePosX(), currentNode.getAbsoluteCentrePosY(),
+                    selectedNode.getAbsoluteCentrePosX(), selectedNode.getAbsoluteCentrePosY(),
                     node.getAbsoluteCentrePosX(), node.getAbsoluteCentrePosY());
-            Arrow arrow = board.createArrow(currentNode, node);
+            Arrow arrow = board.createArrow(selectedNode, node);
             makeErasable(arrow);
-            currentNode.unselectNode();
-            currentNode = null;
+            if (arrow instanceof LineArrow lineArrow) {
+//                makeCurveDraggable(lineArrow);
+            }
+            selectedNode = null;
         } else {
             log.info("Starting point for arrow");
-            currentNode = node;
+            selectedNode = node;
             node.selectNode();
         }
     }
@@ -111,16 +112,45 @@ public class MainController {
                 } else if (event.getButton() == MouseButton.PRIMARY) {
                     startX = event.getSceneX() - node.getTranslateX();
                     startY = event.getSceneY() - node.getTranslateY();
+//                    draggedNode = node;
                 }
             }
         });
 
         node.setOnMouseDragged(e -> {
             if (selectBtnOn) {
-                node.move(e.getSceneX() - startX, e.getSceneY() - startY);
+                log.info("Dragging node X:{} Y:{}", node.getTranslateX(), node.getTranslateY());
+                node.move(e.getSceneX() - startX, e.getSceneY() - startY, node.getTranslateX(), node.getTranslateY());
+                if (draggedNode == null) {
+                    draggedNode = node;
+                }
+                lastUpdate = 0;
             }
         });
+
+
+        node.setOnMouseReleased(event -> {
+            if (selectBtnOn) {
+                draggedNode = null;
+            }
+        });
+
+        updateTimer = new AnimationTimer() {
+            @Override
+            public void handle(long now) {
+                log.info("Now: {} | Last update: {} | Difference: {}", now, lastUpdate, now - lastUpdate);
+                if (now - lastUpdate >= UPDATE_DELAY && draggedNode != null) {
+                    // Update arrow positions here
+                    draggedNode.updateArrows();
+                    log.info("Updating arrows");
+                    lastUpdate = now;
+                }
+            }
+        };
+        updateTimer.start();
     }
+
+
 
     private void enableArrowCreation(MyNode node) {
         node.setOnMouseClicked(event -> {
@@ -202,7 +232,7 @@ public class MainController {
         nodeBtnOn = false;
         arrowBtnOn = false;
         selectBtnOn = false;
-        currentNode = null;
+        selectedNode = null;
         selectBtn.setText("Zvol vyber");
         arrowBtn.setText("Zvol sip");
         nodeBtn.setText("Zvol kruh");
