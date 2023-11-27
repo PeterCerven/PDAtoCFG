@@ -22,9 +22,7 @@ public class SelfLoopArrow extends Arrow {
         super(from, to);
 
         createArc();
-        addSymbolContainer();
-        this.getChildren().addAll(arc, super.getArrowHead());
-        this.getChildren().addAll(super.getSymbolContainers());
+        this.getChildren().add(arc);
         this.updateObjects();
     }
 
@@ -56,19 +54,15 @@ public class SelfLoopArrow extends Arrow {
 
     @Override
     public void updateSymbolContainerPosition() {
-        ObservableList<Node> children = this.symbolContainers.getChildren();
-        for (Node node : children) {
-            HBox container = (HBox) node;
-            double midX = from.getAbsoluteCentrePosX();
-            double midY = from.getAbsoluteCentrePosY() - (from.getCircle().getRadius() + ARC_HEIGHT);
+        double midX = from.getAbsoluteCentrePosX();
+        double midY = from.getAbsoluteCentrePosY() - (from.getCircle().getRadius() + ARC_HEIGHT);
 
-            // Adjust position to place container above the line
-            double offsetX = -container.getWidth() / 2.0;
-            double offsetY = -container.getHeight(); // 10 is the offset above the line
+        // Adjust position to place container above the line
+        double offsetX = -symbolContainers.getWidth() / 2.0;
+        double offsetY = -symbolContainers.getHeight(); // 10 is the offset above the line
 
-            container.setLayoutX(midX + offsetX);
-            container.setLayoutY(midY + offsetY);
-        }
+        symbolContainers.setLayoutX(midX + offsetX);
+        symbolContainers.setLayoutY(midY + offsetY);
     }
 
     @Override

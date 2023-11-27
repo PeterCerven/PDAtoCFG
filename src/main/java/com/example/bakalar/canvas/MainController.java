@@ -20,9 +20,6 @@ public class MainController {
 
     public static final int NODE_RADIUS = 30;
     private static final Logger log = LogManager.getLogger(MainController.class.getName());
-    private static final long UPDATE_DELAY = 50_000_000; // Delay in nanoseconds
-    private AnimationTimer updateTimer;
-    private long lastUpdate = 0;
     @FXML
     private ScrollPane myScrollPane;
 
@@ -73,7 +70,7 @@ public class MainController {
             Arrow arrow = board.createArrow(selectedNode, node);
             makeErasable(arrow);
             if (arrow instanceof LineArrow lineArrow) {
-//                makeCurveDraggable(lineArrow);
+                makeCurveDraggable(lineArrow);
             }
             selectedNode = null;
         } else {
@@ -120,34 +117,10 @@ public class MainController {
         node.setOnMouseDragged(e -> {
             if (selectBtnOn) {
                 log.info("Dragging node X:{} Y:{}", node.getTranslateX(), node.getTranslateY());
-                node.move(e.getSceneX() - startX, e.getSceneY() - startY, node.getTranslateX(), node.getTranslateY());
-                if (draggedNode == null) {
-                    draggedNode = node;
-                }
-                lastUpdate = 0;
+                node.move(e.getSceneX() - startX, e.getSceneY() - startY);
+                node.updateArrows();
             }
         });
-
-
-        node.setOnMouseReleased(event -> {
-            if (selectBtnOn) {
-                draggedNode = null;
-            }
-        });
-
-        updateTimer = new AnimationTimer() {
-            @Override
-            public void handle(long now) {
-                log.info("Now: {} | Last update: {} | Difference: {}", now, lastUpdate, now - lastUpdate);
-                if (now - lastUpdate >= UPDATE_DELAY && draggedNode != null) {
-                    // Update arrow positions here
-                    draggedNode.updateArrows();
-                    log.info("Updating arrows");
-                    lastUpdate = now;
-                }
-            }
-        };
-        updateTimer.start();
     }
 
 

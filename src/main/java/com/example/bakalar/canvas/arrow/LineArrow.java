@@ -1,18 +1,13 @@
 package com.example.bakalar.canvas.arrow;
 
-import com.example.bakalar.canvas.Board;
 import com.example.bakalar.canvas.node.MyNode;
-import javafx.collections.ObservableList;
-import javafx.scene.Node;
-import javafx.scene.layout.HBox;
+import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.QuadCurve;
 import javafx.scene.shape.StrokeType;
 import javafx.scene.transform.Rotate;
 import lombok.Getter;
-
-import java.util.List;
 
 @Getter
 public class LineArrow extends Arrow {
@@ -26,10 +21,9 @@ public class LineArrow extends Arrow {
         super(from, to);
 
         createLine();
-        addSymbolContainer();
         createControlIndicator();
         createControlPoint();
-        this.getChildren().addAll(line, super.getArrowHead(), controlIndicator, super.getSymbolContainers());
+        this.getChildren().addAll(line, controlIndicator);
         this.updateObjects();
     }
 
@@ -57,9 +51,8 @@ public class LineArrow extends Arrow {
         line.setEndX(lineCr.getEndX());
         line.setEndY(lineCr.getEndY());
 
+        log.info("Control X:{}  ControlXProperty:{}", controlX, line.controlXProperty().get());
 
-//        log.info("Line Start X:{} Y:{}", line.getStartX(), line.getEndX());
-//        log.info("Line End X:{} Y:{}", line.getStartY(), line.getEndY());
 
         updateControlIndicator(controlX, controlY);
         updateArrowHead();
@@ -87,7 +80,10 @@ public class LineArrow extends Arrow {
         double startY = line.getStartY();
         double endX = line.getEndX();
         double endY = line.getEndY();
-        ArrowHeadPoints arrowHeadPoints = getArrowHeadPoints(startX, startY, endX, endY);
+        Point2D highestPoint = findHighestPoint(startX, startY, controlX, controlY, endX, endY, 0.9);
+        double endXAngled = highestPoint.getX();
+        double endYAngled = highestPoint.getY();
+        ArrowHeadPoints arrowHeadPoints = getArrowHeadPoints(startX, startY, endX, endY, endXAngled, endYAngled);
 
         arrowHead.getPoints().setAll(
                 endX, endY,
@@ -103,38 +99,26 @@ public class LineArrow extends Arrow {
         double endX = line.getEndX();
         double endY = line.getEndY();
 
-//        double highestY = findHighestPointY(startX, startY, controlX, controlY, endX, endY);
-        double midX = (startX + endX) / 2.0;
-        double midY = (startY + endY) / 2.0;
+        Point2D highestPoint = findHighestPoint(startX, startY, controlX, controlY, endX, endY, 0.5);
+        double midX = highestPoint.getX();
+        double midY = highestPoint.getY();
 
-        ObservableList<Node> children = this.symbolContainers.getChildren();
-        for (Node node : children) {
-            HBox container = (HBox) node;
-            double offsetX = -container.getWidth() / 2.0;
-            double offsetY = -container.getHeight();
+        double offsetX = -symbolContainers.getWidth() / 2.0;
+        double offsetY = -symbolContainers.getHeight();
 
-            container.setLayoutX(midX + offsetX);
-            container.setLayoutY(midY + offsetY);
+        symbolContainers.setLayoutX(midX + offsetX);
+        symbolContainers.setLayoutY(midY + offsetY);
 
-            double angle = Math.toDegrees(Math.atan2(endY - startY, endX - startX));
-            Rotate rotate = new Rotate(angle, container.getWidth() / 2.0, container.getHeight());
-            container.getTransforms().clear();
-            container.getTransforms().add(rotate);
-        }
+        double angle = Math.toDegrees(Math.atan2(endY - startY, endX - startX));
+        Rotate rotate = new Rotate(angle, symbolContainers.getWidth() / 2.0, symbolContainers.getHeight());
+        symbolContainers.getTransforms().clear();
+        symbolContainers.getTransforms().add(rotate);
     }
 
-    private double findHighestPointY(double startX, double startY, double controlX, double controlY, double endX, double endY) {
-        // Calculate the t value at which the derivative of y-coordinate is zero
-        double t = (startY - controlY) / (startY - 2 * controlY + endY);
-
-        // Check if t is within the valid range
-        if (t < 0 || t > 1) {
-            // The highest point is one of the end points
-            return Math.min(startY, endY);
-        }
-
-        // Calculate the y-coordinate of the highest point using the Bezier curve equation
-        return Math.pow(1 - t, 2) * startY + 2 * (1 - t) * t * controlY + Math.pow(t, 2) * endY;
+    private Point2D findHighestPoint(double startX, double startY, double controlX, double controlY, double endX, double endY, double t) {
+        double x = (1 - t) * (1 - t) * startX + 2 * (1 - t) * t * controlX + t * t * endX;
+        double y = (1 - t) * (1 - t) * startY + 2 * (1 - t) * t * controlY + t * t * endY;
+        return new Point2D(x, y);
     }
 
 

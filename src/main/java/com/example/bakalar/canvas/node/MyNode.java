@@ -152,7 +152,7 @@ public class MyNode extends Group {
         this.getNameText().setText(text);
     }
 
-    public void move(double x, double y, double prevX, double prevY ) {
+    public void move(double x, double y) {
         this.setTranslateX(x);
         this.setTranslateY(y);
         if (startNodeArrow != null && starting) {
@@ -166,6 +166,7 @@ public class MyNode extends Group {
     }
 
     public void updateArrows() {
+        log.info("Updating arrows");
         for (Arrow arrow : arrows) {
             arrow.move();
         }

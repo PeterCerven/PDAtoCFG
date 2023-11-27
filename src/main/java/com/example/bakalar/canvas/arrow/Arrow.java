@@ -27,7 +27,7 @@ import java.util.Optional;
 public abstract class Arrow extends Group {
     public static final int ARROW_HEAD_SZIE = 15;
     public static final String LAMDA = "λ";
-    private static final Logger log = LogManager.getLogger(Arrow.class.getName());
+    protected static final Logger log = LogManager.getLogger(Arrow.class.getName());
     protected MyNode from;
     protected MyNode to;
     protected String read;
@@ -45,8 +45,10 @@ public abstract class Arrow extends Group {
         this.pop = LAMDA;
         this.push = LAMDA;
         this.symbolContainers = new VBox();
-        this.setViewOrder(1);
+        this.setViewOrder(-1);
         createArrowHead();
+        addSymbolContainer();
+        this.getChildren().addAll(arrowHead, symbolContainers);
     }
 
 
@@ -54,6 +56,8 @@ public abstract class Arrow extends Group {
         arrowHead = new Polygon();
         arrowHead.setStroke(Color.BLUE);
         arrowHead.setStrokeWidth(3);
+        arrowHead.setFill(Color.BLUE);
+        arrowHead.setViewOrder(-1);
     }
 
     public void addSymbolContainer() {
@@ -73,6 +77,7 @@ public abstract class Arrow extends Group {
             updateSymbolContainerPosition();
         });
         this.symbolContainers.getChildren().add(container);
+        createTransitions(container);
     }
 
     public abstract void updateObjects();
@@ -88,8 +93,8 @@ public abstract class Arrow extends Group {
 
         double angle1 = Math.atan(side1 / side2);
 
-        double newDiffX = Math.sin(angle1) * (double) (MainController.NODE_RADIUS - 1);
-        double newDiffY = Math.cos(angle1) * (double) (MainController.NODE_RADIUS - 1);
+        double newDiffX = Math.sin(angle1) * (double) (MainController.NODE_RADIUS - 3);
+        double newDiffY = Math.cos(angle1) * (double) (MainController.NODE_RADIUS - 3);
 
         if (startX >= endX && startY >= endY || startX < endX && startY >= endY) {
             newDiffX = -newDiffX;
@@ -99,8 +104,8 @@ public abstract class Arrow extends Group {
         return new LineCoordinates(startX + newDiffX, startY + newDiffY, endX - newDiffX, endY - newDiffY);
     }
 
-    protected ArrowHeadPoints getArrowHeadPoints(double startX, double startY, double endX, double endY) {
-        double angle = Math.atan2((endY - startY), (endX - startX)) - Math.PI / 2.0;
+    protected ArrowHeadPoints getArrowHeadPoints(double startX, double startY, double endX, double endY, double endXAngled, double endYAngled) {
+        double angle = Math.atan2((endY - endYAngled), (endX - endXAngled)) - Math.PI / 2.0;
         double sin = Math.sin(angle);
         double cos = Math.cos(angle);
 

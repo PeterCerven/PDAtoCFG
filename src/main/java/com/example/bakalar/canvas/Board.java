@@ -7,6 +7,7 @@ import com.example.bakalar.canvas.node.EndNode;
 import com.example.bakalar.canvas.node.MyNode;
 import com.example.bakalar.canvas.node.StartNodeArrow;
 import javafx.scene.Node;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.AnchorPane;
 import lombok.Getter;
 import lombok.Setter;
