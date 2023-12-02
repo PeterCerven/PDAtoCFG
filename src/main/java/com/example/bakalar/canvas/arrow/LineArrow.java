@@ -32,10 +32,17 @@ public class LineArrow extends Arrow {
     }
 
     private void setLinePoints() {
-        startX = from.getAbsoluteCentrePosX();
-        startY = from.getAbsoluteCentrePosY();
-        endX = to.getAbsoluteCentrePosX();
-        endY = to.getAbsoluteCentrePosY();
+        double fromCentreX = from.getAbsoluteCentrePosX();
+        double fromCentreY = from.getAbsoluteCentrePosY();
+        double toCentreX = to.getAbsoluteCentrePosX();
+        double toCentreY = to.getAbsoluteCentrePosY();
+
+        Point2D toEdgePoint = getNodeEdgePoint(to, fromCentreX, fromCentreY);
+
+        startX = fromCentreX;
+        startY = fromCentreY;
+        endX = toEdgePoint.getX();
+        endY = toEdgePoint.getY();
 
         this.controlX = (startX + endX) / 2.0;
         this.controlY = (startY + endY) / 2.0;
@@ -47,6 +54,7 @@ public class LineArrow extends Arrow {
         line.setEndX(endX);
         line.setEndY(endY);
     }
+
 
     @Override
     public void updateObjects() {

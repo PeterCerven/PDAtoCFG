@@ -3,6 +3,7 @@ package com.example.bakalar.canvas.arrow;
 import com.example.bakalar.canvas.Board;
 import com.example.bakalar.canvas.MainController;
 import com.example.bakalar.canvas.node.MyNode;
+import javafx.geometry.Point2D;
 import javafx.scene.Group;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
@@ -20,6 +21,8 @@ import lombok.Setter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 @Getter
@@ -84,24 +87,28 @@ public abstract class Arrow extends Group {
 
     public abstract void updateSymbolContainerPosition();
 
+    private Map<String, Point2D> cache = new HashMap<>();
 
-    protected LineCoordinates getNodeEdgePoints(double startX, double startY, double endX, double endY) {
-//        log.info("Start X:{} Y:{}", startX, startY);
-//        log.info("End X:{} Y:{}", endX, endY);
-        double side1 = startX - endX;
-        double side2 = startY - endY;
 
-        double angle1 = Math.atan(side1 / side2);
-
-        double newDiffX = Math.sin(angle1) * (double) (MainController.NODE_RADIUS - 3);
-        double newDiffY = Math.cos(angle1) * (double) (MainController.NODE_RADIUS - 3);
-
-        if (startX >= endX && startY >= endY || startX < endX && startY >= endY) {
-            newDiffX = -newDiffX;
-            newDiffY = -newDiffY;
+    protected Point2D getNodeEdgePoint(MyNode node, double targetX, double targetY) {
+        String key = node.getId() + ":" + targetX + ":" + targetY;
+        if (cache.containsKey(key)) {
+            return cache.get(key);
         }
 
-        return new LineCoordinates(startX + newDiffX, startY + newDiffY, endX - newDiffX, endY - newDiffY);
+        double side1 = targetX - node.getAbsoluteCentrePosX();
+        double side2 = targetY - node.getAbsoluteCentrePosY();
+
+        double angle = Math.atan2(side2, side1);
+        double cosAngle = Math.cos(angle);
+        double sinAngle = Math.sin(angle);
+
+        double edgeX = node.getAbsoluteCentrePosX() + cosAngle * node.getCircle().getRadius();
+        double edgeY = node.getAbsoluteCentrePosY() + sinAngle * node.getCircle().getRadius();
+
+        Point2D result = new Point2D(edgeX, edgeY);
+        cache.put(key, result);
+        return result;
     }
 
     protected ArrowHeadPoints getArrowHeadPoints(double endX, double endY, double endXAngled, double endYAngled) {
