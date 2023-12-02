@@ -44,10 +44,6 @@ public class SelfLoopArrow extends Arrow {
         arc.setLength(ARC_LENGTH);
         arc.setType(ArcType.OPEN);
 
-
-//        log.info("Line Start X:{} Y:{}", line.getStartX(), line.getEndX());
-//        log.info("Line End X:{} Y:{}", line.getStartY(), line.getEndY());
-
         updateArrowHead();
         updateSymbolContainerPosition();
     }

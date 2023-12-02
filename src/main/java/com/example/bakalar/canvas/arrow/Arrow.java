@@ -35,20 +35,20 @@ public abstract class Arrow extends Group {
     protected String push;
     protected VBox symbolContainers;
     protected Polygon arrowHead;
-    private Board board;
 
 
     public Arrow(MyNode from, MyNode to) {
+        super();
         this.from = from;
         this.to = to;
         this.read = LAMDA;
         this.pop = LAMDA;
         this.push = LAMDA;
-        this.symbolContainers = new VBox();
-        this.setViewOrder(-1);
-        createArrowHead();
-        addSymbolContainer();
-        this.getChildren().addAll(arrowHead, symbolContainers);
+//        this.symbolContainers = new VBox();
+        this.setViewOrder(1);
+//        createArrowHead();
+//        addSymbolContainer();
+//        this.getChildren().addAll(arrowHead, symbolContainers);
     }
 
 

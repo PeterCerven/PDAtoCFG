@@ -6,9 +6,15 @@ import com.example.bakalar.canvas.arrow.SelfLoopArrow;
 import com.example.bakalar.canvas.node.EndNode;
 import com.example.bakalar.canvas.node.MyNode;
 import com.example.bakalar.canvas.node.StartNodeArrow;
+import javafx.geometry.Insets;
 import javafx.scene.Node;
-import javafx.scene.input.MouseButton;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.paint.Color;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.logging.log4j.LogManager;
@@ -16,6 +22,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Getter
 @Setter
@@ -25,10 +32,11 @@ public class Board {
     private List<Arrow> arrows;
     private List<EndNode> endNodes;
     private MyNode startNode;
-    private MyNode endNode;
     private AnchorPane mainPane;
     private StartNodeArrow startNodeArrow;
     private int nodeCounter;
+    private CheckBox startingCheckBox;
+    private CheckBox endingCheckBox;
 
     public Board(AnchorPane mainPane) {
         this.nodes = new ArrayList<>();
@@ -39,6 +47,8 @@ public class Board {
         this.startNodeArrow.setVisible(false);
         this.endNodes = new ArrayList<>();
         this.nodeCounter = 0;
+        this.startingCheckBox = new CheckBox("Starting Node");
+        this.endingCheckBox = new CheckBox("End Node");
     }
 
 
@@ -52,10 +62,9 @@ public class Board {
     }
 
     public Arrow createArrow(MyNode from, MyNode to) {
-        from.unselectNode();
         Arrow arrow = sameArrowExists(from, to);
         if (arrow != null) {
-            arrow.addSymbolContainer();
+//            arrow.addSymbolContainer();
             return arrow;
         }
         if (from == to) {
@@ -70,7 +79,7 @@ public class Board {
     }
 
     public void addObject(Node node) {
-        log.info("Adding object: " + node);
+//        log.info("Adding object: " + node);
         if (node instanceof Arrow arrow) {
             arrows.add(arrow);
         } else if (node instanceof MyNode myNode) {
@@ -96,12 +105,78 @@ public class Board {
     }
 
 
-    public StartNodeArrow removeStartingFromOtherNodes() {
+    public void removeStartingFromOtherNodes() {
         for (MyNode node : nodes) {
-            node.unSetStarting();
-            node.getStartingCheckBox().setSelected(false);
+            unSetStarting(node);
         }
-        this.startNodeArrow.setVisible(true);
-        return this.startNodeArrow;
+    }
+
+    public void showDialog(MyNode node) {
+        Dialog<ButtonType> dialog = new Dialog<>();
+        dialog.setTitle("Edit Node");
+
+        GridPane gridPane = new GridPane();
+        gridPane.setHgap(10);
+        gridPane.setVgap(10);
+        gridPane.setPadding(new Insets(20, 150, 10, 10));
+
+        TextField nameField = new TextField(node.getName());
+
+        gridPane.add(startingCheckBox, 0, 0);
+        gridPane.add(endingCheckBox, 0, 1);
+        gridPane.add(nameField, 0, 2);
+
+        dialog.getDialogPane().setContent(gridPane);
+        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+
+        Optional<ButtonType> result = dialog.showAndWait();
+        result.ifPresent(buttonType -> {
+            if (buttonType == ButtonType.OK) {
+                node.setName(nameField.getText());
+                if (startingCheckBox.isSelected()) {
+                    removeStartingFromOtherNodes();
+                    setStarting(node);
+                } else {
+                    unSetStarting(node);
+                }
+                if (endingCheckBox.isSelected()) {
+                    setEnding(node);
+                } else {
+                    unSetEnding(node);
+                }
+            }
+        });
+    }
+
+    private void setStarting(MyNode node) {
+        node.setStarting(true);
+        this.startNodeArrow.moveStartArrow(node.getAbsoluteCentrePosX(), node.getAbsoluteCentrePosY(), node.getCircle().getRadius());
+    }
+
+    public void unSetStarting(MyNode node) {
+        node.setStarting(false);
+        this.startNodeArrow = null;
+
+    }
+
+    private void setEnding(MyNode node) {
+        node.setEnding(true);
+        node.getEndNode().moveEndNode(node.getCircle().getCenterX(), node.getCircle().getCenterY());
+        node.getEndNode().setVisible(true);
+    }
+
+    private void unSetEnding(MyNode node) {
+        node.setEnding(false);
+        node.getEndNode().setVisible(false);
+    }
+
+    public void selectNode(MyNode node) {
+        node.setSelected(true);
+        node.getCircle().setFill(Color.BLUE);
+    }
+
+    public void unselectNode(MyNode node) {
+        node.setSelected(false);
+        node.getCircle().setFill(Color.WHITE);
     }
 }

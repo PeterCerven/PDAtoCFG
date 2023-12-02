@@ -21,9 +21,10 @@ public class LineArrow extends Arrow {
         super(from, to);
 
         createLine();
-        createControlIndicator();
-        createControlPoint();
-        this.getChildren().addAll(line, controlIndicator);
+//        createControlIndicator();
+//        createControlPoint();
+        this.getChildren().addAll(line);
+//        this.getChildren().addAll(line, controlIndicator);
         this.updateObjects();
     }
 
@@ -38,6 +39,8 @@ public class LineArrow extends Arrow {
 
     @Override
     public void updateObjects() {
+//        long startTime = System.nanoTime();
+
         LineCoordinates lineCr = getNodeEdgePoints(from.getAbsoluteCentrePosX(), from.getAbsoluteCentrePosY(),
                 to.getAbsoluteCentrePosX(), to.getAbsoluteCentrePosY());
 
@@ -51,12 +54,37 @@ public class LineArrow extends Arrow {
         line.setEndX(lineCr.getEndX());
         line.setEndY(lineCr.getEndY());
 
-        log.info("Control X:{}  ControlXProperty:{}", controlX, line.controlXProperty().get());
+//        long endTime = System.nanoTime();
+//        long duration = (endTime - startTime);
+//        double durationInMs = duration / 1000000.0;
+//        log.info("Update line method executed in " + durationInMs + " ms");
 
 
-        updateControlIndicator(controlX, controlY);
-        updateArrowHead();
-        updateSymbolContainerPosition();
+//        log.info("Control X:{}  ControlXProperty:{}", controlX, line.controlXProperty().get());
+
+
+//        startTime = System.nanoTime();
+//        updateControlIndicator(controlX, controlY);
+//        endTime = System.nanoTime();
+//        duration = (endTime - startTime);
+//        durationInMs = duration / 1000000.0;
+//        log.info("Update control indicator method executed in " + durationInMs + " ms");
+//
+//        startTime = System.nanoTime();
+//        updateArrowHead();
+//        endTime = System.nanoTime();
+//        duration = (endTime - startTime);
+//        durationInMs = duration / 1000000.0;
+//        log.info("Update arrow head method executed in " + durationInMs + " ms");
+//
+//        startTime = System.nanoTime();
+//        updateSymbolContainerPosition();
+//        endTime = System.nanoTime();
+//        duration = (endTime - startTime);
+//        durationInMs = duration / 1000000.0;
+//        log.info("Update symbol container position method executed in " + durationInMs + " ms");
+//        log.info("------------------------------------------------------");
+
     }
 
     private void updateControlIndicator(double controlX, double controlY) {

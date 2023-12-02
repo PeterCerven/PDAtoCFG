@@ -2,9 +2,8 @@ package com.example.bakalar.canvas;
 
 import com.example.bakalar.canvas.arrow.Arrow;
 import com.example.bakalar.canvas.arrow.LineArrow;
+import com.example.bakalar.canvas.button.ButtonState;
 import com.example.bakalar.canvas.node.MyNode;
-import javafx.animation.AnimationTimer;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -41,14 +40,12 @@ public class MainController {
     @FXML
     private Button selectBtn;
 
-    private boolean nodeBtnOn, arrowBtnOn, selectBtnOn, eraseBtnOn;
-    private MyNode selectedNode, draggedNode;
+    private ButtonState currentState = ButtonState.NONE;
+
+    private MyNode selectedNode;
     private double startX, startY;
     private Board board;
 
-
-    public MainController() {
-    }
 
     @FXML
     private void initialize() {
@@ -57,32 +54,29 @@ public class MainController {
 
 
     public void createNode(MouseEvent event) {
-        if (nodeBtnOn && event.getButton() == MouseButton.PRIMARY) {
+        if (currentState.equals(ButtonState.NODE) && event.getButton() == MouseButton.PRIMARY) {
             createNode(event.getX(), event.getY());
         }
     }
 
     private void createArrow(MyNode node) {
         if (selectedNode != null) {
-            log.info("Arrow created: startX:{} startY:{} | finishX:{} finishY:{}",
-                    selectedNode.getAbsoluteCentrePosX(), selectedNode.getAbsoluteCentrePosY(),
-                    node.getAbsoluteCentrePosX(), node.getAbsoluteCentrePosY());
             Arrow arrow = board.createArrow(selectedNode, node);
-            makeErasable(arrow);
+//            makeErasable(arrow);
             if (arrow instanceof LineArrow lineArrow) {
-                makeCurveDraggable(lineArrow);
+//                makeCurveDraggable(lineArrow);
             }
+            board.unselectNode(selectedNode);
             selectedNode = null;
         } else {
-            log.info("Starting point for arrow");
             selectedNode = node;
-            node.selectNode();
+            board.selectNode(node);
         }
     }
 
     private void makeCurveDraggable(LineArrow arrow) {
         arrow.getControlIndicator().setOnMousePressed(event -> {
-            if (selectBtnOn) {
+            if (currentState.equals(ButtonState.SELECT)) {
                 if (event.getButton() == MouseButton.PRIMARY) {
                     startX = event.getSceneX() - arrow.getControlIndicator().getTranslateX();
                     startY = event.getSceneY() - arrow.getControlIndicator().getTranslateY();
@@ -93,7 +87,7 @@ public class MainController {
         });
 
         arrow.getControlIndicator().setOnMouseDragged(e -> {
-            if (selectBtnOn) {
+            if (currentState.equals(ButtonState.SELECT)) {
                 arrow.moveControlPoint(e.getSceneX() - startX, e.getSceneY() - startY);
             }
         });
@@ -102,23 +96,24 @@ public class MainController {
 
     private void makeDraggable(MyNode node) {
         node.setOnMousePressed(event -> {
-            if (selectBtnOn) {
+            if (currentState.equals(ButtonState.SELECT)) {
                 if (event.getButton() == MouseButton.SECONDARY) {
-                    log.info("secondary button");
-                    node.showDialog();
+                    board.showDialog(node);
                 } else if (event.getButton() == MouseButton.PRIMARY) {
                     startX = event.getSceneX() - node.getTranslateX();
                     startY = event.getSceneY() - node.getTranslateY();
-//                    draggedNode = node;
                 }
             }
         });
 
         node.setOnMouseDragged(e -> {
-            if (selectBtnOn) {
-                log.info("Dragging node X:{} Y:{}", node.getTranslateX(), node.getTranslateY());
+            if (currentState.equals(ButtonState.SELECT)) {
+//                long startTime = System.nanoTime();
                 node.move(e.getSceneX() - startX, e.getSceneY() - startY);
-                node.updateArrows();
+//                long endTime = System.nanoTime();
+//                long duration = (endTime - startTime);
+//                double durationInMs = duration / 1000000.0;
+//                log.info("Move node method executed in " + durationInMs + " ms");
             }
         });
     }
@@ -127,7 +122,7 @@ public class MainController {
 
     private void enableArrowCreation(MyNode node) {
         node.setOnMouseClicked(event -> {
-            if (arrowBtnOn && event.getButton() == MouseButton.PRIMARY) {
+            if (currentState.equals(ButtonState.ARROW) && event.getButton() == MouseButton.PRIMARY) {
                 createArrow(node);
             }
         });
@@ -135,7 +130,7 @@ public class MainController {
 
     private void makeErasable(Node node) {
         node.setOnMouseClicked(event -> {
-            if (eraseBtnOn && event.getButton() == MouseButton.PRIMARY) {
+            if (currentState.equals(ButtonState.ERASE) && event.getButton() == MouseButton.PRIMARY) {
                 board.removeObject(node);
             }
         });
@@ -143,82 +138,58 @@ public class MainController {
 
 
     private void createNode(double x, double y) {
-        log.info("Node created: X:{} Y:{}", x, y);
-        MyNode myNode = new MyNode(x, y, NODE_RADIUS, board);
+        MyNode myNode = new MyNode(x, y, NODE_RADIUS);
         makeDraggable(myNode);
-        makeErasable(myNode);
+//        makeErasable(myNode);
         enableArrowCreation(myNode);
         board.addObject(myNode);
     }
 
     public void resetAll() {
         board.clearBoard();
-        turnOffAllButtons();
+        currentState = ButtonState.NONE;
+        selectedNode = null;
+        updateButtonStates();
     }
 
+    private void toggleButtonState(ButtonState newState) {
+        if (currentState == newState) {
+            currentState = ButtonState.NONE;
+        } else {
+            currentState = newState;
+        }
+        updateButtonStates();
+    }
+
+    private void updateButtonStates() {
+        nodeBtn.setText(currentState == ButtonState.NODE ? "Vypni" : "Zvol kruh");
+        arrowBtn.setText(currentState == ButtonState.ARROW ? "Vypni" : "Zvol sip");
+        eraseBtn.setText(currentState == ButtonState.ERASE ? "Vypni" : "Zvol zmizik");
+        selectBtn.setText(currentState == ButtonState.SELECT ? "Vypni" : "Zvol vyber");
+    }
 
     public void drawNodeOn() {
-        if (nodeBtnOn) {
-            turnOffAllButtons();
-        } else {
-            turnOffAllButtons();
-            nodeBtnOn = true;
-            nodeBtn.setText("Vypni");
-        }
+        toggleButtonState(ButtonState.NODE);
     }
 
     public void drawArrowOn() {
-        turnOffAllButtons();
-        if (arrowBtnOn) {
-            turnOffAllButtons();
-        } else {
-            turnOffAllButtons();
-            arrowBtnOn = true;
-            arrowBtn.setText("Vypni");
-        }
+        toggleButtonState(ButtonState.ARROW);
     }
 
     public void eraseFunctionOn() {
-        turnOffAllButtons();
-        if (eraseBtnOn) {
-            turnOffAllButtons();
-        } else {
-            turnOffAllButtons();
-            eraseBtnOn = true;
-            eraseBtn.setText("Vypni");
-        }
+        toggleButtonState(ButtonState.ERASE);
     }
 
     public void selectOn() {
-        turnOffAllButtons();
-        if (selectBtnOn) {
-            turnOffAllButtons();
-        } else {
-            turnOffAllButtons();
-            selectBtnOn = true;
-            selectBtn.setText("Vypni");
-        }
-    }
-
-    private void turnOffAllButtons() {
-        eraseBtnOn = false;
-        nodeBtnOn = false;
-        arrowBtnOn = false;
-        selectBtnOn = false;
-        selectedNode = null;
-        selectBtn.setText("Zvol vyber");
-        arrowBtn.setText("Zvol sip");
-        nodeBtn.setText("Zvol kruh");
-        eraseBtn.setText("Zvol zmizik");
+        toggleButtonState(ButtonState.SELECT);
     }
 
 
-    public void reUndo(ActionEvent actionEvent) {
+    public void reUndo() {
         // TODO reUndo
     }
 
     public void undo() {
-        turnOffAllButtons();
         // TODO undo
     }
 }
