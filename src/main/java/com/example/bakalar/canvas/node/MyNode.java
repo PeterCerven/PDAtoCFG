@@ -1,11 +1,7 @@
 package com.example.bakalar.canvas.node;
 
-import com.example.bakalar.canvas.Board;
 import com.example.bakalar.canvas.arrow.Arrow;
-import javafx.geometry.Insets;
 import javafx.scene.Group;
-import javafx.scene.control.*;
-import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
@@ -15,7 +11,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
-import java.util.Optional;
 
 @Getter
 @Setter
@@ -79,7 +74,6 @@ public class MyNode extends Group {
             arrow.move();
         }
     }
-
 
 
 }

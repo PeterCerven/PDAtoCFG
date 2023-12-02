@@ -44,11 +44,11 @@ public abstract class Arrow extends Group {
         this.read = LAMDA;
         this.pop = LAMDA;
         this.push = LAMDA;
-//        this.symbolContainers = new VBox();
-        this.setViewOrder(1);
-//        createArrowHead();
-//        addSymbolContainer();
-//        this.getChildren().addAll(arrowHead, symbolContainers);
+        this.symbolContainers = new VBox();
+        this.setViewOrder(-1);
+        createArrowHead();
+        addSymbolContainer();
+        this.getChildren().addAll(arrowHead, symbolContainers);
     }
 
 
@@ -104,7 +104,7 @@ public abstract class Arrow extends Group {
         return new LineCoordinates(startX + newDiffX, startY + newDiffY, endX - newDiffX, endY - newDiffY);
     }
 
-    protected ArrowHeadPoints getArrowHeadPoints(double startX, double startY, double endX, double endY, double endXAngled, double endYAngled) {
+    protected ArrowHeadPoints getArrowHeadPoints(double endX, double endY, double endXAngled, double endYAngled) {
         double angle = Math.atan2((endY - endYAngled), (endX - endXAngled)) - Math.PI / 2.0;
         double sin = Math.sin(angle);
         double cos = Math.cos(angle);

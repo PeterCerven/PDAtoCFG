@@ -16,74 +16,44 @@ public class LineArrow extends Arrow {
     private Circle controlIndicator;
     private double controlX;
     private double controlY;
+    private double startX;
+    private double startY;
+    private double endX;
+    private double endY;
 
     public LineArrow(MyNode from, MyNode to) {
         super(from, to);
 
         createLine();
-//        createControlIndicator();
-//        createControlPoint();
-        this.getChildren().addAll(line);
-//        this.getChildren().addAll(line, controlIndicator);
+        createControlIndicator();
+        setLinePoints();
+        this.getChildren().addAll(line, controlIndicator);
         this.updateObjects();
     }
 
-    private void createControlPoint() {
-        LineCoordinates lineCr = getNodeEdgePoints(from.getAbsoluteCentrePosX(), from.getAbsoluteCentrePosY(),
-                to.getAbsoluteCentrePosX(), to.getAbsoluteCentrePosY());
-        this.controlX = (lineCr.getStartX() + lineCr.getEndX()) / 2.0;
-        this.controlY = (lineCr.getStartY() + lineCr.getEndY()) / 2.0;
-        this.line.setControlX(controlX);
-        this.line.setControlY(controlY);
+    private void setLinePoints() {
+        startX = from.getAbsoluteCentrePosX();
+        startY = from.getAbsoluteCentrePosY();
+        endX = to.getAbsoluteCentrePosX();
+        endY = to.getAbsoluteCentrePosY();
+
+        this.controlX = (startX + endX) / 2.0;
+        this.controlY = (startY + endY) / 2.0;
+        line.setControlX(controlX);
+        line.setControlY(controlY);
+
+        line.setStartX(startX);
+        line.setStartY(startY);
+        line.setEndX(endX);
+        line.setEndY(endY);
     }
 
     @Override
     public void updateObjects() {
-//        long startTime = System.nanoTime();
-
-        LineCoordinates lineCr = getNodeEdgePoints(from.getAbsoluteCentrePosX(), from.getAbsoluteCentrePosY(),
-                to.getAbsoluteCentrePosX(), to.getAbsoluteCentrePosY());
-
-        this.controlX = (lineCr.getStartX() + lineCr.getEndX()) / 2.0;
-        this.controlY = (lineCr.getStartY() + lineCr.getEndY()) / 2.0;
-
-        line.setStartX(lineCr.getStartX());
-        line.setStartY(lineCr.getStartY());
-        line.setControlX(controlX);
-        line.setControlY(controlY);
-        line.setEndX(lineCr.getEndX());
-        line.setEndY(lineCr.getEndY());
-
-//        long endTime = System.nanoTime();
-//        long duration = (endTime - startTime);
-//        double durationInMs = duration / 1000000.0;
-//        log.info("Update line method executed in " + durationInMs + " ms");
-
-
-//        log.info("Control X:{}  ControlXProperty:{}", controlX, line.controlXProperty().get());
-
-
-//        startTime = System.nanoTime();
-//        updateControlIndicator(controlX, controlY);
-//        endTime = System.nanoTime();
-//        duration = (endTime - startTime);
-//        durationInMs = duration / 1000000.0;
-//        log.info("Update control indicator method executed in " + durationInMs + " ms");
-//
-//        startTime = System.nanoTime();
-//        updateArrowHead();
-//        endTime = System.nanoTime();
-//        duration = (endTime - startTime);
-//        durationInMs = duration / 1000000.0;
-//        log.info("Update arrow head method executed in " + durationInMs + " ms");
-//
-//        startTime = System.nanoTime();
-//        updateSymbolContainerPosition();
-//        endTime = System.nanoTime();
-//        duration = (endTime - startTime);
-//        durationInMs = duration / 1000000.0;
-//        log.info("Update symbol container position method executed in " + durationInMs + " ms");
-//        log.info("------------------------------------------------------");
+        setLinePoints();
+        updateControlIndicator(controlX, controlY);
+        updateArrowHead();
+        updateSymbolContainerPosition();
 
     }
 
@@ -104,14 +74,10 @@ public class LineArrow extends Arrow {
 
     @Override
     public void updateArrowHead() {
-        double startX = line.getStartX();
-        double startY = line.getStartY();
-        double endX = line.getEndX();
-        double endY = line.getEndY();
         Point2D highestPoint = findHighestPoint(startX, startY, controlX, controlY, endX, endY, 0.9);
         double endXAngled = highestPoint.getX();
         double endYAngled = highestPoint.getY();
-        ArrowHeadPoints arrowHeadPoints = getArrowHeadPoints(startX, startY, endX, endY, endXAngled, endYAngled);
+        ArrowHeadPoints arrowHeadPoints = getArrowHeadPoints(endX, endY, endXAngled, endYAngled);
 
         arrowHead.getPoints().setAll(
                 endX, endY,
@@ -164,10 +130,8 @@ public class LineArrow extends Arrow {
     }
 
     public void resetControlPoint() {
-        LineCoordinates lineCr = getNodeEdgePoints(from.getAbsoluteCentrePosX(), from.getAbsoluteCentrePosY(),
-                to.getAbsoluteCentrePosX(), to.getAbsoluteCentrePosY());
-        this.controlX = (lineCr.getStartX() + lineCr.getEndX()) / 2.0;
-        this.controlY = (lineCr.getStartY() + lineCr.getEndY()) / 2.0;
+        this.controlX = (startX + endX) / 2.0;
+        this.controlY = (startX + endX) / 2.0;
         moveControlPoint(controlX, controlY);
     }
 

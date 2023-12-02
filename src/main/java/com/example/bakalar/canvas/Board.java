@@ -64,7 +64,7 @@ public class Board {
     public Arrow createArrow(MyNode from, MyNode to) {
         Arrow arrow = sameArrowExists(from, to);
         if (arrow != null) {
-//            arrow.addSymbolContainer();
+            arrow.addSymbolContainer();
             return arrow;
         }
         if (from == to) {
@@ -79,7 +79,6 @@ public class Board {
     }
 
     public void addObject(Node node) {
-//        log.info("Adding object: " + node);
         if (node instanceof Arrow arrow) {
             arrows.add(arrow);
         } else if (node instanceof MyNode myNode) {

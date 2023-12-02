@@ -62,9 +62,9 @@ public class MainController {
     private void createArrow(MyNode node) {
         if (selectedNode != null) {
             Arrow arrow = board.createArrow(selectedNode, node);
-//            makeErasable(arrow);
+            makeErasable(arrow);
             if (arrow instanceof LineArrow lineArrow) {
-//                makeCurveDraggable(lineArrow);
+                makeCurveDraggable(lineArrow);
             }
             board.unselectNode(selectedNode);
             selectedNode = null;
@@ -108,12 +108,7 @@ public class MainController {
 
         node.setOnMouseDragged(e -> {
             if (currentState.equals(ButtonState.SELECT)) {
-//                long startTime = System.nanoTime();
                 node.move(e.getSceneX() - startX, e.getSceneY() - startY);
-//                long endTime = System.nanoTime();
-//                long duration = (endTime - startTime);
-//                double durationInMs = duration / 1000000.0;
-//                log.info("Move node method executed in " + durationInMs + " ms");
             }
         });
     }
