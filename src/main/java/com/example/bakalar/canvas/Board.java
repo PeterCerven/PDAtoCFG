@@ -150,12 +150,12 @@ public class Board {
     private void setStarting(MyNode node) {
         node.setStarting(true);
         this.startNodeArrow.moveStartArrow(node.getAbsoluteCentrePosX(), node.getAbsoluteCentrePosY(), node.getCircle().getRadius());
+        this.startNodeArrow.setVisible(true);
     }
 
     public void unSetStarting(MyNode node) {
         node.setStarting(false);
-        this.startNodeArrow = null;
-
+        this.startNodeArrow.setVisible(false);
     }
 
     private void setEnding(MyNode node) {

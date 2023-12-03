@@ -23,7 +23,7 @@ public class SelfLoopArrow extends Arrow {
 
         createArc();
         this.getChildren().add(arc);
-        this.updateObjects();
+        this.updateObjects(true);
     }
 
     private void createArc() {
@@ -35,7 +35,7 @@ public class SelfLoopArrow extends Arrow {
     }
 
     @Override
-    public void updateObjects() {
+    public void updateObjects(boolean toEdge) {
         arc.setCenterX(from.getAbsoluteCentrePosX());
         arc.setCenterY(from.getAbsoluteCentrePosY());
         arc.setRadiusX(from.getCircle().getRadius() - ARC_WIDTH);
@@ -108,7 +108,7 @@ public class SelfLoopArrow extends Arrow {
 
 
     @Override
-    public void move() {
-        updateObjects();
+    public void move(boolean toEdge) {
+        updateObjects(toEdge);
     }
 }

@@ -48,7 +48,7 @@ public abstract class Arrow extends Group {
         this.pop = LAMDA;
         this.push = LAMDA;
         this.symbolContainers = new VBox();
-        this.setViewOrder(-1);
+        setViewOrder(1);
         createArrowHead();
         addSymbolContainer();
         this.getChildren().addAll(arrowHead, symbolContainers);
@@ -83,18 +83,13 @@ public abstract class Arrow extends Group {
         createTransitions(container);
     }
 
-    public abstract void updateObjects();
+    public abstract void updateObjects(boolean toEdge);
 
     public abstract void updateSymbolContainerPosition();
 
-    private Map<String, Point2D> cache = new HashMap<>();
 
 
     protected Point2D getNodeEdgePoint(MyNode node, double targetX, double targetY) {
-        String key = node.getId() + ":" + targetX + ":" + targetY;
-        if (cache.containsKey(key)) {
-            return cache.get(key);
-        }
 
         double side1 = targetX - node.getAbsoluteCentrePosX();
         double side2 = targetY - node.getAbsoluteCentrePosY();
@@ -106,9 +101,7 @@ public abstract class Arrow extends Group {
         double edgeX = node.getAbsoluteCentrePosX() + cosAngle * node.getCircle().getRadius();
         double edgeY = node.getAbsoluteCentrePosY() + sinAngle * node.getCircle().getRadius();
 
-        Point2D result = new Point2D(edgeX, edgeY);
-        cache.put(key, result);
-        return result;
+        return new Point2D(edgeX, edgeY);
     }
 
     protected ArrowHeadPoints getArrowHeadPoints(double endX, double endY, double endXAngled, double endYAngled) {
@@ -128,7 +121,7 @@ public abstract class Arrow extends Group {
     public abstract void updateArrowHead();
 
 
-    public abstract void move();
+    public abstract void move(boolean toEdge);
 
     public void createTransitions(HBox container) {
         Dialog<ButtonType> dialog = new Dialog<>();

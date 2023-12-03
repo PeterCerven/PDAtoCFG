@@ -70,8 +70,11 @@ public class MyNode extends Group {
         if (ending) {
             endNode.moveEndNode(this.circle.getCenterX(), this.circle.getCenterY());
         }
+    }
+
+    public void updateArrows(boolean toEdge) {
         for (Arrow arrow : arrows) {
-            arrow.move();
+            arrow.move(toEdge);
         }
     }
 

@@ -26,23 +26,31 @@ public class LineArrow extends Arrow {
 
         createLine();
         createControlIndicator();
-        setLinePoints();
+        setLinePoints(true);
         this.getChildren().addAll(line, controlIndicator);
-        this.updateObjects();
+        this.updateObjects(true);
     }
 
-    private void setLinePoints() {
+    private void setLinePoints(boolean toEdge) {
         double fromCentreX = from.getAbsoluteCentrePosX();
         double fromCentreY = from.getAbsoluteCentrePosY();
         double toCentreX = to.getAbsoluteCentrePosX();
         double toCentreY = to.getAbsoluteCentrePosY();
 
-        Point2D toEdgePoint = getNodeEdgePoint(to, fromCentreX, fromCentreY);
+        if (toEdge) {
+            Point2D toEdgePoint = getNodeEdgePoint(to, fromCentreX, fromCentreY);
+            endX = toEdgePoint.getX();
+            endY = toEdgePoint.getY();
+
+        } else {
+            endX = toCentreX;
+            endY = toCentreY;
+        }
+
 
         startX = fromCentreX;
         startY = fromCentreY;
-        endX = toEdgePoint.getX();
-        endY = toEdgePoint.getY();
+
 
         this.controlX = (startX + endX) / 2.0;
         this.controlY = (startY + endY) / 2.0;
@@ -56,9 +64,11 @@ public class LineArrow extends Arrow {
     }
 
 
+
+
     @Override
-    public void updateObjects() {
-        setLinePoints();
+    public void updateObjects(boolean toEdge) {
+        setLinePoints(toEdge);
         updateControlIndicator(controlX, controlY);
         updateArrowHead();
         updateSymbolContainerPosition();
@@ -112,6 +122,9 @@ public class LineArrow extends Arrow {
         symbolContainers.setLayoutY(midY + offsetY);
 
         double angle = Math.toDegrees(Math.atan2(endY - startY, endX - startX));
+        if (angle > 90 && angle < 270 || angle < -90 && angle > -180) {
+            angle += 180;
+        }
         Rotate rotate = new Rotate(angle, symbolContainers.getWidth() / 2.0, symbolContainers.getHeight());
         symbolContainers.getTransforms().clear();
         symbolContainers.getTransforms().add(rotate);
@@ -125,8 +138,8 @@ public class LineArrow extends Arrow {
 
 
     @Override
-    public void move() {
-        this.updateObjects();
+    public void move(boolean toEdge) {
+        this.updateObjects(toEdge);
     }
 
     private void createLine() {

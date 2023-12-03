@@ -16,9 +16,6 @@ public class MyApp extends Application {
         FXMLLoader fxmlLoader = new FXMLLoader(MyApp.class.getResource("my-scene.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
 
-        String javafxVersion = System.getProperty("javafx.runtime.version");
-        System.out.println("JavaFX version: " + javafxVersion);
-
         String styles = Objects.requireNonNull(getClass().getResource("/css/styles.css")).toExternalForm();
         scene.getStylesheets().add(styles);
 

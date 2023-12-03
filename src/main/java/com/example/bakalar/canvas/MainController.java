@@ -109,6 +109,13 @@ public class MainController {
         node.setOnMouseDragged(e -> {
             if (currentState.equals(ButtonState.SELECT)) {
                 node.move(e.getSceneX() - startX, e.getSceneY() - startY);
+                node.updateArrows(false);
+            }
+        });
+
+        node.setOnMouseReleased(event -> {
+            if (currentState.equals(ButtonState.SELECT)) {
+                node.updateArrows(true);
             }
         });
     }
@@ -135,7 +142,7 @@ public class MainController {
     private void createNode(double x, double y) {
         MyNode myNode = new MyNode(x, y, NODE_RADIUS);
         makeDraggable(myNode);
-//        makeErasable(myNode);
+        makeErasable(myNode);
         enableArrowCreation(myNode);
         board.addObject(myNode);
     }
