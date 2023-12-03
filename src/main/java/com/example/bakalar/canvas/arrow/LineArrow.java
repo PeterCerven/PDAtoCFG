@@ -63,9 +63,6 @@ public class LineArrow extends Arrow {
         line.setEndY(endY);
     }
 
-
-
-
     @Override
     public void updateObjects(boolean toEdge) {
         setLinePoints(toEdge);
@@ -80,10 +77,11 @@ public class LineArrow extends Arrow {
         this.controlIndicator.setTranslateY(controlY);
     }
 
-    public void moveControlPoint(double controlX, double controlY) {
-        updateControlIndicator(controlX, controlY);
-        this.controlX = controlX;
-        this.controlY = controlY;
+    public void moveControlPoint(double controlIndicatorPointX, double controlIndicatorPointY) {
+        Point2D controlPoint = findControlPoint(startX, startY, controlIndicatorPointX, controlIndicatorPointY, endX, endY, 0.5);
+        this.controlX = controlPoint.getX();
+        this.controlY = controlPoint.getY();
+        updateControlIndicator(controlIndicatorPointX, controlIndicatorPointY);
         this.line.setControlX(controlX);
         this.line.setControlY(controlY);
         updateArrowHead();
@@ -134,6 +132,12 @@ public class LineArrow extends Arrow {
         double x = (1 - t) * (1 - t) * startX + 2 * (1 - t) * t * controlX + t * t * endX;
         double y = (1 - t) * (1 - t) * startY + 2 * (1 - t) * t * controlY + t * t * endY;
         return new Point2D(x, y);
+    }
+
+    private Point2D findControlPoint(double startX, double startY, double controlIndicatorX, double controlIndicatorY, double endX, double endY, double t) {
+        double controlX = (controlIndicatorX - (1 - t) * (1 - t) * startX - t * t * endX) / (2 * (1 - t) * t);
+        double controlY = (controlIndicatorY - (1 - t) * (1 - t) * startY - t * t * endY) / (2 * (1 - t) * t);
+        return new Point2D(controlX, controlY);
     }
 
 

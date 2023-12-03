@@ -1,10 +1,6 @@
 package com.example.bakalar.canvas.arrow;
 
-import com.example.bakalar.canvas.Board;
 import com.example.bakalar.canvas.node.MyNode;
-import javafx.collections.ObservableList;
-import javafx.scene.Node;
-import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Arc;
 import javafx.scene.shape.ArcType;

@@ -106,7 +106,7 @@ public class Board {
 
     public void removeStartingFromOtherNodes() {
         for (MyNode node : nodes) {
-            unSetStarting(node);
+            setStarting(node, false);
         }
     }
 
@@ -125,6 +125,9 @@ public class Board {
         gridPane.add(endingCheckBox, 0, 1);
         gridPane.add(nameField, 0, 2);
 
+        startingCheckBox.setSelected(node.isStarting());
+        endingCheckBox.setSelected(node.isEnding());
+
         dialog.getDialogPane().setContent(gridPane);
         dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 
@@ -134,48 +137,23 @@ public class Board {
                 node.setName(nameField.getText());
                 if (startingCheckBox.isSelected()) {
                     removeStartingFromOtherNodes();
-                    setStarting(node);
-                } else {
-                    unSetStarting(node);
                 }
-                if (endingCheckBox.isSelected()) {
-                    setEnding(node);
-                } else {
-                    unSetEnding(node);
-                }
+                setStarting(node, startingCheckBox.isSelected());
+                setEnding(node, endingCheckBox.isSelected());
             }
         });
     }
 
-    private void setStarting(MyNode node) {
-        node.setStarting(true);
-        this.startNodeArrow.moveStartArrow(node.getAbsoluteCentrePosX(), node.getAbsoluteCentrePosY(), node.getCircle().getRadius());
-        this.startNodeArrow.setVisible(true);
+    public void setStarting(MyNode node, boolean starting) {
+        node.setStarting(starting);
     }
 
-    public void unSetStarting(MyNode node) {
-        node.setStarting(false);
-        this.startNodeArrow.setVisible(false);
+    private void setEnding(MyNode node, boolean ending) {
+        node.setEnding(ending);
+
     }
 
-    private void setEnding(MyNode node) {
-        node.setEnding(true);
-        node.getEndNode().moveEndNode(node.getCircle().getCenterX(), node.getCircle().getCenterY());
-        node.getEndNode().setVisible(true);
-    }
-
-    private void unSetEnding(MyNode node) {
-        node.setEnding(false);
-        node.getEndNode().setVisible(false);
-    }
-
-    public void selectNode(MyNode node) {
-        node.setSelected(true);
-        node.getCircle().setFill(Color.BLUE);
-    }
-
-    public void unselectNode(MyNode node) {
-        node.setSelected(false);
-        node.getCircle().setFill(Color.WHITE);
+    public void selectNode(MyNode node, boolean select) {
+        node.setSelected(select);
     }
 }

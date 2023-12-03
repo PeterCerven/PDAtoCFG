@@ -66,11 +66,11 @@ public class MainController {
             if (arrow instanceof LineArrow lineArrow) {
                 makeCurveDraggable(lineArrow);
             }
-            board.unselectNode(selectedNode);
+            board.selectNode(selectedNode, false);
             selectedNode = null;
         } else {
             selectedNode = node;
-            board.selectNode(node);
+            board.selectNode(node, true);
         }
     }
 

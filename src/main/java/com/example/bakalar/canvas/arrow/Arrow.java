@@ -1,7 +1,5 @@
 package com.example.bakalar.canvas.arrow;
 
-import com.example.bakalar.canvas.Board;
-import com.example.bakalar.canvas.MainController;
 import com.example.bakalar.canvas.node.MyNode;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
@@ -21,8 +19,6 @@ import lombok.Setter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 @Getter
@@ -86,7 +82,6 @@ public abstract class Arrow extends Group {
     public abstract void updateObjects(boolean toEdge);
 
     public abstract void updateSymbolContainerPosition();
-
 
 
     protected Point2D getNodeEdgePoint(MyNode node, double targetX, double targetY) {

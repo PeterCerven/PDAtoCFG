@@ -23,6 +23,7 @@ public class MyNode extends Group {
     private boolean starting;
     private boolean ending;
     private EndNode endNode;
+    private StartNodeArrow startNodeArrow;
     private boolean selected;
 
     public MyNode(double x, double y, double radius) {
@@ -34,13 +35,16 @@ public class MyNode extends Group {
         endNode = new EndNode(x, y, radius);
         endNode.setVisible(false);
 
+        startNodeArrow = new StartNodeArrow(x, y, radius);
+        startNodeArrow.setVisible(false);
+
         name = "Node";
         nameText = new Text(name);
         nameText.setX(circle.getCenterX() - nameText.getBoundsInLocal().getWidth() / 2);
         nameText.setY(circle.getCenterY() + nameText.getBoundsInLocal().getHeight() / 4);
 
 
-        this.getChildren().addAll(circle, endNode, nameText);
+        this.getChildren().addAll(circle, endNode, nameText, startNodeArrow);
         this.arrows = new ArrayList<>();
     }
 
@@ -50,6 +54,25 @@ public class MyNode extends Group {
 
     public double getAbsoluteCentrePosY() {
         return this.circle.getCenterY() + this.getTranslateY();
+    }
+
+    public void setEnding(boolean ending) {
+        this.ending = ending;
+        this.endNode.setVisible(ending);
+    }
+
+    public void setStarting(boolean starting) {
+        this.starting = starting;
+        this.startNodeArrow.setVisible(starting);
+    }
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
+        if (selected) {
+            this.circle.setFill(Color.BLUE);
+        } else {
+            this.circle.setFill(Color.WHITE);
+        }
     }
 
 
@@ -67,9 +90,6 @@ public class MyNode extends Group {
     public void move(double x, double y) {
         this.setTranslateX(x);
         this.setTranslateY(y);
-        if (ending) {
-            endNode.moveEndNode(this.circle.getCenterX(), this.circle.getCenterY());
-        }
     }
 
     public void updateArrows(boolean toEdge) {
