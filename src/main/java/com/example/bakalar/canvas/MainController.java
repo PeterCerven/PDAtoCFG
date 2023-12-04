@@ -127,6 +127,9 @@ public class MainController {
             if (currentState.equals(ButtonState.ARROW) && event.getButton() == MouseButton.PRIMARY) {
                 createArrow(node);
             }
+            else if (currentState.equals(ButtonState.ERASE) && event.getButton() == MouseButton.PRIMARY) {
+                board.removeObject(node);
+            }
         });
     }
 
@@ -142,7 +145,6 @@ public class MainController {
     private void createNode(double x, double y) {
         MyNode myNode = new MyNode(x, y, NODE_RADIUS);
         makeDraggable(myNode);
-        makeErasable(myNode);
         enableArrowCreation(myNode);
         board.addObject(myNode);
     }

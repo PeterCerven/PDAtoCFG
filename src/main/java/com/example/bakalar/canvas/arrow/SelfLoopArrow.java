@@ -25,7 +25,7 @@ public class SelfLoopArrow extends Arrow {
     private void createArc() {
         arc = new Arc();
         arc.setStroke(Color.BLACK);
-        arc.setFill(Color.WHITE);
+        arc.setFill(Color.TRANSPARENT);
         arc.setStrokeType(StrokeType.OUTSIDE);
         arc.setStrokeWidth(2);
     }

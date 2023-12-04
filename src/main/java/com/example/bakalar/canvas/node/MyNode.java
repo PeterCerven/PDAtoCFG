@@ -99,4 +99,7 @@ public class MyNode extends Group {
     }
 
 
+    public void removeArrow(Arrow arrow1) {
+        arrows.remove(arrow1);
+    }
 }

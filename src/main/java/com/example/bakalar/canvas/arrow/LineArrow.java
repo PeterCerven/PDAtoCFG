@@ -18,6 +18,8 @@ public class LineArrow extends Arrow {
     private double controlY;
     private double startX;
     private double startY;
+    private double controlPointChangeX;
+    private double controlPointChangeY;
     private double endX;
     private double endY;
 
@@ -27,38 +29,55 @@ public class LineArrow extends Arrow {
         createLine();
         createControlIndicator();
         setLinePoints(true);
+
         this.getChildren().addAll(line, controlIndicator);
         this.updateObjects(true);
     }
 
+    public LineArrow(MyNode from, MyNode to, double change) {
+        this(from, to);
+        Point2D thirdPoint = getThirdPoint(change);
+        this.controlPointChangeX = thirdPoint.getX() - (startX + endX) / 2.0;
+        this.controlPointChangeY = thirdPoint.getY() - (startY + endY) / 2.0;
+        this.updateObjects(true);
+    }
+
+    private Point2D getThirdPoint(double change) {
+        double midX = (startX + endX) / 2.0;
+        double midY = (startY + endY) / 2.0;
+
+        double vectorX = endX - startX;
+        double vectorY = endY - startY;
+
+        double vectorLength = Math.sqrt(vectorX * vectorX + vectorY * vectorY);
+        double vectorXNormal = vectorX / vectorLength;
+        double vectorYNormal = vectorY / vectorLength;
+
+        double pointX = midX + change * vectorYNormal;
+        double pointY = midY - change * vectorXNormal;
+        return new Point2D(pointX, pointY);
+    }
+
     private void setLinePoints(boolean toEdge) {
-        double fromCentreX = from.getAbsoluteCentrePosX();
-        double fromCentreY = from.getAbsoluteCentrePosY();
-        double toCentreX = to.getAbsoluteCentrePosX();
-        double toCentreY = to.getAbsoluteCentrePosY();
+        startX = from.getAbsoluteCentrePosX();
+        startY = from.getAbsoluteCentrePosY();
+        endX = to.getAbsoluteCentrePosX();
+        endY = to.getAbsoluteCentrePosY();
 
         if (toEdge) {
-            Point2D toEdgePoint = getNodeEdgePoint(to, fromCentreX, fromCentreY);
+            Point2D toEdgePoint = getNodeEdgePoint(to, startX, startY);
             endX = toEdgePoint.getX();
             endY = toEdgePoint.getY();
-
-        } else {
-            endX = toCentreX;
-            endY = toCentreY;
         }
+        line.setStartX(startX);
+        line.setStartY(startY);
 
+        this.controlX = (startX + endX) / 2.0 + controlPointChangeX;
+        this.controlY = (startY + endY) / 2.0 + controlPointChangeY;
 
-        startX = fromCentreX;
-        startY = fromCentreY;
-
-
-        this.controlX = (startX + endX) / 2.0;
-        this.controlY = (startY + endY) / 2.0;
         line.setControlX(controlX);
         line.setControlY(controlY);
 
-        line.setStartX(startX);
-        line.setStartY(startY);
         line.setEndX(endX);
         line.setEndY(endY);
     }
@@ -66,26 +85,29 @@ public class LineArrow extends Arrow {
     @Override
     public void updateObjects(boolean toEdge) {
         setLinePoints(toEdge);
-        updateControlIndicator(controlX, controlY);
+        updateControlPointPos(this.controlPointChangeX, this.controlPointChangeY);
         updateArrowHead();
         updateSymbolContainerPosition();
-
-    }
-
-    private void updateControlIndicator(double controlX, double controlY) {
-        this.controlIndicator.setTranslateX(controlX);
-        this.controlIndicator.setTranslateY(controlY);
     }
 
     public void moveControlPoint(double controlIndicatorPointX, double controlIndicatorPointY) {
-        Point2D controlPoint = findControlPoint(startX, startY, controlIndicatorPointX, controlIndicatorPointY, endX, endY, 0.5);
-        this.controlX = controlPoint.getX();
-        this.controlY = controlPoint.getY();
-        updateControlIndicator(controlIndicatorPointX, controlIndicatorPointY);
-        this.line.setControlX(controlX);
-        this.line.setControlY(controlY);
+        this.controlPointChangeX = (startX + endX) / 2.0 - controlIndicatorPointX;
+        this.controlPointChangeY = (startY + endY) / 2.0 - controlIndicatorPointY;
+        updateControlPointPos(this.controlPointChangeX, this.controlPointChangeY);
         updateArrowHead();
         updateSymbolContainerPosition();
+    }
+
+    private void updateControlPointPos(double controlIndicatorPointX, double controlIndicatorPointY) {
+        double controlXZero = (startX + endX) / 2.0 - controlIndicatorPointX;
+        double controlYZero = (startY + endY) / 2.0 - controlIndicatorPointY;
+        Point2D controlPoint = findControlPoint(startX, startY, controlXZero, controlYZero, endX, endY, 0.5);
+        this.controlX = controlPoint.getX();
+        this.controlY = controlPoint.getY();
+        this.controlIndicator.setTranslateX(controlXZero);
+        this.controlIndicator.setTranslateY(controlYZero);
+        this.line.setControlX(controlX);
+        this.line.setControlY(controlY);
     }
 
     @Override
@@ -152,17 +174,46 @@ public class LineArrow extends Arrow {
         line.setStrokeWidth(2);
         line.setFill(Color.TRANSPARENT);
         line.setStroke(Color.BLACK);
+        resetLine();
     }
 
     public void resetControlPoint() {
+        resetLine();
+        updateControlPointPos(this.controlPointChangeX, this.controlPointChangeY);
+        updateArrowHead();
+        updateSymbolContainerPosition();
+    }
+
+    private void resetLine() {
+        this.startX = from.getAbsoluteCentrePosX();
+        this.startY = from.getAbsoluteCentrePosY();
+
+        Point2D toEdgePoint = getNodeEdgePoint(to, startX, startY);
+        endX = toEdgePoint.getX();
+        endY = toEdgePoint.getY();
+
         this.controlX = (startX + endX) / 2.0;
-        this.controlY = (startX + endX) / 2.0;
-        moveControlPoint(controlX, controlY);
+        this.controlY = (startY + endY) / 2.0;
+        this.controlPointChangeX = 0;
+        this.controlPointChangeY = 0;
+        line.setControlX(controlX);
+        line.setControlY(controlY);
+
+        line.setStartX(startX);
+        line.setStartY(startY);
+        line.setEndX(endX);
+        line.setEndY(endY);
+    }
+
+    private Point2D getDifference(double x1, double y1, double x2, double y2) {
+        return new Point2D(x2 - x1, y2 - y1);
     }
 
     private void createControlIndicator() {
         controlIndicator = new Circle(5, Color.WHITE);
         controlIndicator.setStroke(Color.BLACK);
+        controlIndicator.setTranslateX(controlX);
+        controlIndicator.setTranslateY(controlY);
     }
 
 }

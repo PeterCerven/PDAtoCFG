@@ -14,7 +14,6 @@ import javafx.scene.control.Dialog;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
-import javafx.scene.paint.Color;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.logging.log4j.LogManager;
@@ -56,6 +55,12 @@ public class Board {
         if (node instanceof Arrow arrow) {
             arrows.remove(arrow);
         } else if (node instanceof MyNode myNode) {
+            myNode.getArrows().forEach(arrow1 -> {
+                arrow1.getFrom().removeArrow(arrow1);
+                arrow1.getTo().removeArrow(arrow1);
+                arrows.remove(arrow1);
+                mainPane.getChildren().remove(arrow1);
+            });
             nodes.remove(myNode);
         }
         mainPane.getChildren().remove(node);
@@ -70,7 +75,11 @@ public class Board {
         if (from == to) {
             arrow = new SelfLoopArrow(from, to);
         } else {
-            arrow = new LineArrow(from, to);
+            if (oppositeExists(from, to)) {
+                arrow = new LineArrow(from, to, 30);
+            } else {
+                arrow = new LineArrow(from, to);
+            }
         }
         from.addArrow(arrow);
         to.addArrow(arrow);
@@ -96,6 +105,15 @@ public class Board {
             }
         }
         return null;
+    }
+
+    private boolean oppositeExists(MyNode from, MyNode to) {
+        for (Arrow arrow : arrows) {
+            if (arrow.getFrom() == to && arrow.getTo() == from) {
+                return true;
+            }
+        }
+        return false;
     }
 
 
