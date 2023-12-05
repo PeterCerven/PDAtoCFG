@@ -3,7 +3,6 @@ package com.example.bakalar.canvas;
 import com.example.bakalar.canvas.arrow.Arrow;
 import com.example.bakalar.canvas.arrow.LineArrow;
 import com.example.bakalar.canvas.arrow.SelfLoopArrow;
-import com.example.bakalar.canvas.node.EndNode;
 import com.example.bakalar.canvas.node.MyNode;
 import com.example.bakalar.canvas.node.StartNodeArrow;
 import javafx.geometry.Insets;
@@ -20,6 +19,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,7 +29,6 @@ public class Board {
     private static final Logger log = LogManager.getLogger(Board.class.getName());
     private List<MyNode> nodes;
     private List<Arrow> arrows;
-    private List<EndNode> endNodes;
     private MyNode startNode;
     private AnchorPane mainPane;
     private StartNodeArrow startNodeArrow;
@@ -44,7 +43,6 @@ public class Board {
         this.startNodeArrow = new StartNodeArrow(0, 0, 0);
         this.addObject(startNodeArrow);
         this.startNodeArrow.setVisible(false);
-        this.endNodes = new ArrayList<>();
         this.nodeCounter = 0;
         this.startingCheckBox = new CheckBox("Starting Node");
         this.endingCheckBox = new CheckBox("End Node");
@@ -55,12 +53,18 @@ public class Board {
         if (node instanceof Arrow arrow) {
             arrows.remove(arrow);
         } else if (node instanceof MyNode myNode) {
-            myNode.getArrows().forEach(arrow1 -> {
-                arrow1.getFrom().removeArrow(arrow1);
-                arrow1.getTo().removeArrow(arrow1);
+            Iterator<Arrow> iterator = myNode.getArrows().iterator();
+            while (iterator.hasNext()) {
+                Arrow arrow1 = iterator.next();
+                if (arrow1.getFrom() == myNode) {
+                    arrow1.getTo().removeArrow(arrow1);
+                } else {
+                    arrow1.getFrom().removeArrow(arrow1);
+                }
                 arrows.remove(arrow1);
                 mainPane.getChildren().remove(arrow1);
-            });
+                iterator.remove();
+            }
             nodes.remove(myNode);
         }
         mainPane.getChildren().remove(node);
