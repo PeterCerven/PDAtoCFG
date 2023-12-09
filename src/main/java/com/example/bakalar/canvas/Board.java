@@ -5,6 +5,7 @@ import com.example.bakalar.canvas.arrow.LineArrow;
 import com.example.bakalar.canvas.arrow.SelfLoopArrow;
 import com.example.bakalar.canvas.node.MyNode;
 import com.example.bakalar.canvas.node.StartNodeArrow;
+import com.example.bakalar.character.TerminalSymbol;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.ButtonType;
@@ -13,15 +14,14 @@ import javafx.scene.control.Dialog;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Getter
 @Setter
@@ -35,10 +35,14 @@ public class Board {
     private int nodeCounter;
     private CheckBox startingCheckBox;
     private CheckBox endingCheckBox;
+    private VBox stack;
+    private HBox inputAlphabet;
 
-    public Board(AnchorPane mainPane) {
+    public Board(AnchorPane mainPane, VBox stack, HBox inputAlphabet) {
         this.nodes = new ArrayList<>();
         this.arrows = new ArrayList<>();
+        this.stack = stack;
+        this.inputAlphabet = inputAlphabet;
         this.mainPane = mainPane;
         this.startNodeArrow = new StartNodeArrow(0, 0, 0);
         this.addObject(startNodeArrow);
@@ -177,5 +181,18 @@ public class Board {
 
     public void selectNode(MyNode node, boolean select) {
         node.setSelected(select);
+    }
+
+    // Start pushdown automata logic
+
+    public void updateStack(Stack<TerminalSymbol> stack) {
+        for (int i = 0; i < 10; i++) {
+            TextField textField = (TextField) this.stack.getChildren().get(i);
+            if (i < stack.size()) {
+                textField.setText(stack.get(i).toString());
+            } else {
+                textField.setText("");
+            }
+        }
     }
 }

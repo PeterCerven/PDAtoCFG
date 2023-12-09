@@ -11,6 +11,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -98,8 +99,17 @@ public class MyNode extends Group {
         }
     }
 
-
     public void removeArrow(Arrow arrow1) {
         arrows.remove(arrow1);
+    }
+
+    public List<NodeTransition> getTransitions() {
+        List<NodeTransition> nodeTransitions = new ArrayList<>();
+        for (Arrow arrow : arrows) {
+            if (arrow.getFrom() == this) {
+                nodeTransitions.add(arrow.getTransition());
+            }
+        }
+        return nodeTransitions;
     }
 }

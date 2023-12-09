@@ -2,10 +2,14 @@
 
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="727.0" prefWidth="1285.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.bakalar.canvas.MainController" stylesheets="@../../../css/styles.css">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="727.0" prefWidth="1285.0" stylesheets="@../../../css/styles.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.bakalar.canvas.MainController">
    <children>
       <HBox alignment="CENTER" layoutX="281.0" layoutY="28.0" prefHeight="38.0" prefWidth="656.0">
          <children>
@@ -20,8 +24,33 @@
       </HBox>
       <ScrollPane fx:id="myScrollPane" layoutX="226.0" layoutY="112.0" prefHeight="461.0" prefWidth="781.0">
         <content>
-          <AnchorPane fx:id="mainPane" minHeight="0.0" minWidth="0.0" onMouseClicked="#createNode" prefHeight="1500.0" prefWidth="2000.0" />
+          <AnchorPane fx:id="mainPane" minHeight="0.0" minWidth="0.0" onMouseClicked="#createNode" prefHeight="1540.0" prefWidth="2000.0">
+               <children>
+                  <Text layoutX="71.0" layoutY="500.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Zásobník" wrappingWidth="57.0" />
+               </children></AnchorPane>
         </content>
       </ScrollPane>
+      <VBox fx:id="stack" layoutX="46.0" layoutY="112.0" prefHeight="266.0" prefWidth="54.0" style="-fx-border-color: black;" />
+      <HBox fx:id="inputAlphabet" layoutX="19.0" layoutY="603.0" prefHeight="25.0" prefWidth="200.0" style="-fx-border-color: black;" />
+      <Text layoutX="43.0" layoutY="83.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Zásobník" wrappingWidth="77.0">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </Text>
+      <TextField fx:id="inputFieldAlphabet" layoutX="19.0" layoutY="507.0" prefHeight="25.0" prefWidth="164.0" />
+      <Text layoutX="19.0" layoutY="493.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Vstupna paska zadaj" wrappingWidth="149.0">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </Text>
+      <Text layoutX="22.0" layoutY="590.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Vstupna paska" wrappingWidth="117.00000000000011">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </Text>
+      <Button fx:id="stepButton" layoutX="18.0" layoutY="645.0" mnemonicParsing="false" onAction="#step" text="Krok" />
+      <Button fx:id="startButton" layoutX="77.0" layoutY="548.0" mnemonicParsing="false" onAction="#start" text="Spusti" />
+      <TextField fx:id="begSymbol" layoutX="80.0" layoutY="451.0" prefHeight="25.0" prefWidth="28.0" />
+      <Text layoutX="18.0" layoutY="434.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Počiatočný zásobníkový symbol" wrappingWidth="180.0" />
    </children>
 </AnchorPane>

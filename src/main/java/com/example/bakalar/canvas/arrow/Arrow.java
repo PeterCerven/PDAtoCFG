@@ -1,6 +1,7 @@
 package com.example.bakalar.canvas.arrow;
 
 import com.example.bakalar.canvas.node.MyNode;
+import com.example.bakalar.canvas.node.NodeTransition;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
 import javafx.scene.control.ButtonType;
@@ -158,6 +159,9 @@ public abstract class Arrow extends Group {
         });
     }
 
+    public NodeTransition getTransition() {
+        return new NodeTransition(read, pop, push);
+    }
 }
 
 

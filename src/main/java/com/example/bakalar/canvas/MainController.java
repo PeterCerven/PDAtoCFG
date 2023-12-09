@@ -5,12 +5,17 @@ import com.example.bakalar.canvas.arrow.LineArrow;
 import com.example.bakalar.canvas.button.ButtonState;
 import com.example.bakalar.canvas.node.MyNode;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextField;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -21,9 +26,13 @@ public class MainController {
     private static final Logger log = LogManager.getLogger(MainController.class.getName());
     @FXML
     private ScrollPane myScrollPane;
-
     @FXML
     private AnchorPane mainPane;
+
+    @FXML
+    private VBox stack;
+    @FXML
+    private HBox inputAlphabet;
 
     @FXML
     private Button nodeBtn;
@@ -39,23 +48,48 @@ public class MainController {
     private Button reUndoBtn;
     @FXML
     private Button selectBtn;
-
+    @FXML
+    private Button startButton;
+    @FXML
+    private Button stepButton;
+    @FXML
+    private TextField inputFieldAlphabet;
+    @FXML
+    private TextField begSymbol;
     private ButtonState currentState = ButtonState.NONE;
-
     private MyNode selectedNode;
     private double startX, startY;
     private Board board;
+    private BoardLogic boardLogic;
 
 
     @FXML
     private void initialize() {
-        board = new Board(mainPane);
+        board = new Board(mainPane, stack, inputAlphabet);
+        this.boardLogic = new BoardLogic(board);
+        initStack();
     }
 
+    // initialization
+
+    private void initStack() {
+        for (int i = 0; i < 10; i++) {
+            TextField textField = new TextField();
+            textField.setAlignment(Pos.CENTER);
+            textField.setStyle("-fx-border-color: black;");
+            textField.setEditable(false);
+            stack.getChildren().add(textField);
+        }
+    }
+
+    // Objects creation
 
     public void createNode(MouseEvent event) {
         if (currentState.equals(ButtonState.NODE) && event.getButton() == MouseButton.PRIMARY) {
-            createNode(event.getX(), event.getY());
+            MyNode myNode = new MyNode(event.getX(), event.getY(), NODE_RADIUS);
+            makeDraggable(myNode);
+            enableArrowCreation(myNode);
+            board.addObject(myNode);
         }
     }
 
@@ -73,6 +107,8 @@ public class MainController {
             board.selectNode(node, true);
         }
     }
+
+    // Event handlers
 
     private void makeCurveDraggable(LineArrow arrow) {
         arrow.getControlIndicator().setOnMousePressed(event -> {
@@ -121,13 +157,11 @@ public class MainController {
     }
 
 
-
     private void enableArrowCreation(MyNode node) {
         node.setOnMouseClicked(event -> {
             if (currentState.equals(ButtonState.ARROW) && event.getButton() == MouseButton.PRIMARY) {
                 createArrow(node);
-            }
-            else if (currentState.equals(ButtonState.ERASE) && event.getButton() == MouseButton.PRIMARY) {
+            } else if (currentState.equals(ButtonState.ERASE) && event.getButton() == MouseButton.PRIMARY) {
                 board.removeObject(node);
             }
         });
@@ -141,13 +175,7 @@ public class MainController {
         });
     }
 
-
-    private void createNode(double x, double y) {
-        MyNode myNode = new MyNode(x, y, NODE_RADIUS);
-        makeDraggable(myNode);
-        enableArrowCreation(myNode);
-        board.addObject(myNode);
-    }
+    // Buttons actions
 
     public void resetAll() {
         board.clearBoard();
@@ -156,14 +184,31 @@ public class MainController {
         updateButtonStates();
     }
 
-    private void toggleButtonState(ButtonState newState) {
-        if (currentState == newState) {
-            currentState = ButtonState.NONE;
-        } else {
-            currentState = newState;
-        }
-        updateButtonStates();
+    public void start() {
+        log.info("Start");
+        String begSymbol = this.begSymbol.getText();
+        String inputAlphabet = this.inputFieldAlphabet.getText();
+        boardLogic.start(begSymbol, inputAlphabet);
+        // TODO start
     }
+
+    public void step() {
+        log.info("Step");
+        boardLogic.step();
+        // TODO step
+    }
+
+    public void reUndo() {
+        log.info("ReUndo");
+        // TODO reUndo
+    }
+
+    public void undo() {
+        log.info("Undo");
+        // TODO undo
+    }
+
+    // Buttons toggle
 
     private void updateButtonStates() {
         nodeBtn.setText(currentState == ButtonState.NODE ? "Vypni" : "Zvol kruh");
@@ -188,12 +233,14 @@ public class MainController {
         toggleButtonState(ButtonState.SELECT);
     }
 
-
-    public void reUndo() {
-        // TODO reUndo
+    private void toggleButtonState(ButtonState newState) {
+        if (currentState == newState) {
+            currentState = ButtonState.NONE;
+        } else {
+            currentState = newState;
+        }
+        updateButtonStates();
     }
 
-    public void undo() {
-        // TODO undo
-    }
+
 }
