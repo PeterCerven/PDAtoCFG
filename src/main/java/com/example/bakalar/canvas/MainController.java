@@ -61,6 +61,7 @@ public class MainController {
 
     @FXML
     private void initialize() {
+        this.begSymbol.setText("Z");
         board = new Board(mainPane, inputAlphabet);
         this.boardLogic = new BoardLogic(board, this.stateContainer);
     }

@@ -72,26 +72,7 @@ public class BoardLogic {
         }
     }
 
-//    public void updateStack(Stack<TerminalSymbol> stack) {
-//        for (int i = 0; i < 10; i++) {
-//            TextField textField = (TextField) this.stack.getChildren().get(i);
-//            if (i < stack.size()) {
-//                textField.setText(stack.get(i).toString());
-//            } else {
-//                textField.setText("");
-//            }
-//        }
-//    }
-//
-//    private void initStack() {
-//        for (int i = 0; i < 10; i++) {
-//            TextField textField = new TextField();
-//            textField.setAlignment(Pos.CENTER);
-//            textField.setStyle("-fx-border-color: black;");
-//            textField.setEditable(false);
-//            stack.getChildren().add(textField);
-//        }
-//    }
+
 
 
 }
