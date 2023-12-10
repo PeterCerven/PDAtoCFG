@@ -35,13 +35,11 @@ public class Board {
     private int nodeCounter;
     private CheckBox startingCheckBox;
     private CheckBox endingCheckBox;
-    private VBox stack;
     private HBox inputAlphabet;
 
-    public Board(AnchorPane mainPane, VBox stack, HBox inputAlphabet) {
+    public Board(AnchorPane mainPane, HBox inputAlphabet) {
         this.nodes = new ArrayList<>();
         this.arrows = new ArrayList<>();
-        this.stack = stack;
         this.inputAlphabet = inputAlphabet;
         this.mainPane = mainPane;
         this.startNodeArrow = new StartNodeArrow(0, 0, 0);
@@ -163,6 +161,7 @@ public class Board {
                 node.setName(nameField.getText());
                 if (startingCheckBox.isSelected()) {
                     removeStartingFromOtherNodes();
+                    this.startNode = node;
                 }
                 setStarting(node, startingCheckBox.isSelected());
                 setEnding(node, endingCheckBox.isSelected());
@@ -183,16 +182,5 @@ public class Board {
         node.setSelected(select);
     }
 
-    // Start pushdown automata logic
 
-    public void updateStack(Stack<TerminalSymbol> stack) {
-        for (int i = 0; i < 10; i++) {
-            TextField textField = (TextField) this.stack.getChildren().get(i);
-            if (i < stack.size()) {
-                textField.setText(stack.get(i).toString());
-            } else {
-                textField.setText("");
-            }
-        }
-    }
 }

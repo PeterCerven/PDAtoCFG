@@ -10,10 +10,7 @@ module com.example.bakalar {
 
     opens com.example.bakalar to javafx.fxml;
     exports com.example.bakalar;
-    exports com.example.bakalar.pda;
     exports com.example.bakalar.character;
-
-    opens com.example.bakalar.pda to javafx.fxml;
 
     opens com.example.bakalar.cfg to lombok, javafx.fxml;
     exports com.example.bakalar.cfg;
@@ -25,4 +22,6 @@ module com.example.bakalar {
     opens com.example.bakalar.canvas.arrow to javafx.fxml, lombok;
     exports com.example.bakalar.canvas.node;
     opens com.example.bakalar.canvas.node to javafx.fxml, lombok;
+    exports com.example.bakalar.canvas.transitions;
+    opens com.example.bakalar.canvas.transitions to javafx.fxml, lombok;
 }

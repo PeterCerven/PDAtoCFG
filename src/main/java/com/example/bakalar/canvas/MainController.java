@@ -4,8 +4,8 @@ import com.example.bakalar.canvas.arrow.Arrow;
 import com.example.bakalar.canvas.arrow.LineArrow;
 import com.example.bakalar.canvas.button.ButtonState;
 import com.example.bakalar.canvas.node.MyNode;
+import com.example.bakalar.canvas.transitions.BoardLogic;
 import javafx.fxml.FXML;
-import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
@@ -14,8 +14,6 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
-import javafx.scene.text.Text;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -28,12 +26,8 @@ public class MainController {
     private ScrollPane myScrollPane;
     @FXML
     private AnchorPane mainPane;
-
-    @FXML
-    private VBox stack;
     @FXML
     private HBox inputAlphabet;
-
     @FXML
     private Button nodeBtn;
     @FXML
@@ -56,6 +50,8 @@ public class MainController {
     private TextField inputFieldAlphabet;
     @FXML
     private TextField begSymbol;
+    @FXML
+    private HBox stateContainer;
     private ButtonState currentState = ButtonState.NONE;
     private MyNode selectedNode;
     private double startX, startY;
@@ -65,22 +61,10 @@ public class MainController {
 
     @FXML
     private void initialize() {
-        board = new Board(mainPane, stack, inputAlphabet);
-        this.boardLogic = new BoardLogic(board);
-        initStack();
+        board = new Board(mainPane, inputAlphabet);
+        this.boardLogic = new BoardLogic(board, this.stateContainer);
     }
 
-    // initialization
-
-    private void initStack() {
-        for (int i = 0; i < 10; i++) {
-            TextField textField = new TextField();
-            textField.setAlignment(Pos.CENTER);
-            textField.setStyle("-fx-border-color: black;");
-            textField.setEditable(false);
-            stack.getChildren().add(textField);
-        }
-    }
 
     // Objects creation
 
