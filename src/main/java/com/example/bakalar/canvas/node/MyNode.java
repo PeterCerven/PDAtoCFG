@@ -21,6 +21,7 @@ public class MyNode extends Group {
     private Text nameText;
     private String name;
     private ArrayList<Arrow> arrows;
+    private ArrayList<Arrow> arrowsFrom;
     private boolean starting;
     private boolean ending;
     private EndNode endNode;
@@ -47,6 +48,7 @@ public class MyNode extends Group {
 
         this.getChildren().addAll(circle, endNode, nameText, startNodeArrow);
         this.arrows = new ArrayList<>();
+        this.arrowsFrom = new ArrayList<>();
     }
 
     public double getAbsoluteCentrePosX() {
@@ -77,8 +79,11 @@ public class MyNode extends Group {
     }
 
 
-    public void addArrow(Arrow arrow) {
+    public void addArrow(Arrow arrow, boolean from) {
         this.arrows.add(arrow);
+        if (from) {
+            this.arrowsFrom.add(arrow);
+        }
     }
 
     public void setName(String newName) {

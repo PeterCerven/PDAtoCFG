@@ -178,9 +178,7 @@ public class MainController {
     }
 
     public void step() {
-        log.info("Step");
         boardLogic.step();
-        // TODO step
     }
 
     public void reUndo() {

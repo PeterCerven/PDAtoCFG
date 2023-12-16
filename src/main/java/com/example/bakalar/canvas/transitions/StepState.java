@@ -1,43 +1,38 @@
 package com.example.bakalar.canvas.transitions;
 
+import com.example.bakalar.canvas.MainController;
 import com.example.bakalar.canvas.node.MyNode;
-import com.example.bakalar.character.TerminalSymbol;
 import javafx.geometry.Pos;
-import javafx.scene.Group;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.util.List;
-import java.util.Stack;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 @Getter
 @Setter
-public class StepState extends Group {
-    private VBox stackContainer;
-    private HBox inputAlphabetContainer;
+public class StepState extends Pane {
+    private static final Logger log = LogManager.getLogger(MainController.class.getName());
     private MyNode currentNode;
-    private Stack<TerminalSymbol> stack;
-    private List<TerminalSymbol> inputAlphabet;
+    private TextField stack;
     private Circle circle;
     private Text nodeName;
+    private StateColor state;
 
-    public StepState(Stack<TerminalSymbol> stack, List<TerminalSymbol> inputAlphabet, MyNode currentNode) {
+    public StepState(TextField stack, MyNode currentNode, StateColor state) {
         this.currentNode = currentNode;
         this.stack = stack;
-        this.inputAlphabet = inputAlphabet;
+        this.state = state;
 
-        initStack();
-        initInputAlphabet();
         initCircle();
         initTextField();
+        initStackField();
 
-
-        this.getChildren().addAll(stackContainer, inputAlphabetContainer, circle, nodeName);
+        this.setStyle("-fx-border-color: black; -fx-border-width: 2; -fx-border-radius: 5; -fx-background-color: " + state.getColor() + "; -fx-background-radius: 5;");
+        this.getChildren().addAll(stack, circle, nodeName);
     }
 
     private void initCircle() {
@@ -54,46 +49,12 @@ public class StepState extends Group {
         this.nodeName.setStyle("-fx-border-color: black;");
     }
 
-    private void initInputAlphabet() {
-        this.inputAlphabetContainer = new HBox();
-        this.inputAlphabetContainer.setLayoutX(0);
-        this.inputAlphabetContainer.setLayoutY(40);
-
-        for (int i = 0; i < 10; i++) {
-            TextField textField = new TextField();
-            textField.setAlignment(Pos.CENTER);
-            textField.setPrefWidth(5);
-            textField.setPrefHeight(5);
-            textField.setStyle("-fx-border-color: black;");
-            textField.setEditable(false);
-            inputAlphabetContainer.getChildren().add(textField);
-        }
-    }
-
-    public void updateStack(Stack<TerminalSymbol> stack) {
-        for (int i = 0; i < 10; i++) {
-            TextField textField = (TextField) this.stackContainer.getChildren().get(i);
-            if (i < stack.size()) {
-                textField.setText(stack.get(i).toString());
-            } else {
-                textField.setText("");
-            }
-        }
-    }
-
-    private void initStack() {
-        this.stackContainer = new VBox();
-        this.stackContainer.setLayoutX(170);
-        this.stackContainer.setLayoutY(0);
-        for (int i = 0; i < 10; i++) {
-            TextField textField = new TextField();
-            textField.setPrefWidth(10);
-            textField.setPrefHeight(10);
-            textField.setAlignment(Pos.CENTER);
-            textField.setStyle("-fx-border-color: black;");
-            textField.setEditable(false);
-            stackContainer.getChildren().add(textField);
-        }
+    private void initStackField() {
+        this.stack.setAlignment(Pos.CENTER);
+        this.stack.setEditable(false);
+        this.stack.setStyle("-fx-border-color: black; -fx-border-width: 2; -fx-background-color: white; -fx-background-radius: 5;");
+        this.stack.setLayoutX(10);
+        this.stack.setLayoutY(50);
     }
 
 

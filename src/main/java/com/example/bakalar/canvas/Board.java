@@ -87,8 +87,8 @@ public class Board {
                 arrow = new LineArrow(from, to);
             }
         }
-        from.addArrow(arrow);
-        to.addArrow(arrow);
+        from.addArrow(arrow, true);
+        to.addArrow(arrow, false);
         this.addObject(arrow);
         return arrow;
     }
