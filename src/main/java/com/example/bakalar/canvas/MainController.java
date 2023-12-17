@@ -17,6 +17,8 @@ import javafx.scene.layout.HBox;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.List;
+
 
 public class MainController {
 
@@ -26,8 +28,6 @@ public class MainController {
     private ScrollPane myScrollPane;
     @FXML
     private AnchorPane mainPane;
-    @FXML
-    private HBox inputAlphabet;
     @FXML
     private Button nodeBtn;
     @FXML
@@ -52,6 +52,18 @@ public class MainController {
     private TextField begSymbol;
     @FXML
     private HBox stateContainer;
+    @FXML
+    private TextField describeStates;
+    @FXML
+    private TextField describeAlphabet;
+    @FXML
+    private TextField describeStackAlphabet;
+    @FXML
+    private TextField describeStartingState;
+    @FXML
+    private TextField describeStartingStackSymbol;
+    @FXML
+    private TextField describeEndStates;
     private ButtonState currentState = ButtonState.NONE;
     private MyNode selectedNode;
     private double startX, startY;
@@ -61,9 +73,13 @@ public class MainController {
 
     @FXML
     private void initialize() {
-        this.begSymbol.setText("Z");
-        board = new Board(mainPane, inputAlphabet);
+        this.begSymbol.setText("Z\u2080");
+        List<TextField> describeFields = List.of(describeStates, describeAlphabet, describeStackAlphabet, describeStartingState, describeStartingStackSymbol, describeEndStates);
+        board = new Board(mainPane, inputFieldAlphabet, describeFields);
         this.boardLogic = new BoardLogic(board, this.stateContainer);
+        inputFieldAlphabet.textProperty().addListener((observable, oldValue, newValue) -> {
+            board.updateAllDescribePDA();
+        });
     }
 
 
@@ -94,6 +110,7 @@ public class MainController {
     }
 
     // Event handlers
+
 
     private void makeCurveDraggable(LineArrow arrow) {
         arrow.getControlIndicator().setOnMousePressed(event -> {

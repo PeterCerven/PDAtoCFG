@@ -5,23 +5,21 @@ import com.example.bakalar.canvas.arrow.LineArrow;
 import com.example.bakalar.canvas.arrow.SelfLoopArrow;
 import com.example.bakalar.canvas.node.MyNode;
 import com.example.bakalar.canvas.node.StartNodeArrow;
-import com.example.bakalar.character.TerminalSymbol;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.Dialog;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Optional;
 
 @Getter
 @Setter
@@ -35,12 +33,21 @@ public class Board {
     private int nodeCounter;
     private CheckBox startingCheckBox;
     private CheckBox endingCheckBox;
-    private HBox inputAlphabet;
+    private TextField inputFieldAlphabet;
+    private Button conversionBtn;
+    private TextField describeStates;
+    private TextField describeAlphabet;
+    private TextField describeStackAlphabet;
+    private TextField describeStartingState;
+    private TextField describeStartingStackSymbol;
+    private TextField describeEndStates;
 
-    public Board(AnchorPane mainPane, HBox inputAlphabet) {
+
+    public Board(AnchorPane mainPane, TextField inputFieldAlphabet, List<TextField> describeFields) {
         this.nodes = new ArrayList<>();
+        initDescribeFields(describeFields);
         this.arrows = new ArrayList<>();
-        this.inputAlphabet = inputAlphabet;
+        this.inputFieldAlphabet = inputFieldAlphabet;
         this.mainPane = mainPane;
         this.startNodeArrow = new StartNodeArrow(0, 0, 0);
         this.addObject(startNodeArrow);
@@ -50,6 +57,70 @@ public class Board {
         this.endingCheckBox = new CheckBox("End Node");
     }
 
+    // init functions
+
+    private void initDescribeFields(List<TextField> describeFields) {
+        this.describeStates = describeFields.get(0);
+        this.describeAlphabet = describeFields.get(1);
+        this.describeStackAlphabet = describeFields.get(2);
+        this.describeStartingState = describeFields.get(3);
+        this.describeStartingStackSymbol = describeFields.get(4);
+        this.describeEndStates = describeFields.get(5);
+    }
+
+    // describe functions
+
+    public void updateAllDescribePDA() {
+        updateDescribeStates();
+        updateDescribeAlphabet();
+//        updateDescribeStackAlphabet();
+//        updateDescribeStartingState();
+//        updateDescribeStartingStackSymbol();
+//        updateDescribeEndStates();
+    }
+
+    private void updateDescribeStates() {
+        StringBuilder text = new StringBuilder("Q = {");
+        for (MyNode node : nodes) {
+            text.append(node.getName()).append(", ");
+        }
+        if (!nodes.isEmpty()) {
+            text.delete(text.length() - 2, text.length());
+        }
+        text.append("}");
+        this.describeStates.setText(text.toString());
+    }
+
+    private void updateDescribeAlphabet() {
+        StringBuilder text = new StringBuilder("\u03A3 = {");
+        for (Character character : inputFieldAlphabet.getText().toCharArray()) {
+            text.append(character).append(", ");
+        }
+        if (!inputFieldAlphabet.getText().isEmpty()) {
+            text.delete(text.length() - 2, text.length());
+        }
+        text.append("}");
+        this.describeAlphabet.setText(text.toString());
+    }
+
+    private void updateDescribeStackAlphabet() {
+        this.describeStackAlphabet.setText("s");
+    }
+
+    private void updateDescribeStartingState() {
+        this.describeStartingState.setText(this.startNode.toString());
+    }
+
+    private void updateDescribeStartingStackSymbol() {
+        this.describeStartingStackSymbol.setText(this.startNode.toString());
+    }
+
+    private void updateDescribeEndStates() {
+        this.describeEndStates.setText(this.nodes.toString());
+    }
+
+
+    // adding and removing objects
 
     public void removeObject(Node node) {
         if (node instanceof Arrow arrow) {
@@ -70,6 +141,7 @@ public class Board {
             nodes.remove(myNode);
         }
         mainPane.getChildren().remove(node);
+        updateAllDescribePDA();
     }
 
     public Arrow createArrow(MyNode from, MyNode to) {
@@ -102,7 +174,10 @@ public class Board {
 
         }
         mainPane.getChildren().add(node);
+        updateAllDescribePDA();
     }
+
+    // utility functions
 
     private Arrow sameArrowExists(MyNode from, MyNode to) {
         for (Arrow arrow : arrows) {
@@ -122,7 +197,6 @@ public class Board {
         return false;
     }
 
-
     public void clearBoard() {
         mainPane.getChildren().clear();
     }
@@ -133,6 +207,21 @@ public class Board {
             setStarting(node, false);
         }
     }
+
+    public void setStarting(MyNode node, boolean starting) {
+        node.setStarting(starting);
+    }
+
+    private void setEnding(MyNode node, boolean ending) {
+        node.setEnding(ending);
+
+    }
+
+    public void selectNode(MyNode node, boolean select) {
+        node.setSelected(select);
+    }
+
+    // event handlers
 
     public void showDialog(MyNode node) {
         Dialog<ButtonType> dialog = new Dialog<>();
@@ -167,19 +256,6 @@ public class Board {
                 setEnding(node, endingCheckBox.isSelected());
             }
         });
-    }
-
-    public void setStarting(MyNode node, boolean starting) {
-        node.setStarting(starting);
-    }
-
-    private void setEnding(MyNode node, boolean ending) {
-        node.setEnding(ending);
-
-    }
-
-    public void selectNode(MyNode node, boolean select) {
-        node.setSelected(select);
     }
 
 
