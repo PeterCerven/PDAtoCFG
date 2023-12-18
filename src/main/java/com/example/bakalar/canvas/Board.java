@@ -10,20 +10,22 @@ import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
-import javafx.scene.text.Text;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Getter
 @Setter
 public class Board {
+    public static final String LAMDA = "λ";
+    public static final String EPSILON = "ε";
+    public static final String GAMMA_CAPITAL = "Γ";
+    public static final String SIGMA = "Σ";
+    public static final String DELTA_LOWER = "δ";
+    public static final String Z_ZERO = "Z₀";
     private static final Logger log = LogManager.getLogger(Board.class.getName());
     private List<MyNode> nodes;
     private List<Arrow> arrows;
@@ -63,9 +65,7 @@ public class Board {
         this.describeStates = describeFields.get(0);
         this.describeAlphabet = describeFields.get(1);
         this.describeStackAlphabet = describeFields.get(2);
-        this.describeStartingState = describeFields.get(3);
-        this.describeStartingStackSymbol = describeFields.get(4);
-        this.describeEndStates = describeFields.get(5);
+        this.describeEndStates = describeFields.get(3);
     }
 
     // describe functions
@@ -73,14 +73,12 @@ public class Board {
     public void updateAllDescribePDA() {
         updateDescribeStates();
         updateDescribeAlphabet();
-//        updateDescribeStackAlphabet();
-//        updateDescribeStartingState();
-//        updateDescribeStartingStackSymbol();
-//        updateDescribeEndStates();
+        updateDescribeStackAlphabet();
+        updateDescribeEndStates();
     }
 
     private void updateDescribeStates() {
-        StringBuilder text = new StringBuilder("Q = {");
+        StringBuilder text = new StringBuilder("K = {");
         for (MyNode node : nodes) {
             text.append(node.getName()).append(", ");
         }
@@ -92,8 +90,12 @@ public class Board {
     }
 
     private void updateDescribeAlphabet() {
-        StringBuilder text = new StringBuilder("\u03A3 = {");
+        StringBuilder text = new StringBuilder(SIGMA + " = {");
+        Set<Character> alphabet = new HashSet<>();
         for (Character character : inputFieldAlphabet.getText().toCharArray()) {
+            alphabet.add(character);
+        }
+        for (Character character : alphabet) {
             text.append(character).append(", ");
         }
         if (!inputFieldAlphabet.getText().isEmpty()) {
@@ -104,19 +106,35 @@ public class Board {
     }
 
     private void updateDescribeStackAlphabet() {
-        this.describeStackAlphabet.setText("s");
+        StringBuilder text = new StringBuilder(GAMMA_CAPITAL + " = { " + Z_ZERO);
+        Set<String> stackAlphabet = new HashSet<>();
+        for (Arrow arrow : arrows) {
+            if (!arrow.getPush().equals(EPSILON)) {
+                stackAlphabet.add(arrow.getPush());
+            }
+        }
+        for (String symbol : stackAlphabet) {
+            text.append(", ").append(symbol);
+        }
+        text.append(" }");
+        this.describeStackAlphabet.setText(text.toString());
     }
 
-    private void updateDescribeStartingState() {
-        this.describeStartingState.setText(this.startNode.toString());
-    }
-
-    private void updateDescribeStartingStackSymbol() {
-        this.describeStartingStackSymbol.setText(this.startNode.toString());
-    }
 
     private void updateDescribeEndStates() {
-        this.describeEndStates.setText(this.nodes.toString());
+        StringBuilder text = new StringBuilder("F = {");
+        boolean hasEndStates = false;
+        for (MyNode node : nodes) {
+            if (node.isEnding()) {
+                text.append(node.getName()).append(", ");
+                hasEndStates = true;
+            }
+        }
+        if (hasEndStates) {
+            text.delete(text.length() - 2, text.length());
+        }
+        text.append("}");
+        this.describeEndStates.setText(text.toString());
     }
 
 
@@ -151,12 +169,12 @@ public class Board {
             return arrow;
         }
         if (from == to) {
-            arrow = new SelfLoopArrow(from, to);
+            arrow = new SelfLoopArrow(from, to, this);
         } else {
             if (oppositeExists(from, to)) {
-                arrow = new LineArrow(from, to, 30);
+                arrow = new LineArrow(from, to, 30, this);
             } else {
-                arrow = new LineArrow(from, to);
+                arrow = new LineArrow(from, to, this);
             }
         }
         from.addArrow(arrow, true);
@@ -255,6 +273,7 @@ public class Board {
                 setStarting(node, startingCheckBox.isSelected());
                 setEnding(node, endingCheckBox.isSelected());
             }
+            updateAllDescribePDA();
         });
     }
 

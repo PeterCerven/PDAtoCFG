@@ -37,13 +37,11 @@
          </content>
       </ScrollPane>
       <Button fx:id="conversionBtn" layoutX="724.0" layoutY="455.0" mnemonicParsing="false" text="Konvertuj" />
-      <VBox fx:id="describePDA" layoutX="699.0" layoutY="52.0" prefHeight="151.0" prefWidth="135.0" style="-fx-border-color: black;">
+      <VBox fx:id="describePDA" layoutX="699.0" layoutY="52.0" prefHeight="102.0" prefWidth="135.0" style="-fx-border-color: black;">
          <children>
             <TextField fx:id="describeStates" />
             <TextField fx:id="describeAlphabet" />
             <TextField fx:id="describeStackAlphabet" />
-            <TextField fx:id="describeStartingState" />
-            <TextField fx:id="describeStartingStackSymbol" />
             <TextField fx:id="describeEndStates" />
          </children>
       </VBox>

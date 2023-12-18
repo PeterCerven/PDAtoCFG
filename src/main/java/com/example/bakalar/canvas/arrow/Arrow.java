@@ -1,5 +1,6 @@
 package com.example.bakalar.canvas.arrow;
 
+import com.example.bakalar.canvas.Board;
 import com.example.bakalar.canvas.node.MyNode;
 import com.example.bakalar.canvas.node.NodeTransition;
 import javafx.geometry.Point2D;
@@ -26,7 +27,7 @@ import java.util.Optional;
 @Setter
 public abstract class Arrow extends Group {
     public static final int ARROW_HEAD_SZIE = 15;
-    public static final String LAMDA = "λ";
+    public static final String EPSILON = "ε";
     protected static final Logger log = LogManager.getLogger(Arrow.class.getName());
     protected MyNode from;
     protected MyNode to;
@@ -35,15 +36,18 @@ public abstract class Arrow extends Group {
     protected String push;
     protected VBox symbolContainers;
     protected Polygon arrowHead;
+    protected Board board;
 
 
-    public Arrow(MyNode from, MyNode to) {
+    public Arrow(MyNode from, MyNode to, Board board) {
         super();
         this.from = from;
         this.to = to;
-        this.read = LAMDA;
-        this.pop = LAMDA;
-        this.push = LAMDA;
+        this.read = EPSILON;
+        this.pop = EPSILON;
+        this.push = EPSILON;
+        this.board = board;
+
         this.symbolContainers = new VBox();
         setViewOrder(1);
         createArrowHead();
@@ -148,13 +152,14 @@ public abstract class Arrow extends Group {
         Optional<ButtonType> result = dialog.showAndWait();
         result.ifPresent(buttonType -> {
             if (buttonType == ButtonType.OK) {
-                this.read = input1.getText().isBlank() ? LAMDA : input1.getText();
-                this.pop = input2.getText().isBlank() ? LAMDA : input2.getText();
-                this.push = input3.getText().isBlank() ? LAMDA : input3.getText();
+                this.read = input1.getText().isBlank() ? EPSILON : input1.getText();
+                this.pop = input2.getText().isBlank() ? EPSILON : input2.getText();
+                this.push = input3.getText().isBlank() ? EPSILON : input3.getText();
 
                 if (container != null) {
                     container.getChildren().setAll(new Text(read), new Text(pop), new Text(push));
                 }
+                this.board.updateAllDescribePDA();
             }
         });
     }

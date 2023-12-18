@@ -59,10 +59,6 @@ public class MainController {
     @FXML
     private TextField describeStackAlphabet;
     @FXML
-    private TextField describeStartingState;
-    @FXML
-    private TextField describeStartingStackSymbol;
-    @FXML
     private TextField describeEndStates;
     private ButtonState currentState = ButtonState.NONE;
     private MyNode selectedNode;
@@ -73,8 +69,8 @@ public class MainController {
 
     @FXML
     private void initialize() {
-        this.begSymbol.setText("Z\u2080");
-        List<TextField> describeFields = List.of(describeStates, describeAlphabet, describeStackAlphabet, describeStartingState, describeStartingStackSymbol, describeEndStates);
+        this.begSymbol.setText("Z₀");
+        List<TextField> describeFields = List.of(describeStates, describeAlphabet, describeStackAlphabet, describeEndStates);
         board = new Board(mainPane, inputFieldAlphabet, describeFields);
         this.boardLogic = new BoardLogic(board, this.stateContainer);
         inputFieldAlphabet.textProperty().addListener((observable, oldValue, newValue) -> {

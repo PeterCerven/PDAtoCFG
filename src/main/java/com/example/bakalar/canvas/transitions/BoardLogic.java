@@ -3,7 +3,6 @@ package com.example.bakalar.canvas.transitions;
 import com.example.bakalar.canvas.Board;
 import com.example.bakalar.canvas.arrow.Arrow;
 import com.example.bakalar.canvas.node.MyNode;
-import com.example.bakalar.canvas.node.NodeTransition;
 import com.example.bakalar.character.TerminalSymbol;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
@@ -12,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
-import static com.example.bakalar.canvas.arrow.Arrow.LAMDA;
+import static com.example.bakalar.canvas.arrow.Arrow.EPSILON;
 
 public class BoardLogic {
     private Stack<TerminalSymbol> startingStack;
@@ -65,9 +64,9 @@ public class BoardLogic {
                 char pop = arrow.getPop().charAt(0);
                 char push = arrow.getPush().charAt(0);
                 TextField stack = new TextField();
-                if (read == inputLetterToRead.getName() && (pop == stackTop || pop == LAMDA.charAt(0))) {
-                    String newStackAfterPop = pop == LAMDA.charAt(0) ? stepState.getStack().getText() : stepState.getStack().getText().substring(1);
-                    String newStackAfterPush = push == LAMDA.charAt(0) ? newStackAfterPop : push + newStackAfterPop;
+                if (read == inputLetterToRead.getName() && (pop == stackTop || pop == EPSILON.charAt(0))) {
+                    String newStackAfterPop = pop == EPSILON.charAt(0) ? stepState.getStack().getText() : stepState.getStack().getText().substring(1);
+                    String newStackAfterPush = push == EPSILON.charAt(0) ? newStackAfterPop : push + newStackAfterPop;
                     stack.setText(newStackAfterPush);
                     MyNode currentNode = arrow.getTo();
                     StepState newStepState = stack.getText().isEmpty()

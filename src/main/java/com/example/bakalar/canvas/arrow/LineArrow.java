@@ -1,5 +1,6 @@
 package com.example.bakalar.canvas.arrow;
 
+import com.example.bakalar.canvas.Board;
 import com.example.bakalar.canvas.node.MyNode;
 import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;
@@ -23,8 +24,8 @@ public class LineArrow extends Arrow {
     private double endX;
     private double endY;
 
-    public LineArrow(MyNode from, MyNode to) {
-        super(from, to);
+    public LineArrow(MyNode from, MyNode to, Board board) {
+        super(from, to, board);
 
         createLine();
         createControlIndicator();
@@ -34,8 +35,8 @@ public class LineArrow extends Arrow {
         this.updateObjects(true);
     }
 
-    public LineArrow(MyNode from, MyNode to, double change) {
-        this(from, to);
+    public LineArrow(MyNode from, MyNode to, double change, Board board) {
+        this(from, to, board);
         Point2D thirdPoint = getThirdPoint(change);
         this.controlPointChangeX = thirdPoint.getX() - (startX + endX) / 2.0;
         this.controlPointChangeY = thirdPoint.getY() - (startY + endY) / 2.0;
@@ -136,7 +137,7 @@ public class LineArrow extends Arrow {
         double midY = highestPoint.getY();
 
         double offsetX = -symbolContainers.getWidth() / 2.0;
-        double offsetY = -symbolContainers.getHeight();
+        double offsetY = -symbolContainers.getHeight() - 4;
 
         symbolContainers.setLayoutX(midX + offsetX);
         symbolContainers.setLayoutY(midY + offsetY);
@@ -203,10 +204,6 @@ public class LineArrow extends Arrow {
         line.setStartY(startY);
         line.setEndX(endX);
         line.setEndY(endY);
-    }
-
-    private Point2D getDifference(double x1, double y1, double x2, double y2) {
-        return new Point2D(x2 - x1, y2 - y1);
     }
 
     private void createControlIndicator() {
