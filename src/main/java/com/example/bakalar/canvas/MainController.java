@@ -14,6 +14,7 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -60,6 +61,9 @@ public class MainController {
     private TextField describeStackAlphabet;
     @FXML
     private TextField describeEndStates;
+    @FXML
+    private VBox transFunctions;
+
     private ButtonState currentState = ButtonState.NONE;
     private MyNode selectedNode;
     private double startX, startY;
@@ -71,7 +75,7 @@ public class MainController {
     private void initialize() {
         this.begSymbol.setText("Z₀");
         List<TextField> describeFields = List.of(describeStates, describeAlphabet, describeStackAlphabet, describeEndStates);
-        board = new Board(mainPane, inputFieldAlphabet, describeFields);
+        board = new Board(mainPane, inputFieldAlphabet, describeFields, transFunctions);
         this.boardLogic = new BoardLogic(board, this.stateContainer);
         inputFieldAlphabet.textProperty().addListener((observable, oldValue, newValue) -> {
             board.updateAllDescribePDA();
@@ -186,8 +190,7 @@ public class MainController {
         log.info("Start");
         String begSymbol = this.begSymbol.getText();
         String inputAlphabet = this.inputFieldAlphabet.getText();
-        boardLogic.start(begSymbol, inputAlphabet);
-        // TODO start
+        boardLogic.start("Z₀", inputAlphabet);
     }
 
     public void step() {

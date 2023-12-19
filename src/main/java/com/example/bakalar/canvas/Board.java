@@ -4,12 +4,14 @@ import com.example.bakalar.canvas.arrow.Arrow;
 import com.example.bakalar.canvas.arrow.LineArrow;
 import com.example.bakalar.canvas.arrow.SelfLoopArrow;
 import com.example.bakalar.canvas.node.MyNode;
+import com.example.bakalar.canvas.node.NodeTransition;
 import com.example.bakalar.canvas.node.StartNodeArrow;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.logging.log4j.LogManager;
@@ -43,10 +45,12 @@ public class Board {
     private TextField describeStartingState;
     private TextField describeStartingStackSymbol;
     private TextField describeEndStates;
+    private VBox transFunctions;
 
 
-    public Board(AnchorPane mainPane, TextField inputFieldAlphabet, List<TextField> describeFields) {
+    public Board(AnchorPane mainPane, TextField inputFieldAlphabet, List<TextField> describeFields, VBox transFunctions) {
         this.nodes = new ArrayList<>();
+        this.transFunctions = transFunctions;
         initDescribeFields(describeFields);
         this.arrows = new ArrayList<>();
         this.inputFieldAlphabet = inputFieldAlphabet;
@@ -75,6 +79,7 @@ public class Board {
         updateDescribeAlphabet();
         updateDescribeStackAlphabet();
         updateDescribeEndStates();
+        updateDescribeTransFunctions();
     }
 
     private void updateDescribeStates() {
@@ -137,6 +142,24 @@ public class Board {
         this.describeEndStates.setText(text.toString());
     }
 
+    public void updateDescribeTransFunctions() {
+        for (MyNode node : nodes) {
+            for(Arrow arrow : node.getArrowsFrom()) {
+                String createTransFunction = createTransFunction(arrow);
+            }
+        }
+    }
+
+    private String createTransFunction(Arrow arrow) {
+        StringBuilder text = new StringBuilder();
+        text.append(DELTA_LOWER).append("(").append(arrow.getFrom().getName()).append(", ");
+        text.append(arrow.getRead()).append(", ");
+        text.append(arrow.getPop()).append(") = {");
+        text.append(arrow.getTo().getName()).append(", ");
+        text.append(arrow.getPush()).append("}");
+        return text.toString();
+    }
+
 
     // adding and removing objects
 
@@ -187,7 +210,12 @@ public class Board {
         if (node instanceof Arrow arrow) {
             arrows.add(arrow);
         } else if (node instanceof MyNode myNode) {
-            myNode.setName("Q" + nodeCounter++);
+            char character = (char) (nodeCounter + '₀');
+            // utf-8 subscript 0
+            String name = "q" + character;
+
+            myNode.setName(name);
+            nodeCounter++;
             nodes.add(myNode);
 
         }

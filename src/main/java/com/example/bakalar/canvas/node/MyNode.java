@@ -42,6 +42,7 @@ public class MyNode extends Group {
 
         name = "Node";
         nameText = new Text(name);
+        nameText.setFont(javafx.scene.text.Font.font(20));
         nameText.setX(circle.getCenterX() - nameText.getBoundsInLocal().getWidth() / 2);
         nameText.setY(circle.getCenterY() + nameText.getBoundsInLocal().getHeight() / 4);
 

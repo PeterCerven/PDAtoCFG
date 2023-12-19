@@ -47,7 +47,7 @@
       </VBox>
       <Text layoutX="684.0" layoutY="27.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Popis Zásobníkového automatu" />
       <Text layoutX="699.0" layoutY="251.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Prechodové funkcie" />
-      <VBox layoutX="700.0" layoutY="270.0" prefHeight="151.0" prefWidth="135.0" style="-fx-border-color: black;">
+      <VBox fx:id="transFunctions" layoutX="700.0" layoutY="270.0" prefHeight="151.0" prefWidth="135.0" style="-fx-border-color: black;">
          <children>
             <TextField />
             <TextField />
