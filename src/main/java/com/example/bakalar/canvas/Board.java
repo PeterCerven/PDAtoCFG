@@ -6,6 +6,7 @@ import com.example.bakalar.canvas.arrow.SelfLoopArrow;
 import com.example.bakalar.canvas.node.MyNode;
 import com.example.bakalar.canvas.node.NodeTransition;
 import com.example.bakalar.canvas.node.StartNodeArrow;
+import com.example.bakalar.character.MySymbol;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.*;
@@ -115,7 +116,10 @@ public class Board {
         Set<String> stackAlphabet = new HashSet<>();
         for (Arrow arrow : arrows) {
             if (!arrow.getPush().equals(EPSILON)) {
-                stackAlphabet.add(arrow.getPush());
+                String pushString = arrow.getPush();
+                for (int i = 0; i < arrow.getPush().length(); i++) {
+                    stackAlphabet.add((String) pushString.subSequence(i, i + 1));
+                }
             }
         }
         for (String symbol : stackAlphabet) {
@@ -143,9 +147,12 @@ public class Board {
     }
 
     public void updateDescribeTransFunctions() {
+        this.transFunctions.getChildren().clear();
         for (MyNode node : nodes) {
             for(Arrow arrow : node.getArrowsFrom()) {
-                String createTransFunction = createTransFunction(arrow);
+                TextField textField = new TextField(createTransFunction(arrow));
+                textField.setEditable(false);
+                this.transFunctions.getChildren().add(textField);
             }
         }
     }
@@ -245,6 +252,11 @@ public class Board {
 
     public void clearBoard() {
         mainPane.getChildren().clear();
+        nodes.clear();
+        arrows.clear();
+        nodeCounter = 0;
+        startNode = null;
+        updateAllDescribePDA();
     }
 
 

@@ -60,13 +60,15 @@ public class BoardLogic {
                 symbolStack.addAll(stepState.getSymbolStack());
                 MySymbol read = new MySymbol(arrow.getRead());
                 MySymbol pop = new MySymbol(arrow.getPop());
-                MySymbol push = new MySymbol(arrow.getPush());
+                List<MySymbol> pushSymbols = convertStringToListOfSymbols(arrow.getPush());
                 if (read.equals(inputLetterToRead) && (pop.equals(stackTop) || Objects.equals(pop.getName(), EPSILON))) {
                     if (!Objects.equals(pop.getName(), EPSILON)) {
                         symbolStack.pop();
                     }
-                    if (!Objects.equals(push.getName(), EPSILON)) {
-                        symbolStack.push(push);
+                    if (!Objects.equals(pushSymbols.get(0).getName(), EPSILON)) {
+                        for (int i = pushSymbols.size() - 1; i >= 0; i--) {
+                            symbolStack.push(pushSymbols.get(i));
+                        }
                     }
                     MyNode currentNode = arrow.getTo();
                     StepState newStepState = symbolStack.isEmpty()
@@ -96,6 +98,14 @@ public class BoardLogic {
         for (int i = 0; i < inputAlphabet.length(); i++) {
             this.inputAlphabet.add(new MySymbol((String) inputAlphabet.subSequence(i, i + 1)));
         }
+    }
+
+    private List<MySymbol> convertStringToListOfSymbols(String pushString) {
+        List<MySymbol> symbols = new ArrayList<>();
+        for (int i = 0; i < pushString.length(); i++) {
+            symbols.add(new MySymbol((String) pushString.subSequence(i, i + 1)));
+        }
+        return symbols;
     }
 
 
