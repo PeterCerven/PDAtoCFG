@@ -53,13 +53,22 @@ public class GrammarLogic {
         return sortedRules;
     }
 
-    public void reduceGrammar(List<TerminalSymbol> terminals, List<NonTerminalSymbol> nonTerminals, Set<Rule> rules, NonTerminalSymbol startSymbol) {
-        Grammar grammar = removeNonTerminalSymbols(terminals, rules, startSymbol);
+    public void reduceGrammar(Grammar grammar) {
+        NonTerminalSymbol startSymbol = grammar.getStartSymbol();
+        Set<Rule> rules = grammar.getRules();
+        Set<NonTerminalSymbol> nonTerminals = grammar.getNonTerminals();
+        Set<TerminalSymbol> terminals = grammar.getTerminals();
+        grammar = removeNonTerminalSymbols(grammar);
         Set<Rule> newRules = removeCycle(rules);
-        phase2();
+        phase2(grammar);
     }
 
-    private Grammar removeNonTerminalSymbols(List<TerminalSymbol> terminals, Set<Rule> rules, NonTerminalSymbol startSymbol) {
+    private Grammar removeNonTerminalSymbols(Grammar grammar) {
+        NonTerminalSymbol startSymbol = grammar.getStartSymbol();
+        Set<Rule> rules = grammar.getRules();
+        Set<NonTerminalSymbol> nonTerminals = grammar.getNonTerminals();
+        Set<TerminalSymbol> terminals = grammar.getTerminals();
+
         Set<Symbol> beforeSet = new LinkedHashSet<>(terminals);
         Set<Symbol> afterSet = new LinkedHashSet<>();
         while (true) {
@@ -75,11 +84,15 @@ public class GrammarLogic {
             }
             beforeSet = new LinkedHashSet<>(afterSet);
         }
-        removeNonUsedSymbols();
-        return new Grammar(rules, startSymbol);
+        return grammar = removeNonUsedSymbols(grammar);
     }
 
-    private void phase2(List<TerminalSymbol> terminals, Set<Rule> rules, NonTerminalSymbol startSymbol) {
+    private Grammar phase2(Grammar grammar) {
+        NonTerminalSymbol startSymbol = grammar.getStartSymbol();
+        Set<Rule> rules = grammar.getRules();
+        Set<NonTerminalSymbol> nonTerminals = grammar.getNonTerminals();
+        Set<TerminalSymbol> terminals = grammar.getTerminals();
+
         Set<Symbol> beforeSet = new LinkedHashSet<>();
         beforeSet.add(startSymbol);
         Set<Symbol> afterSet = new LinkedHashSet<>();
@@ -97,12 +110,24 @@ public class GrammarLogic {
             }
             beforeSet = new LinkedHashSet<>(afterSet);
         }
-        terminals = afterSet.stream().filter(symbol -> symbol instanceof TerminalSymbol).map(s -> (TerminalSymbol) s).collect(Collectors.toSet());
-        nonTerminals = afterSet.stream().filter(symbol -> symbol instanceof NonTerminalSymbol).map(s -> (NonTerminalSymbol) s).collect(Collectors.toSet());
-        removeNonUsedSymbols();
+        grammar.setTerminals(
+                afterSet.stream()
+                        .filter(symbol -> symbol instanceof TerminalSymbol)
+                        .map(s -> (TerminalSymbol) s).collect(Collectors.toSet())
+        );
+        grammar.setNonTerminals(
+                afterSet.stream()
+                        .filter(symbol -> symbol instanceof NonTerminalSymbol)
+                        .map(s -> (NonTerminalSymbol) s).collect(Collectors.toSet())
+        );
+        removeNonUsedSymbols(grammar);
+        return grammar;
     }
 
-    private void removeNonUsedSymbols() {
+    private Grammar removeNonUsedSymbols(Grammar grammar) {
+        Set<Rule> rules = grammar.getRules();
+        Set<NonTerminalSymbol> nonTerminals = grammar.getNonTerminals();
+        Set<TerminalSymbol> terminals = grammar.getTerminals();
         for (Iterator<Rule> iterator = rules.iterator(); iterator.hasNext(); ) {
             Rule rule = iterator.next();
             if (!nonTerminals.contains(rule.getLeftSide())) {
@@ -114,6 +139,7 @@ public class GrammarLogic {
                 iterator.remove();
             }
         }
+        return grammar;
 
 
     }
@@ -122,7 +148,6 @@ public class GrammarLogic {
         for (Rule rule : rules) {
             if (rule.getRightSide().size() == 1) {
                 rule.getRightSide().removeIf(s -> rule.getLeftSide().equals(s));
-
             }
         }
         return rules;
