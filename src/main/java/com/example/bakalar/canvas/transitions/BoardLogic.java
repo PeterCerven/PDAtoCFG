@@ -4,8 +4,6 @@ import com.example.bakalar.canvas.Board;
 import com.example.bakalar.canvas.arrow.Arrow;
 import com.example.bakalar.canvas.node.MyNode;
 import com.example.bakalar.character.MySymbol;
-import com.example.bakalar.character.TerminalSymbol;
-import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 
 import java.util.ArrayList;
@@ -55,7 +53,7 @@ public class BoardLogic {
             }
             MySymbol stackTop = stepState.getSymbolStack().peek();
             boolean foundWay = false;
-            for (Arrow arrow : stepState.getCurrentNode().getArrowsFrom()) {
+            for (Arrow arrow : stepState.getCurrentNode().getArrows()) {
                 Stack<MySymbol> symbolStack = new Stack<>();
                 symbolStack.addAll(stepState.getSymbolStack());
                 MySymbol read = new MySymbol(arrow.getRead());

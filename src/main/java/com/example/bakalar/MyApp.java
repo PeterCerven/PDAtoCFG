@@ -26,7 +26,6 @@ public class MyApp extends Application {
         });
         stage.setTitle("Context Free Grammar");
         stage.setScene(scene);
-        stage.setResizable(false);
         stage.show();
     }
 

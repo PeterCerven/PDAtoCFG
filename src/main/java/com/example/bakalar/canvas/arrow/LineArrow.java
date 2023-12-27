@@ -2,6 +2,7 @@ package com.example.bakalar.canvas.arrow;
 
 import com.example.bakalar.canvas.Board;
 import com.example.bakalar.canvas.node.MyNode;
+import com.example.bakalar.canvas.node.NodeTransition;
 import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -9,6 +10,8 @@ import javafx.scene.shape.QuadCurve;
 import javafx.scene.shape.StrokeType;
 import javafx.scene.transform.Rotate;
 import lombok.Getter;
+
+import static com.example.bakalar.canvas.MainController.NODE_RADIUS;
 
 @Getter
 public class LineArrow extends Arrow {
@@ -24,8 +27,8 @@ public class LineArrow extends Arrow {
     private double endX;
     private double endY;
 
-    public LineArrow(MyNode from, MyNode to, Board board) {
-        super(from, to, board);
+    public LineArrow(MyNode from, MyNode to, Board board, NodeTransition nodeTransition) {
+        super(from, to, board, nodeTransition);
 
         createLine();
         createControlIndicator();
@@ -35,8 +38,8 @@ public class LineArrow extends Arrow {
         this.updateObjects(true);
     }
 
-    public LineArrow(MyNode from, MyNode to, double change, Board board) {
-        this(from, to, board);
+    public LineArrow(MyNode from, MyNode to, double change, Board board, NodeTransition nodeTransition) {
+        this(from, to, board,nodeTransition);
         Point2D thirdPoint = getThirdPoint(change);
         this.controlPointChangeX = thirdPoint.getX() - (startX + endX) / 2.0;
         this.controlPointChangeY = thirdPoint.getY() - (startY + endY) / 2.0;
@@ -207,7 +210,7 @@ public class LineArrow extends Arrow {
     }
 
     private void createControlIndicator() {
-        controlIndicator = new Circle(5, Color.WHITE);
+        controlIndicator = new Circle(NODE_RADIUS / 6.0 ,  Color.WHITE);
         controlIndicator.setStroke(Color.BLACK);
         controlIndicator.setTranslateX(controlX);
         controlIndicator.setTranslateY(controlY);

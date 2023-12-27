@@ -20,6 +20,8 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.List;
 
+import static com.example.bakalar.canvas.Board.STARTING_Z;
+
 
 public class MainController {
 
@@ -73,7 +75,7 @@ public class MainController {
 
     @FXML
     private void initialize() {
-        this.begSymbol.setText("Z₀");
+        this.begSymbol.setText(STARTING_Z);
         List<TextField> describeFields = List.of(describeStates, describeAlphabet, describeStackAlphabet, describeEndStates);
         board = new Board(mainPane, inputFieldAlphabet, describeFields, transFunctions);
         this.boardLogic = new BoardLogic(board, this.stateContainer);
@@ -97,9 +99,12 @@ public class MainController {
     private void createArrow(MyNode node) {
         if (selectedNode != null) {
             Arrow arrow = board.createArrow(selectedNode, node);
-            makeErasable(arrow);
-            if (arrow instanceof LineArrow lineArrow) {
-                makeCurveDraggable(lineArrow);
+            if (arrow != null) {
+                makeErasable(arrow);
+                if (arrow instanceof LineArrow lineArrow) {
+                    makeCurveDraggable(lineArrow);
+                }
+
             }
             board.selectNode(selectedNode, false);
             selectedNode = null;
@@ -190,7 +195,7 @@ public class MainController {
         log.info("Start");
         String begSymbol = this.begSymbol.getText();
         String inputAlphabet = this.inputFieldAlphabet.getText();
-        boardLogic.start("Z₀", inputAlphabet);
+        boardLogic.start(STARTING_Z, inputAlphabet);
     }
 
     public void step() {

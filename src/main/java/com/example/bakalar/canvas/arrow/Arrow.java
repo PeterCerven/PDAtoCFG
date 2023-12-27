@@ -7,6 +7,7 @@ import javafx.geometry.Point2D;
 import javafx.scene.Group;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
@@ -23,10 +24,12 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.Optional;
 
+import static com.example.bakalar.canvas.MainController.NODE_RADIUS;
+
 @Getter
 @Setter
 public abstract class Arrow extends Group {
-    public static final int ARROW_HEAD_SZIE = 15;
+    public static final int ARROW_HEAD_SZIE = NODE_RADIUS / 2;
     public static final String EPSILON = "ε";
     protected static final Logger log = LogManager.getLogger(Arrow.class.getName());
     protected MyNode from;
@@ -39,7 +42,7 @@ public abstract class Arrow extends Group {
     protected Board board;
 
 
-    public Arrow(MyNode from, MyNode to, Board board) {
+    public Arrow(MyNode from, MyNode to, Board board, NodeTransition nodeTransition) {
         super();
         this.from = from;
         this.to = to;
@@ -51,7 +54,7 @@ public abstract class Arrow extends Group {
         this.symbolContainers = new VBox();
         setViewOrder(1);
         createArrowHead();
-        addSymbolContainer();
+        addSymbolContainer(nodeTransition.getRead(), nodeTransition.getPop(), nodeTransition.getPush());
         this.getChildren().addAll(arrowHead, symbolContainers);
     }
 
@@ -64,15 +67,15 @@ public abstract class Arrow extends Group {
         arrowHead.setViewOrder(-1);
     }
 
-    public void addSymbolContainer() {
-        HBox container = new HBox(5);
+    public void addSymbolContainer(String read, String pop, String push) {
+        HBox container = new HBox(NODE_RADIUS / 6.0);
         Text readSymbol = new Text(read);
         Text popSymbol = new Text(pop);
         Text pushSymbol = new Text(push);
         container.getChildren().addAll(readSymbol, popSymbol, pushSymbol);
         container.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
             if (event.getButton() == MouseButton.SECONDARY) {
-                createTransitions(container);
+                board.createArrowTransition(this.read, this.pop, this.push);
             }
         });
         container.layoutBoundsProperty().addListener((observable, oldValue, newValue) -> {
@@ -81,7 +84,6 @@ public abstract class Arrow extends Group {
             updateSymbolContainerPosition();
         });
         this.symbolContainers.getChildren().add(container);
-        createTransitions(container);
     }
 
     public abstract void updateObjects(boolean toEdge);
@@ -123,46 +125,6 @@ public abstract class Arrow extends Group {
 
     public abstract void move(boolean toEdge);
 
-    public void createTransitions(HBox container) {
-        Dialog<ButtonType> dialog = new Dialog<>();
-        dialog.setTitle("Custom Dialog");
-        dialog.setHeaderText("Enter Three Values");
-
-        // Add buttons
-        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
-
-        // Create the input fields
-        TextField input1 = new TextField();
-        input1.setPromptText("Read");
-        TextField input2 = new TextField();
-        input2.setPromptText("Pop");
-        TextField input3 = new TextField();
-        input3.setPromptText("Push");
-
-        // Layout the dialog's fields
-        GridPane grid = new GridPane();
-        grid.setHgap(10);
-        grid.setVgap(10);
-        grid.add(input1, 0, 0);
-        grid.add(input2, 0, 1);
-        grid.add(input3, 0, 2);
-
-        dialog.getDialogPane().setContent(grid);
-
-        Optional<ButtonType> result = dialog.showAndWait();
-        result.ifPresent(buttonType -> {
-            if (buttonType == ButtonType.OK) {
-                this.read = input1.getText().isBlank() ? EPSILON : input1.getText();
-                this.pop = input2.getText().isBlank() ? EPSILON : input2.getText();
-                this.push = input3.getText().isBlank() ? EPSILON : input3.getText();
-
-                if (container != null) {
-                    container.getChildren().setAll(new Text(read), new Text(pop), new Text(push));
-                }
-                this.board.updateAllDescribePDA();
-            }
-        });
-    }
 
     public NodeTransition getTransition() {
         return new NodeTransition(read, pop, push);

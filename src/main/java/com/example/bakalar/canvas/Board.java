@@ -6,13 +6,14 @@ import com.example.bakalar.canvas.arrow.SelfLoopArrow;
 import com.example.bakalar.canvas.node.MyNode;
 import com.example.bakalar.canvas.node.NodeTransition;
 import com.example.bakalar.canvas.node.StartNodeArrow;
-import com.example.bakalar.character.MySymbol;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.logging.log4j.LogManager;
@@ -28,7 +29,7 @@ public class Board {
     public static final String GAMMA_CAPITAL = "Γ";
     public static final String SIGMA = "Σ";
     public static final String DELTA_LOWER = "δ";
-    public static final String Z_ZERO = "Z₀";
+    public static final String STARTING_Z = "Z";
     private static final Logger log = LogManager.getLogger(Board.class.getName());
     private List<MyNode> nodes;
     private List<Arrow> arrows;
@@ -112,7 +113,7 @@ public class Board {
     }
 
     private void updateDescribeStackAlphabet() {
-        StringBuilder text = new StringBuilder(GAMMA_CAPITAL + " = { " + Z_ZERO);
+        StringBuilder text = new StringBuilder(GAMMA_CAPITAL + " = { " + STARTING_Z);
         Set<String> stackAlphabet = new HashSet<>();
         for (Arrow arrow : arrows) {
             if (!arrow.getPush().equals(EPSILON)) {
@@ -149,7 +150,7 @@ public class Board {
     public void updateDescribeTransFunctions() {
         this.transFunctions.getChildren().clear();
         for (MyNode node : nodes) {
-            for(Arrow arrow : node.getArrowsFrom()) {
+            for(Arrow arrow : node.getArrows()) {
                 TextField textField = new TextField(createTransFunction(arrow));
                 textField.setEditable(false);
                 this.transFunctions.getChildren().add(textField);
@@ -174,7 +175,7 @@ public class Board {
         if (node instanceof Arrow arrow) {
             arrows.remove(arrow);
         } else if (node instanceof MyNode myNode) {
-            Iterator<Arrow> iterator = myNode.getArrows().iterator();
+            Iterator<Arrow> iterator = myNode.getAllArrows().iterator();
             while (iterator.hasNext()) {
                 Arrow arrow1 = iterator.next();
                 if (arrow1.getFrom() == myNode) {
@@ -193,22 +194,26 @@ public class Board {
     }
 
     public Arrow createArrow(MyNode from, MyNode to) {
+        NodeTransition nodeTransition = createArrowTransition("", "", "");
+        if (nodeTransition == null) {
+            return null;
+        }
         Arrow arrow = sameArrowExists(from, to);
         if (arrow != null) {
-            arrow.addSymbolContainer();
+            arrow.addSymbolContainer(nodeTransition.getRead(), nodeTransition.getPop(), nodeTransition.getPush());
             return arrow;
         }
         if (from == to) {
-            arrow = new SelfLoopArrow(from, to, this);
+            arrow = new SelfLoopArrow(from, to, this, nodeTransition);
         } else {
             if (oppositeExists(from, to)) {
-                arrow = new LineArrow(from, to, 30, this);
+                arrow = new LineArrow(from, to, 30, this, nodeTransition);
             } else {
-                arrow = new LineArrow(from, to, this);
+                arrow = new LineArrow(from, to, this, nodeTransition);
             }
         }
-        from.addArrow(arrow, true);
-        to.addArrow(arrow, false);
+        to.addArrow(arrow, "to");
+        from.addArrow(arrow, "from");
         this.addObject(arrow);
         return arrow;
     }
@@ -280,6 +285,46 @@ public class Board {
     }
 
     // event handlers
+
+    public NodeTransition createArrowTransition(String read, String pop, String push) {
+        Dialog<ButtonType> dialog = new Dialog<>();
+        dialog.setTitle("Create transition");
+        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+
+        TextField input1 = new TextField(read == null ? EPSILON : read);
+        input1.setPromptText("Read");
+        Label label1 = new Label("Read");
+        TextField input2 = new TextField(pop == null ? EPSILON : pop);
+        input2.setPromptText("Pop");
+        Label label2 = new Label("Pop");
+        TextField input3 = new TextField(push == null ? EPSILON : push);
+        input3.setPromptText("Push");
+        Label label3 = new Label("Push");
+
+        GridPane grid = new GridPane();
+        grid.setHgap(5);
+        grid.setVgap(5);
+        grid.add(input1, 0, 0);
+        grid.add(label1, 1, 0);
+        grid.add(input2, 0, 1);
+        grid.add(label2, 1, 1);
+        grid.add(input3, 0, 2);
+        grid.add(label3, 1, 2);
+
+        dialog.getDialogPane().setContent(grid);
+
+        Optional<ButtonType> result = dialog.showAndWait();
+
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            String newRead = input1.getText().isBlank() ? EPSILON : input1.getText();
+            String newPop = input2.getText().isBlank() ? EPSILON : input2.getText();
+            String newPush = input3.getText().isBlank() ? EPSILON : input3.getText();
+
+            this.updateAllDescribePDA();
+            return new NodeTransition(newRead, newPop, newPush);
+        }
+        return null;
+    }
 
     public void showDialog(MyNode node) {
         Dialog<ButtonType> dialog = new Dialog<>();

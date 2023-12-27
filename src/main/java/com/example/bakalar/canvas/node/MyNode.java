@@ -13,6 +13,8 @@ import org.apache.logging.log4j.Logger;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.example.bakalar.canvas.MainController.NODE_RADIUS;
+
 @Getter
 @Setter
 public class MyNode extends Group {
@@ -21,7 +23,7 @@ public class MyNode extends Group {
     private Text nameText;
     private String name;
     private ArrayList<Arrow> arrows;
-    private ArrayList<Arrow> arrowsFrom;
+    private ArrayList<Arrow> arrowsTo;
     private boolean starting;
     private boolean ending;
     private EndNode endNode;
@@ -42,14 +44,14 @@ public class MyNode extends Group {
 
         name = "Node";
         nameText = new Text(name);
-        nameText.setFont(javafx.scene.text.Font.font(20));
+        nameText.setFont(javafx.scene.text.Font.font(NODE_RADIUS / 1.5));
         nameText.setX(circle.getCenterX() - nameText.getBoundsInLocal().getWidth() / 2);
         nameText.setY(circle.getCenterY() + nameText.getBoundsInLocal().getHeight() / 4);
 
 
         this.getChildren().addAll(circle, endNode, nameText, startNodeArrow);
         this.arrows = new ArrayList<>();
-        this.arrowsFrom = new ArrayList<>();
+        this.arrowsTo = new ArrayList<>();
     }
 
     public double getAbsoluteCentrePosX() {
@@ -80,10 +82,16 @@ public class MyNode extends Group {
     }
 
 
-    public void addArrow(Arrow arrow, boolean from) {
-        this.arrows.add(arrow);
-        if (from) {
-            this.arrowsFrom.add(arrow);
+    public void addArrow(Arrow arrow, String fromTo) {
+        switch (fromTo) {
+            case "to":
+                this.arrowsTo.add(arrow);
+                break;
+            case "from":
+                this.arrows.add(arrow);
+                break;
+            default:
+                log.error("Wrong fromTo value");
         }
     }
 
@@ -103,18 +111,27 @@ public class MyNode extends Group {
         for (Arrow arrow : arrows) {
             arrow.move(toEdge);
         }
+        for (Arrow arrow : arrowsTo) {
+            arrow.move(toEdge);
+        }
     }
 
-    public void removeArrow(Arrow arrow1) {
-        arrows.remove(arrow1);
+    public void removeArrow(Arrow arrow) {
+        arrows.remove(arrow);
+        arrowsTo.remove(arrow);
+    }
+
+    public List<Arrow> getAllArrows() {
+        List<Arrow> allArrows = new ArrayList<>();
+        allArrows.addAll(arrows);
+        allArrows.addAll(arrowsTo);
+        return allArrows;
     }
 
     public List<NodeTransition> getTransitions() {
         List<NodeTransition> nodeTransitions = new ArrayList<>();
         for (Arrow arrow : arrows) {
-            if (arrow.getFrom() == this) {
-                nodeTransitions.add(arrow.getTransition());
-            }
+            nodeTransitions.add(arrow.getTransition());
         }
         return nodeTransitions;
     }

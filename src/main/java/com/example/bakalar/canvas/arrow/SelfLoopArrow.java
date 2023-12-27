@@ -2,21 +2,24 @@ package com.example.bakalar.canvas.arrow;
 
 import com.example.bakalar.canvas.Board;
 import com.example.bakalar.canvas.node.MyNode;
+import com.example.bakalar.canvas.node.NodeTransition;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Arc;
 import javafx.scene.shape.ArcType;
 import javafx.scene.shape.StrokeType;
 
+import static com.example.bakalar.canvas.MainController.NODE_RADIUS;
+
 public class SelfLoopArrow extends Arrow {
 
-    public static int ARC_WIDTH = 12;
-    public static int ARC_HEIGHT = 45;
-    public static int ARC_START_ANGLE = 20;
+    public static double ARC_WIDTH = NODE_RADIUS / 2.0;
+    public static double ARC_HEIGHT = (NODE_RADIUS / 2.0) * 3;
+    public static double ARC_START_ANGLE = 20;
     public static int ARC_LENGTH = 140;
     private Arc arc;
 
-    public SelfLoopArrow(MyNode from, MyNode to, Board board) {
-        super(from, to, board);
+    public SelfLoopArrow(MyNode from, MyNode to, Board board, NodeTransition nodeTransition) {
+        super(from, to, board, nodeTransition);
 
         createArc();
         this.getChildren().add(arc);
@@ -28,6 +31,9 @@ public class SelfLoopArrow extends Arrow {
         arc.setStroke(Color.BLACK);
         arc.setFill(Color.TRANSPARENT);
         arc.setStrokeType(StrokeType.OUTSIDE);
+        arc.setType(ArcType.OPEN);
+        arc.setLength(ARC_LENGTH);
+        arc.setStartAngle(ARC_START_ANGLE);
         arc.setStrokeWidth(2);
     }
 
@@ -37,9 +43,6 @@ public class SelfLoopArrow extends Arrow {
         arc.setCenterY(from.getAbsoluteCentrePosY());
         arc.setRadiusX(from.getCircle().getRadius() - ARC_WIDTH);
         arc.setRadiusY(from.getCircle().getRadius() + ARC_HEIGHT);
-        arc.setStartAngle(ARC_START_ANGLE);
-        arc.setLength(ARC_LENGTH);
-        arc.setType(ArcType.OPEN);
 
         updateArrowHead();
         updateSymbolContainerPosition();
@@ -95,7 +98,7 @@ public class SelfLoopArrow extends Arrow {
                 baseRightX, baseRightY // Right base point
         );
 
-        double angleToNodeDegrees = Math.toDegrees(angleToNode) + 20;
+        double angleToNodeDegrees = Math.toDegrees(angleToNode) + 20.0;
         arrowHead.setRotate(angleToNodeDegrees);
 
         // Translate the arrowhead to the intersection position
