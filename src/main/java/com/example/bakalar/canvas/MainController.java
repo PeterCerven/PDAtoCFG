@@ -10,6 +10,8 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
@@ -66,6 +68,7 @@ public class MainController {
     @FXML
     private VBox transFunctions;
 
+
     private ButtonState currentState = ButtonState.NONE;
     private MyNode selectedNode;
     private double startX, startY;
@@ -82,6 +85,49 @@ public class MainController {
         inputFieldAlphabet.textProperty().addListener((observable, oldValue, newValue) -> {
             board.updateAllDescribePDA();
         });
+        setButtonImages();
+
+    }
+
+    // button images
+
+    private void setButtonImages() {
+        Image image = new Image("file:src/main/resources/icons/Arrow.png");
+        ImageView imageView = new ImageView(image);
+        this.arrowBtn.setGraphic(imageView);
+
+        image = new Image("file:src/main/resources/icons/Eraser.png");
+        imageView = new ImageView(image);
+        this.eraseBtn.setGraphic(imageView);
+
+        image = new Image("file:src/main/resources/icons/Node.png");
+        imageView = new ImageView(image);
+        this.nodeBtn.setGraphic(imageView);
+
+        image = new Image("file:src/main/resources/icons/Select.png");
+        imageView = new ImageView(image);
+        this.selectBtn.setGraphic(imageView);
+
+        image = new Image("file:src/main/resources/icons/Start.png");
+        imageView = new ImageView(image);
+        this.startButton.setGraphic(imageView);
+
+        image = new Image("file:src/main/resources/icons/Step.png");
+        imageView = new ImageView(image);
+        this.stepButton.setGraphic(imageView);
+
+        image = new Image("file:src/main/resources/icons/EraseAll.png");
+        imageView = new ImageView(image);
+        this.resetBtn.setGraphic(imageView);
+
+        image = new Image("file:src/main/resources/icons/Undo.png");
+        imageView = new ImageView(image);
+        this.undoBtn.setGraphic(imageView);
+
+        image = new Image("file:src/main/resources/icons/Redo.png");
+        imageView = new ImageView(image);
+        this.reUndoBtn.setGraphic(imageView);
+
     }
 
 
@@ -215,10 +261,12 @@ public class MainController {
     // Buttons toggle
 
     private void updateButtonStates() {
-        nodeBtn.setText(currentState == ButtonState.NODE ? "Vypni" : "Zvol kruh");
-        arrowBtn.setText(currentState == ButtonState.ARROW ? "Vypni" : "Zvol sip");
-        eraseBtn.setText(currentState == ButtonState.ERASE ? "Vypni" : "Zvol zmizik");
-        selectBtn.setText(currentState == ButtonState.SELECT ? "Vypni" : "Zvol vyber");
+        // change appearance of button base on ButtonState
+
+//        nodeBtn.setText(currentState == ButtonState.NODE ? "Vypni" : "Zvol kruh");
+//        arrowBtn.setText(currentState == ButtonState.ARROW ? "Vypni" : "Zvol sip");
+//        eraseBtn.setText(currentState == ButtonState.ERASE ? "Vypni" : "Zvol zmizik");
+//        selectBtn.setText(currentState == ButtonState.SELECT ? "Vypni" : "Zvol vyber");
     }
 
     public void drawNodeOn() {

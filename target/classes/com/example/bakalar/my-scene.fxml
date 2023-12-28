@@ -8,17 +8,17 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="744.0" prefWidth="1295.0" stylesheets="@../../../css/styles.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.bakalar.canvas.MainController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="744.0" prefWidth="1295.0" stylesheets="@../../../css/styles.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.bakalar.canvas.MainController">
    <children>
       <HBox alignment="CENTER" layoutX="72.0" layoutY="4.0" prefHeight="38.0" prefWidth="497.0">
          <children>
             <Button fx:id="selectBtn" mnemonicParsing="false" onAction="#selectOn" prefHeight="25.0" prefWidth="75.0" text="Zvol vyber" />
-            <Button fx:id="nodeBtn" mnemonicParsing="false" onAction="#drawNodeOn" text="Zvol kruh" />
-            <Button fx:id="arrowBtn" mnemonicParsing="false" onAction="#drawArrowOn" text="Zvol sip" />
-            <Button fx:id="resetBtn" mnemonicParsing="false" onAction="#resetAll" text="Vymaz vsetko" />
-            <Button fx:id="eraseBtn" mnemonicParsing="false" onAction="#eraseFunctionOn" text="Zvol zmizik" />
-            <Button fx:id="undoBtn" mnemonicParsing="false" onAction="#undo" text="Naspat" />
-            <Button fx:id="reUndoBtn" mnemonicParsing="false" onAction="#reUndo" text="Vrat naspat" />
+            <Button fx:id="nodeBtn" mnemonicParsing="false" onAction="#drawNodeOn" />
+            <Button fx:id="arrowBtn" mnemonicParsing="false" onAction="#drawArrowOn" />
+            <Button fx:id="resetBtn" mnemonicParsing="false" onAction="#resetAll" />
+            <Button fx:id="eraseBtn" mnemonicParsing="false" onAction="#eraseFunctionOn" />
+            <Button fx:id="undoBtn" mnemonicParsing="false" onAction="#undo" />
+            <Button fx:id="reUndoBtn" mnemonicParsing="false" onAction="#reUndo" />
          </children>
       </HBox>
       <ScrollPane fx:id="myScrollPane" layoutX="6.0" layoutY="52.0" prefHeight="475.0" prefWidth="665.0">
