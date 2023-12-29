@@ -89,7 +89,9 @@ public class MainController {
 
     }
 
-    // button images
+
+    // set images
+
 
     private void setButtonImages() {
         Image image = new Image("file:src/main/resources/icons/Arrow.png");
@@ -261,13 +263,12 @@ public class MainController {
     // Buttons toggle
 
     private void updateButtonStates() {
-        // change appearance of button base on ButtonState
-
-//        nodeBtn.setText(currentState == ButtonState.NODE ? "Vypni" : "Zvol kruh");
-//        arrowBtn.setText(currentState == ButtonState.ARROW ? "Vypni" : "Zvol sip");
-//        eraseBtn.setText(currentState == ButtonState.ERASE ? "Vypni" : "Zvol zmizik");
-//        selectBtn.setText(currentState == ButtonState.SELECT ? "Vypni" : "Zvol vyber");
+        nodeBtn.setStyle(currentState == ButtonState.NODE ? "-fx-background-color: #00ff00" : "");
+        arrowBtn.setStyle(currentState == ButtonState.ARROW ? "-fx-background-color: #00ff00" : "");
+        eraseBtn.setStyle(currentState == ButtonState.ERASE ? "-fx-background-color: #00ff00" : "");
+        selectBtn.setStyle(currentState == ButtonState.SELECT ? "-fx-background-color: #00ff00" : "");
     }
+
 
     public void drawNodeOn() {
         toggleButtonState(ButtonState.NODE);

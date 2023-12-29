@@ -291,13 +291,13 @@ public class Board {
         dialog.setTitle("Create transition");
         dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 
-        TextField input1 = new TextField(read == null ? EPSILON : read);
+        TextField input1 = new TextField(read == null || read.isBlank() ? EPSILON : read);
         input1.setPromptText("Read");
         Label label1 = new Label("Read");
-        TextField input2 = new TextField(pop == null ? EPSILON : pop);
+        TextField input2 = new TextField(pop == null || pop.isBlank() ? EPSILON : pop);
         input2.setPromptText("Pop");
         Label label2 = new Label("Pop");
-        TextField input3 = new TextField(push == null ? EPSILON : push);
+        TextField input3 = new TextField(push == null || push.isBlank() ? EPSILON : push);
         input3.setPromptText("Push");
         Label label3 = new Label("Push");
 

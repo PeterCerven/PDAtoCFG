@@ -46,9 +46,9 @@ public abstract class Arrow extends Group {
         super();
         this.from = from;
         this.to = to;
-        this.read = EPSILON;
-        this.pop = EPSILON;
-        this.push = EPSILON;
+        this.read = nodeTransition.getRead();
+        this.pop = nodeTransition.getPop();
+        this.push = nodeTransition.getPush();
         this.board = board;
 
         this.symbolContainers = new VBox();
