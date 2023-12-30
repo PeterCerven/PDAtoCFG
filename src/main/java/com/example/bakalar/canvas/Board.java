@@ -3,17 +3,17 @@ package com.example.bakalar.canvas;
 import com.example.bakalar.canvas.arrow.Arrow;
 import com.example.bakalar.canvas.arrow.LineArrow;
 import com.example.bakalar.canvas.arrow.SelfLoopArrow;
+import com.example.bakalar.canvas.conversion.Rule;
 import com.example.bakalar.canvas.node.MyNode;
 import com.example.bakalar.canvas.node.NodeTransition;
 import com.example.bakalar.canvas.node.StartNodeArrow;
+import com.example.bakalar.canvas.transitions.Transition;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Text;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.logging.log4j.LogManager;
@@ -24,12 +24,12 @@ import java.util.*;
 @Getter
 @Setter
 public class Board {
-    public static final String LAMDA = "λ";
     public static final String EPSILON = "ε";
     public static final String GAMMA_CAPITAL = "Γ";
     public static final String SIGMA = "Σ";
     public static final String DELTA_LOWER = "δ";
     public static final String STARTING_Z = "Z";
+    public static final String STARTING_S = "S";
     private static final Logger log = LogManager.getLogger(Board.class.getName());
     private List<MyNode> nodes;
     private List<Arrow> arrows;
@@ -48,11 +48,15 @@ public class Board {
     private TextField describeStartingStackSymbol;
     private TextField describeEndStates;
     private VBox transFunctions;
+    private VBox rulesContainer;
+    private List<Rule> rules;
 
 
-    public Board(AnchorPane mainPane, TextField inputFieldAlphabet, List<TextField> describeFields, VBox transFunctions) {
+    public Board(AnchorPane mainPane, TextField inputFieldAlphabet, List<TextField> describeFields, VBox transFunctions, VBox rulesContainer) {
         this.nodes = new ArrayList<>();
+        this.rules = new ArrayList<>();
         this.transFunctions = transFunctions;
+        this.rulesContainer = rulesContainer;
         initDescribeFields(describeFields);
         this.arrows = new ArrayList<>();
         this.inputFieldAlphabet = inputFieldAlphabet;
@@ -149,23 +153,24 @@ public class Board {
 
     public void updateDescribeTransFunctions() {
         this.transFunctions.getChildren().clear();
-        for (MyNode node : nodes) {
-            for(Arrow arrow : node.getArrows()) {
-                TextField textField = new TextField(createTransFunction(arrow));
-                textField.setEditable(false);
-                this.transFunctions.getChildren().add(textField);
-            }
+        List<Transition> transitions = getNodesTransitions();
+        for (Transition transition : transitions) {
+            TextField textField = new TextField(transition.toString());
+            textField.setEditable(false);
+            this.transFunctions.getChildren().add(textField);
         }
     }
 
-    private String createTransFunction(Arrow arrow) {
-        StringBuilder text = new StringBuilder();
-        text.append(DELTA_LOWER).append("(").append(arrow.getFrom().getName()).append(", ");
-        text.append(arrow.getRead()).append(", ");
-        text.append(arrow.getPop()).append(") = {");
-        text.append(arrow.getTo().getName()).append(", ");
-        text.append(arrow.getPush()).append("}");
-        return text.toString();
+
+
+    public List<Transition> getNodesTransitions() {
+        List<Transition> transitions = new ArrayList<>();
+        for (MyNode node : nodes) {
+            for (Arrow arrow : node.getArrows()) {
+                transitions.add(new Transition(arrow.getFrom().getName(), arrow.getRead(), arrow.getPop(), arrow.getTo().getName(), arrow.getPush()));
+            }
+        }
+        return transitions;
     }
 
 
@@ -362,5 +367,19 @@ public class Board {
         });
     }
 
+    // rules
+
+    public void addConversions() {
+        this.rulesContainer.getChildren().clear();
+        for (Rule rule : rules) {
+            TextField textField = new TextField(rule.toString());
+            textField.setEditable(false);
+            this.rulesContainer.getChildren().add(textField);
+        }
+    }
+
+    public void addRule(Rule rule) {
+        rules.add(rule);
+    }
 
 }

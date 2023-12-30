@@ -19,7 +19,7 @@ public class BoardLogic {
     private List<StepState> tmpStepStates;
     private final Board board;
     private int currentAlphabetInputIndex;
-    private HBox stateContainer;
+    private final HBox stateContainer;
 
 
     public BoardLogic(Board board, HBox stateContainer) {

@@ -24,4 +24,9 @@ public class MySymbol {
     public int hashCode() {
         return getName().hashCode();
     }
+
+    @Override
+    public String toString() {
+        return this.name;
+    }
 }

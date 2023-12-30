@@ -105,7 +105,7 @@ public class LineArrow extends Arrow {
     private void updateControlPointPos(double controlIndicatorPointX, double controlIndicatorPointY) {
         double controlXZero = (startX + endX) / 2.0 - controlIndicatorPointX;
         double controlYZero = (startY + endY) / 2.0 - controlIndicatorPointY;
-        Point2D controlPoint = findControlPoint(startX, startY, controlXZero, controlYZero, endX, endY, 0.5);
+        Point2D controlPoint = findControlPoint(startX, startY, controlXZero, controlYZero, endX, endY);
         this.controlX = controlPoint.getX();
         this.controlY = controlPoint.getY();
         this.controlIndicator.setTranslateX(controlXZero);
@@ -160,9 +160,9 @@ public class LineArrow extends Arrow {
         return new Point2D(x, y);
     }
 
-    private Point2D findControlPoint(double startX, double startY, double controlIndicatorX, double controlIndicatorY, double endX, double endY, double t) {
-        double controlX = (controlIndicatorX - (1 - t) * (1 - t) * startX - t * t * endX) / (2 * (1 - t) * t);
-        double controlY = (controlIndicatorY - (1 - t) * (1 - t) * startY - t * t * endY) / (2 * (1 - t) * t);
+    private Point2D findControlPoint(double startX, double startY, double controlIndicatorX, double controlIndicatorY, double endX, double endY) {
+        double controlX = (controlIndicatorX - (1 - 0.5) * (1 - 0.5) * startX - 0.5 * 0.5 * endX) / (2 * (1 - 0.5) * 0.5);
+        double controlY = (controlIndicatorY - (1 - 0.5) * (1 - 0.5) * startY - 0.5 * 0.5 * endY) / (2 * (1 - 0.5) * 0.5);
         return new Point2D(controlX, controlY);
     }
 

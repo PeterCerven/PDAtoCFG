@@ -1,5 +1,8 @@
 package com.example.bakalar.canvas.transitions;
 
+import lombok.Getter;
+
+@Getter
 public enum StateColor {
     NEUTRAL("white"),
     ACCEPTED("green"),
@@ -11,7 +14,4 @@ public enum StateColor {
         this.color = color;
     }
 
-    public String getColor() {
-        return color;
-    }
 }

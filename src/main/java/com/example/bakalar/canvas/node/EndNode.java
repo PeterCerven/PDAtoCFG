@@ -10,9 +10,4 @@ public class EndNode extends Circle {
         super.setStroke(Color.BLACK);
         super.setStrokeWidth(2);
     }
-
-    public void moveEndNode(double centerX, double centerY) {
-        this.setCenterX(centerX);
-        this.setCenterY(centerY);
-    }
 }

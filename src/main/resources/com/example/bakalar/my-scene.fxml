@@ -8,11 +8,10 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="744.0" prefWidth="1295.0" stylesheets="@../../../css/styles.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.bakalar.canvas.MainController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="744.0" prefWidth="1295.0" stylesheets="@../../../css/styles.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.bakalar.canvas.MainController">
    <children>
       <HBox alignment="CENTER" layoutX="72.0" layoutY="4.0" prefHeight="38.0" prefWidth="497.0">
          <children>
-            <Button fx:id="selectBtn" mnemonicParsing="false" onAction="#selectOn" prefHeight="25.0" prefWidth="75.0" text="Zvol vyber" />
             <Button fx:id="nodeBtn" mnemonicParsing="false" onAction="#drawNodeOn" />
             <Button fx:id="arrowBtn" mnemonicParsing="false" onAction="#drawArrowOn" />
             <Button fx:id="resetBtn" mnemonicParsing="false" onAction="#resetAll" />
@@ -36,7 +35,7 @@
             <HBox fx:id="stateContainer" prefHeight="188.0" prefWidth="663.0" />
          </content>
       </ScrollPane>
-      <Button fx:id="conversionBtn" layoutX="724.0" layoutY="455.0" mnemonicParsing="false" text="Konvertuj" />
+      <Button fx:id="conversionBtn" layoutX="724.0" layoutY="455.0" mnemonicParsing="false" onAction="#convertPDA" text="Konvertuj" />
       <VBox fx:id="describePDA" layoutX="699.0" layoutY="52.0" prefHeight="102.0" prefWidth="135.0" style="-fx-border-color: black;">
          <children>
             <TextField fx:id="describeStates" />
@@ -47,35 +46,8 @@
       </VBox>
       <Text layoutX="684.0" layoutY="27.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Popis Zásobníkového automatu" />
       <Text layoutX="699.0" layoutY="251.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Prechodové funkcie" />
-      <VBox fx:id="transFunctions" layoutX="700.0" layoutY="270.0" prefHeight="151.0" prefWidth="135.0" style="-fx-border-color: black;">
-         <children>
-            <TextField />
-            <TextField />
-            <TextField />
-            <TextField />
-            <TextField />
-            <TextField />
-         </children>
-      </VBox>
-      <VBox layoutX="881.0" layoutY="53.0" prefHeight="378.0" prefWidth="135.0" style="-fx-border-color: black;">
-         <children>
-            <TextField />
-            <TextField />
-            <TextField />
-            <TextField />
-            <TextField />
-            <TextField />
-            <TextField />
-            <TextField />
-            <TextField />
-            <TextField />
-            <TextField />
-            <TextField />
-            <TextField />
-            <TextField />
-            <TextField />
-         </children>
-      </VBox>
+      <VBox fx:id="transFunctions" layoutX="700.0" layoutY="270.0" prefHeight="151.0" prefWidth="135.0" style="-fx-border-color: black;" />
+      <VBox fx:id="rulesContainer" layoutX="881.0" layoutY="53.0" prefHeight="378.0" prefWidth="135.0" style="-fx-border-color: black;" />
       <Text layoutX="881.0" layoutY="27.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Pravidlá bezkontextovej gramatiky" />
       <Text layoutX="1079.0" layoutY="27.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Popis bezkontextovej gramatiky" />
       <VBox layoutX="1102.0" layoutY="52.0" prefHeight="101.0" prefWidth="135.0" style="-fx-border-color: black;">

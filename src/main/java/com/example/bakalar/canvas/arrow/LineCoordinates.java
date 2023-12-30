@@ -1,6 +1,5 @@
 package com.example.bakalar.canvas.arrow;
 
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 

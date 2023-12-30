@@ -24,4 +24,6 @@ module com.example.bakalar {
     opens com.example.bakalar.canvas.node to javafx.fxml, lombok;
     exports com.example.bakalar.canvas.transitions;
     opens com.example.bakalar.canvas.transitions to javafx.fxml, lombok;
+    exports com.example.bakalar.canvas.conversion;
+    opens com.example.bakalar.canvas.conversion to javafx.fxml, lombok;
 }
