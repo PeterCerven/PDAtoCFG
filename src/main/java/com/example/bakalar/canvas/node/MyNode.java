@@ -84,14 +84,9 @@ public class MyNode extends Group {
 
     public void addArrow(Arrow arrow, String fromTo) {
         switch (fromTo) {
-            case "to":
-                this.arrowsTo.add(arrow);
-                break;
-            case "from":
-                this.arrows.add(arrow);
-                break;
-            default:
-                log.error("Wrong fromTo value");
+            case "to" -> this.arrowsTo.add(arrow);
+            case "from" -> this.arrows.add(arrow);
+            default -> log.error("Wrong fromTo value");
         }
     }
 
@@ -106,6 +101,8 @@ public class MyNode extends Group {
         this.setTranslateX(x);
         this.setTranslateY(y);
     }
+
+    // arrow updates
 
     public void updateArrows(boolean toEdge) {
         for (Arrow arrow : arrows) {
@@ -135,4 +132,6 @@ public class MyNode extends Group {
         }
         return nodeTransitions;
     }
+
+
 }

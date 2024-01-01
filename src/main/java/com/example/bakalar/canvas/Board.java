@@ -117,8 +117,9 @@ public class Board {
     }
 
     private void updateDescribeStackAlphabet() {
-        StringBuilder text = new StringBuilder(GAMMA_CAPITAL + " = { " + STARTING_Z);
+        StringBuilder text = new StringBuilder(GAMMA_CAPITAL + " = {");
         Set<String> stackAlphabet = new HashSet<>();
+        stackAlphabet.add(STARTING_Z);
         for (Arrow arrow : arrows) {
             if (!arrow.getPush().equals(EPSILON)) {
                 String pushString = arrow.getPush();
@@ -128,9 +129,12 @@ public class Board {
             }
         }
         for (String symbol : stackAlphabet) {
-            text.append(", ").append(symbol);
+            text.append(symbol).append(", ");
         }
-        text.append(" }");
+        if (!stackAlphabet.isEmpty()) {
+            text.delete(text.length() - 2, text.length());
+        }
+        text.append("}");
         this.describeStackAlphabet.setText(text.toString());
     }
 
@@ -160,7 +164,6 @@ public class Board {
             this.transFunctions.getChildren().add(textField);
         }
     }
-
 
 
     public List<Transition> getNodesTransitions() {
@@ -198,8 +201,14 @@ public class Board {
         updateAllDescribePDA();
     }
 
-    public Arrow createArrow(MyNode from, MyNode to) {
-        NodeTransition nodeTransition = createArrowTransition("", "", "");
+    public Arrow createArrow(MyNode from, MyNode to, String read, String pop, String push) {
+        NodeTransition nodeTransition;
+        if (read != null) {
+            nodeTransition = new NodeTransition(read, pop, push);
+            this.updateAllDescribePDA();
+        } else {
+            nodeTransition = createArrowTransition("", "", "");
+        }
         if (nodeTransition == null) {
             return null;
         }
@@ -278,9 +287,10 @@ public class Board {
 
     public void setStarting(MyNode node, boolean starting) {
         node.setStarting(starting);
+        this.setStartNode(node);
     }
 
-    private void setEnding(MyNode node, boolean ending) {
+    public void setEnding(MyNode node, boolean ending) {
         node.setEnding(ending);
 
     }
@@ -382,4 +392,8 @@ public class Board {
         rules.add(rule);
     }
 
+    public void testBoard() {
+        clearBoard();
+
+    }
 }

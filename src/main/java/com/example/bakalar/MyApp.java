@@ -1,5 +1,6 @@
 package com.example.bakalar;
 
+import com.example.bakalar.canvas.MainController;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -18,6 +19,9 @@ public class MyApp extends Application {
 
         String styles = Objects.requireNonNull(getClass().getResource("/css/styles.css")).toExternalForm();
         scene.getStylesheets().add(styles);
+
+        MainController controller = fxmlLoader.getController();
+        controller.setPrimaryStage(stage);
 
         scene.addEventHandler(KeyEvent.KEY_PRESSED, keyEvent -> {
             if (keyEvent.getCode() == KeyCode.ESCAPE) {

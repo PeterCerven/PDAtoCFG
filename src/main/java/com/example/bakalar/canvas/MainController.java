@@ -17,11 +17,13 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.List;
 
+import static com.example.bakalar.canvas.Board.EPSILON;
 import static com.example.bakalar.canvas.Board.STARTING_Z;
 
 
@@ -29,6 +31,7 @@ public class MainController {
 
     public static final int NODE_RADIUS = 30;
     private static final Logger log = LogManager.getLogger(MainController.class.getName());
+    private Stage primaryStage;
     @FXML
     private AnchorPane mainPane;
     @FXML
@@ -49,6 +52,8 @@ public class MainController {
     private Button stepButton;
     @FXML
     private Button conversionBtn;
+    @FXML
+    private Button testBtn;
     @FXML
     private TextField inputFieldAlphabet;
     @FXML
@@ -89,6 +94,10 @@ public class MainController {
         });
         setButtonImages();
 
+    }
+
+    public void setPrimaryStage(Stage stage) {
+        this.primaryStage = stage;
     }
 
 
@@ -135,28 +144,46 @@ public class MainController {
 
     public void createNode(MouseEvent event) {
         if (currentState.equals(ButtonState.NODE) && event.getButton() == MouseButton.PRIMARY) {
-            MyNode myNode = new MyNode(event.getX(), event.getY(), NODE_RADIUS);
-            makeDraggable(myNode);
-            enableArrowCreation(myNode);
-            board.addObject(myNode);
+            createMyNode(event.getX(), event.getY());
         }
+    }
+
+    private MyNode createMyNode(double x, double y) {
+        MyNode myNode = new MyNode(x, y, NODE_RADIUS);
+        makeDraggable(myNode);
+        enableArrowCreation(myNode);
+        board.addObject(myNode);
+        return myNode;
     }
 
     private void createArrow(MyNode node) {
         if (selectedNode != null) {
-            Arrow arrow = board.createArrow(selectedNode, node);
-            if (arrow != null) {
-                makeErasable(arrow);
-                if (arrow instanceof LineArrow lineArrow) {
-                    makeCurveDraggable(lineArrow);
-                }
-
-            }
+            createMyArrow(selectedNode, node);
             board.selectNode(selectedNode, false);
             selectedNode = null;
         } else {
             selectedNode = node;
             board.selectNode(node, true);
+        }
+    }
+
+    private void createMyArrow(MyNode from, MyNode to) {
+        Arrow arrow = board.createArrow(from, to, null, null, null);
+        if (arrow != null) {
+            makeErasable(arrow);
+            if (arrow instanceof LineArrow lineArrow) {
+                makeCurveDraggable(lineArrow);
+            }
+        }
+    }
+
+    private void createMyArrow(MyNode from, MyNode to, String input, String stackTop, String stackPush) {
+        Arrow arrow = board.createArrow(from, to, input, stackTop, stackPush);
+        if (arrow != null) {
+            makeErasable(arrow);
+            if (arrow instanceof LineArrow lineArrow) {
+                makeCurveDraggable(lineArrow);
+            }
         }
     }
 
@@ -232,7 +259,7 @@ public class MainController {
 
     public void resetAll() {
         board.clearBoard();
-        currentState = ButtonState.NONE;
+        currentState = ButtonState.SELECT;
         selectedNode = null;
         updateButtonStates();
     }
@@ -257,8 +284,19 @@ public class MainController {
     }
 
     public void convertPDA() {
-        log.info("Convert PDA");
-        conversionLogic.convertPDA();
+        conversionLogic.convertPDA(primaryStage);
+    }
+
+    public void testBoard() {
+        board.testBoard();
+        MyNode firstNode = createMyNode(100, 100);
+        board.setStarting(firstNode, true);
+        MyNode secondNode = createMyNode(500, 100);
+        MyNode  thirdNode = createMyNode(400, 400);
+        board.setEnding(thirdNode, true);
+        board.getInputFieldAlphabet().setText("aa");
+        createMyArrow(firstNode, secondNode, "a", "Z", "SZ");
+        createMyArrow(secondNode, thirdNode, "a", "S", EPSILON);
     }
 
     // Buttons toggle
@@ -290,6 +328,5 @@ public class MainController {
         }
         updateButtonStates();
     }
-
 
 }
