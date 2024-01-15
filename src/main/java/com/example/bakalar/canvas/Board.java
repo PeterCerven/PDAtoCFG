@@ -118,16 +118,7 @@ public class Board {
 
     private void updateDescribeStackAlphabet() {
         StringBuilder text = new StringBuilder(GAMMA_CAPITAL + " = {");
-        Set<String> stackAlphabet = new HashSet<>();
-        stackAlphabet.add(STARTING_Z);
-        for (Arrow arrow : arrows) {
-            if (!arrow.getPush().equals(EPSILON)) {
-                String pushString = arrow.getPush();
-                for (int i = 0; i < arrow.getPush().length(); i++) {
-                    stackAlphabet.add((String) pushString.subSequence(i, i + 1));
-                }
-            }
-        }
+        Set<String> stackAlphabet = getStrings();
         for (String symbol : stackAlphabet) {
             text.append(symbol).append(", ");
         }
@@ -136,6 +127,22 @@ public class Board {
         }
         text.append("}");
         this.describeStackAlphabet.setText(text.toString());
+    }
+
+    private Set<String> getStrings() {
+        Set<String> stackAlphabet = new HashSet<>();
+        stackAlphabet.add(STARTING_Z);
+        for (Arrow arrow : arrows) {
+            for (NodeTransition nodeTransition: arrow.getTransitions()) {
+                if (!nodeTransition.getPush().equals(EPSILON)) {
+                    String pushString = nodeTransition.getPush();
+                    for (int i = 0; i < nodeTransition.getPush().length(); i++) {
+                        stackAlphabet.add((String) pushString.subSequence(i, i + 1));
+                    }
+                }
+        }
+        }
+        return stackAlphabet;
     }
 
 
@@ -169,8 +176,11 @@ public class Board {
     public List<Transition> getNodesTransitions() {
         List<Transition> transitions = new ArrayList<>();
         for (MyNode node : nodes) {
-            for (Arrow arrow : node.getArrows()) {
-                transitions.add(new Transition(arrow.getFrom().getName(), arrow.getRead(), arrow.getPop(), arrow.getTo().getName(), arrow.getPush()));
+            for (Arrow arrow : node.getArrowsFrom()) {
+                for (NodeTransition nodeTransition : arrow.getTransitions()) {
+                    transitions.add(new Transition(arrow.getFrom().getName(), nodeTransition.getRead(),
+                            nodeTransition.getPop(), arrow.getTo().getName(), nodeTransition.getPush()));
+                }
             }
         }
         return transitions;
@@ -182,6 +192,8 @@ public class Board {
     public void removeObject(Node node) {
         if (node instanceof Arrow arrow) {
             arrows.remove(arrow);
+            arrow.getFrom().removeArrow(arrow);
+            arrow.getTo().removeArrow(arrow);
         } else if (node instanceof MyNode myNode) {
             Iterator<Arrow> iterator = myNode.getAllArrows().iterator();
             while (iterator.hasNext()) {
@@ -214,7 +226,7 @@ public class Board {
         }
         Arrow arrow = sameArrowExists(from, to);
         if (arrow != null) {
-            arrow.addSymbolContainer(nodeTransition.getRead(), nodeTransition.getPop(), nodeTransition.getPush());
+            arrow.addSymbolContainer(nodeTransition);
             return arrow;
         }
         if (from == to) {
@@ -237,7 +249,6 @@ public class Board {
             arrows.add(arrow);
         } else if (node instanceof MyNode myNode) {
             char character = (char) (nodeCounter + '₀');
-            // utf-8 subscript 0
             String name = "q" + character;
 
             myNode.setName(name);

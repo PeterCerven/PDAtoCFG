@@ -22,7 +22,7 @@ public class MyNode extends Group {
     private Circle circle;
     private Text nameText;
     private String name;
-    private ArrayList<Arrow> arrows;
+    private ArrayList<Arrow> arrowsFrom;
     private ArrayList<Arrow> arrowsTo;
     private boolean starting;
     private boolean ending;
@@ -50,7 +50,7 @@ public class MyNode extends Group {
 
 
         this.getChildren().addAll(circle, endNode, nameText, startNodeArrow);
-        this.arrows = new ArrayList<>();
+        this.arrowsFrom = new ArrayList<>();
         this.arrowsTo = new ArrayList<>();
     }
 
@@ -85,7 +85,7 @@ public class MyNode extends Group {
     public void addArrow(Arrow arrow, String fromTo) {
         switch (fromTo) {
             case "to" -> this.arrowsTo.add(arrow);
-            case "from" -> this.arrows.add(arrow);
+            case "from" -> this.arrowsFrom.add(arrow);
             default -> log.error("Wrong fromTo value");
         }
     }
@@ -105,7 +105,7 @@ public class MyNode extends Group {
     // arrow updates
 
     public void updateArrows(boolean toEdge) {
-        for (Arrow arrow : arrows) {
+        for (Arrow arrow : arrowsFrom) {
             arrow.move(toEdge);
         }
         for (Arrow arrow : arrowsTo) {
@@ -114,21 +114,21 @@ public class MyNode extends Group {
     }
 
     public void removeArrow(Arrow arrow) {
-        arrows.remove(arrow);
+        arrowsFrom.remove(arrow);
         arrowsTo.remove(arrow);
     }
 
     public List<Arrow> getAllArrows() {
         List<Arrow> allArrows = new ArrayList<>();
-        allArrows.addAll(arrows);
+        allArrows.addAll(arrowsFrom);
         allArrows.addAll(arrowsTo);
         return allArrows;
     }
 
     public List<NodeTransition> getTransitions() {
         List<NodeTransition> nodeTransitions = new ArrayList<>();
-        for (Arrow arrow : arrows) {
-            nodeTransitions.add(arrow.getTransition());
+        for (Arrow arrow : arrowsFrom) {
+            nodeTransitions.addAll(arrow.getTransitions());
         }
         return nodeTransitions;
     }

@@ -289,14 +289,17 @@ public class MainController {
 
     public void testBoard() {
         board.testBoard();
-        MyNode firstNode = createMyNode(100, 100);
+        MyNode firstNode = createMyNode(120, 150);
         board.setStarting(firstNode, true);
-        MyNode secondNode = createMyNode(500, 100);
-        MyNode  thirdNode = createMyNode(400, 400);
-        board.setEnding(thirdNode, true);
-        board.getInputFieldAlphabet().setText("aa");
-        createMyArrow(firstNode, secondNode, "a", "Z", "SZ");
-        createMyArrow(secondNode, thirdNode, "a", "S", EPSILON);
+        MyNode  secondNode = createMyNode(320, 150);
+        board.setEnding(firstNode, true);
+        board.getInputFieldAlphabet().setText("111000");
+        createMyArrow(firstNode, firstNode, "1", "Z", "XZ");
+        createMyArrow(firstNode, firstNode, "1", "X", "XX");
+        createMyArrow(firstNode, firstNode, EPSILON, "X", EPSILON);
+        createMyArrow(firstNode, secondNode, "0", "X", "X");
+        createMyArrow(secondNode, secondNode, "1", "X", EPSILON);
+        createMyArrow(secondNode, firstNode, "0", "Z", "Z");
     }
 
     // Buttons toggle

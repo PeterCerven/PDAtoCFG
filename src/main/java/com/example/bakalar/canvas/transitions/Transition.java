@@ -34,6 +34,10 @@ public class Transition {
                 .collect(Collectors.toList());
     }
 
+    public String getSymbolsToPushAsString() {
+        return symbolsToPush.stream().map(MySymbol::getName).collect(Collectors.joining());
+    }
+
     @Override
     public String toString() {
         return "δ(" + currentState + ", " + inputSymbolToRead + ", " + symbolToPop + ") -> " +

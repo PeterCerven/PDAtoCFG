@@ -3,6 +3,7 @@ package com.example.bakalar.canvas.arrow;
 import com.example.bakalar.canvas.Board;
 import com.example.bakalar.canvas.node.MyNode;
 import com.example.bakalar.canvas.node.NodeTransition;
+import com.example.bakalar.canvas.transitions.Transition;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
 import javafx.scene.input.MouseButton;
@@ -17,6 +18,9 @@ import lombok.Setter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static com.example.bakalar.canvas.MainController.NODE_RADIUS;
 
 @Getter
@@ -27,9 +31,7 @@ public abstract class Arrow extends Group {
     protected static final Logger log = LogManager.getLogger(Arrow.class.getName());
     protected MyNode from;
     protected MyNode to;
-    protected String read;
-    protected String pop;
-    protected String push;
+    protected List<NodeTransition> transitions;
     protected VBox symbolContainers;
     protected Polygon arrowHead;
     protected Board board;
@@ -37,17 +39,15 @@ public abstract class Arrow extends Group {
 
     public Arrow(MyNode from, MyNode to, Board board, NodeTransition nodeTransition) {
         super();
+        this.transitions = new ArrayList<>();
         this.from = from;
         this.to = to;
-        this.read = nodeTransition.getRead();
-        this.pop = nodeTransition.getPop();
-        this.push = nodeTransition.getPush();
         this.board = board;
 
         this.symbolContainers = new VBox();
         setViewOrder(1);
         createArrowHead();
-        addSymbolContainer(nodeTransition.getRead(), nodeTransition.getPop(), nodeTransition.getPush());
+        addSymbolContainer(nodeTransition);
         this.getChildren().addAll(arrowHead, symbolContainers);
     }
 
@@ -60,15 +60,15 @@ public abstract class Arrow extends Group {
         arrowHead.setViewOrder(-1);
     }
 
-    public void addSymbolContainer(String read, String pop, String push) {
+    public void addSymbolContainer(NodeTransition nodeTransition) {
         HBox container = new HBox(NODE_RADIUS / 6.0);
-        Text readSymbol = new Text(read);
-        Text popSymbol = new Text(pop);
-        Text pushSymbol = new Text(push);
+        Text readSymbol = new Text(nodeTransition.getRead());
+        Text popSymbol = new Text(nodeTransition.getPop());
+        Text pushSymbol = new Text(nodeTransition.getPush());
         container.getChildren().addAll(readSymbol, popSymbol, pushSymbol);
         container.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
             if (event.getButton() == MouseButton.SECONDARY) {
-                board.createArrowTransition(this.read, this.pop, this.push);
+                board.createArrowTransition(nodeTransition.getRead(), nodeTransition.getPop(), nodeTransition.getPush());
             }
         });
         container.layoutBoundsProperty().addListener((observable, oldValue, newValue) -> {
@@ -76,7 +76,9 @@ public abstract class Arrow extends Group {
             container.setLayoutX(newValue.getHeight());
             updateSymbolContainerPosition();
         });
+        this.transitions.add(nodeTransition);
         this.symbolContainers.getChildren().add(container);
+        this.board.updateAllDescribePDA();
     }
 
     public abstract void updateObjects(boolean toEdge);
@@ -117,11 +119,6 @@ public abstract class Arrow extends Group {
 
 
     public abstract void move(boolean toEdge);
-
-
-    public NodeTransition getTransition() {
-        return new NodeTransition(read, pop, push);
-    }
 }
 
 

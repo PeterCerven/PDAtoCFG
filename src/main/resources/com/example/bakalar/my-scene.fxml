@@ -41,7 +41,7 @@
             <HBox fx:id="stateContainer" prefHeight="188.0" prefWidth="663.0" />
          </content>
       </ScrollPane>
-      <Button fx:id="conversionBtn" layoutX="724.0" layoutY="455.0" mnemonicParsing="false" onAction="#convertPDA" text="Konvertuj" />
+      <Button fx:id="conversionBtn" layoutX="717.0" layoutY="540.0" mnemonicParsing="false" onAction="#convertPDA" text="Konvertuj" />
       <VBox fx:id="describePDA" layoutX="699.0" layoutY="52.0" prefHeight="102.0" prefWidth="135.0" style="-fx-border-color: black;">
          <children>
             <TextField fx:id="describeStates" />
@@ -51,18 +51,19 @@
          </children>
       </VBox>
       <Text layoutX="684.0" layoutY="27.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Popis Zásobníkového automatu" />
-      <Text layoutX="699.0" layoutY="251.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Prechodové funkcie" />
-      <VBox fx:id="transFunctions" layoutX="700.0" layoutY="270.0" prefHeight="151.0" prefWidth="135.0" style="-fx-border-color: black;" />
-      <VBox fx:id="rulesContainer" layoutX="904.0" layoutY="49.0" prefHeight="378.0" prefWidth="190.0" style="-fx-border-color: black;" />
-      <Text layoutX="881.0" layoutY="27.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Pravidlá bezkontextovej gramatiky" />
-      <Text layoutX="904.0" layoutY="459.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Popis bezkontextovej gramatiky" />
-      <VBox layoutX="904.0" layoutY="476.0" prefHeight="101.0" prefWidth="135.0" style="-fx-border-color: black;">
+      <Text layoutX="699.0" layoutY="182.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Prechodové funkcie" />
+      <VBox fx:id="transFunctions" layoutX="700.0" layoutY="214.0" prefHeight="242.0" prefWidth="148.0" style="-fx-border-color: black;" />
+      <VBox fx:id="rulesContainer" layoutX="1091.0" layoutY="49.0" prefHeight="378.0" prefWidth="190.0" style="-fx-border-color: black;" />
+      <Text layoutX="1091.0" layoutY="35.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Pravidlá bezkontextovej gramatiky" />
+      <Text layoutX="902.0" layoutY="57.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Popis bezkontextovej gramatiky" />
+      <VBox layoutX="919.0" layoutY="71.0" prefHeight="77.0" prefWidth="135.0" style="-fx-border-color: black;">
          <children>
-            <TextField />
             <TextField />
             <TextField />
             <TextField />
          </children>
       </VBox>
+      <VBox fx:id="transFunctions1" layoutX="913.0" layoutY="198.0" prefHeight="266.0" prefWidth="133.0" style="-fx-border-color: black;" />
+      <Text layoutX="928.0" layoutY="181.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Prechodové funkcie" />
    </children>
 </AnchorPane>

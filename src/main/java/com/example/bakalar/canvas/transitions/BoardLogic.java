@@ -3,6 +3,7 @@ package com.example.bakalar.canvas.transitions;
 import com.example.bakalar.canvas.Board;
 import com.example.bakalar.canvas.arrow.Arrow;
 import com.example.bakalar.canvas.node.MyNode;
+import com.example.bakalar.canvas.node.NodeTransition;
 import com.example.bakalar.character.MySymbol;
 import javafx.scene.layout.HBox;
 
@@ -53,28 +54,30 @@ public class BoardLogic {
             }
             MySymbol stackTop = stepState.getSymbolStack().peek();
             boolean foundWay = false;
-            for (Arrow arrow : stepState.getCurrentNode().getArrows()) {
-                Stack<MySymbol> symbolStack = new Stack<>();
-                symbolStack.addAll(stepState.getSymbolStack());
-                MySymbol read = new MySymbol(arrow.getRead());
-                MySymbol pop = new MySymbol(arrow.getPop());
-                List<MySymbol> pushSymbols = convertStringToListOfSymbols(arrow.getPush());
-                if (read.equals(inputLetterToRead) && (pop.equals(stackTop) || Objects.equals(pop.getName(), EPSILON))) {
-                    if (!Objects.equals(pop.getName(), EPSILON)) {
-                        symbolStack.pop();
-                    }
-                    if (!Objects.equals(pushSymbols.get(0).getName(), EPSILON)) {
-                        for (int i = pushSymbols.size() - 1; i >= 0; i--) {
-                            symbolStack.push(pushSymbols.get(i));
+            for (Arrow arrow : stepState.getCurrentNode().getArrowsFrom()) {
+                for (NodeTransition nodeTransition : arrow.getTransitions()) {
+                    Stack<MySymbol> symbolStack = new Stack<>();
+                    symbolStack.addAll(stepState.getSymbolStack());
+                    MySymbol read = new MySymbol(nodeTransition.getRead());
+                    MySymbol pop = new MySymbol(nodeTransition.getPop());
+                    List<MySymbol> pushSymbols = convertStringToListOfSymbols(nodeTransition.getPush());
+                    if (read.equals(inputLetterToRead) && (pop.equals(stackTop) || Objects.equals(pop.getName(), EPSILON))) {
+                        if (!Objects.equals(pop.getName(), EPSILON)) {
+                            symbolStack.pop();
                         }
+                        if (!Objects.equals(pushSymbols.get(0).getName(), EPSILON)) {
+                            for (int i = pushSymbols.size() - 1; i >= 0; i--) {
+                                symbolStack.push(pushSymbols.get(i));
+                            }
+                        }
+                        MyNode currentNode = arrow.getTo();
+                        StepState newStepState = symbolStack.isEmpty()
+                                ? new StepState(symbolStack, currentNode, StateColor.ACCEPTED)
+                                : new StepState(symbolStack, currentNode, StateColor.NEUTRAL);
+                        tmpStepStates.add(newStepState);
+                        stateContainer.getChildren().add(newStepState);
+                        foundWay = true;
                     }
-                    MyNode currentNode = arrow.getTo();
-                    StepState newStepState = symbolStack.isEmpty()
-                            ? new StepState(symbolStack, currentNode, StateColor.ACCEPTED)
-                            : new StepState(symbolStack, currentNode, StateColor.NEUTRAL);
-                    tmpStepStates.add(newStepState);
-                    stateContainer.getChildren().add(newStepState);
-                    foundWay = true;
                 }
             }
             if (!foundWay) {
