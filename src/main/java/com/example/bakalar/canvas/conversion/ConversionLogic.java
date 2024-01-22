@@ -15,7 +15,11 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import static com.example.bakalar.canvas.Board.STARTING_Z;
 
 public class ConversionLogic {
     private final Board board;
@@ -24,14 +28,17 @@ public class ConversionLogic {
     private Label transitionNumberLabel;
     private List<Transition> transitions;
     private VBox convertedTransitionBox;
+    private Map<Integer, List<ConvertedTransitions>> convertedTransitions;
     private int currentIndex = 0;
 
     public ConversionLogic(Board board) {
         this.board = board;
     }
 
-    public void convertPDA(Stage primaryStage) {
+    public void convertPDA() {
         List<Transition> transitions = board.getNodesTransitions();
+        transitions.add(0, new Transition(board.getStartNode().getName(), TransitionType.START));
+        transitions.add(new Transition("qf", TransitionType.END));
         setupTransitionStage(transitions);
         showTransitionStage();
     }
@@ -42,6 +49,7 @@ public class ConversionLogic {
         this.currentStateLabel = new Label();
         this.transitionNumberLabel = new Label();
         this.convertedTransitionBox = new VBox();
+        this.convertedTransitions = new HashMap<>();
 
         Button nextButton = new Button("Next");
         nextButton.setOnAction(e -> updateTransition(1));
@@ -56,6 +64,10 @@ public class ConversionLogic {
 
         transitionNumberLabel.setFont(new Font("Arial", 16));
         transitionNumberLabel.setAlignment(Pos.TOP_LEFT);
+
+        for (Transition transition : transitions) {
+            this.convertedTransitions.put(transitions.indexOf(transition), convertTransitions(transition));
+        }
 
         VBox layout = new VBox(10, currentStateLabel, buttonLayout, convertedTransitionBox, transitionNumberLabel);
         layout.setAlignment(Pos.TOP_CENTER);
@@ -79,7 +91,7 @@ public class ConversionLogic {
         Transition currentTransition = transitions.get(currentIndex);
         currentStateLabel.setText(currentTransition.toString());
         transitionNumberLabel.setText("Transition " + (currentIndex + 1) + "/" + transitions.size());
-        List<ConvertedTransitions> convertedTransitions = convertTransitions(currentTransition);
+        List<ConvertedTransitions> convertedTransitions = this.convertedTransitions.get(currentIndex);
         convertedTransitionBox.getChildren().clear();
         for (ConvertedTransitions convertedTransition : convertedTransitions) {
             convertedTransitionBox.getChildren().add(new TextField(convertedTransition.toString()));
@@ -87,6 +99,20 @@ public class ConversionLogic {
     }
 
     private List<ConvertedTransitions> convertTransitions(Transition transition) {
+        List<ConvertedTransitions> convertedTransitions = new ArrayList<>();
+        switch (transition.getTransitionType()) {
+            case START -> convertedTransitions.addAll(startMove(transition));
+            case END -> convertedTransitions.addAll(endMove(transition));
+            case NORMAL -> convertedTransitions.addAll(pushMove(transition));
+        }
+        return convertedTransitions;
+    }
+
+    private List<ConvertedTransitions> endMove(Transition transition) {
+        return new ArrayList<>();
+    }
+
+    private List<ConvertedTransitions> pushMove(Transition transition) {
         List<MySymbol> allStateSymbols = board.getNodes().stream().map(node -> new MySymbol(node.getName())).toList();
         List<ConvertedTransitions> convertedTransitions = new ArrayList<>();
         // convert transition to cfg rules
@@ -122,8 +148,27 @@ public class ConversionLogic {
                 convertedTransitions.add(convertedTransition);
             }
         }
+        return convertedTransitions;
+    }
 
+    private List<ConvertedTransitions> startMove(Transition transition) {
+        List<MySymbol> allStateSymbols = board.getNodes().stream().map(node -> new MySymbol(node.getName())).toList();
+        List<ConvertedTransitions> convertedTransitions = new ArrayList<>();
+        MySymbol startSymbol = new MySymbol("S");
+        MySymbol startStackSymbol = new MySymbol(STARTING_Z);
+        for (MySymbol stateSymbol : allStateSymbols) {
+            ConvertedTransitions convertedTransition = new ConvertedTransitions();
 
+            // Construct the left-hand side of the CFG rule
+
+            convertedTransition.setLeftSide(startSymbol);
+
+            // Construct the right-hand side of the CFG rule
+            List<MySymbol> rightSide = new ArrayList<>();
+            rightSide.add(new MySymbol("[" + transition.getCurrentState() + ", " + startStackSymbol + ", " + stateSymbol + "]"));
+            convertedTransition.setRightSide(rightSide);
+            convertedTransitions.add(convertedTransition);
+        }
         return convertedTransitions;
     }
 

@@ -1,5 +1,6 @@
 package com.example.bakalar.canvas.transitions;
 
+import com.example.bakalar.canvas.conversion.TransitionType;
 import com.example.bakalar.character.MySymbol;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -17,6 +18,7 @@ public class Transition {
     private MySymbol symbolToPop;
     private MySymbol nextState;
     private List<MySymbol> symbolsToPush;
+    private TransitionType transitionType;
 
     public Transition(String currentState, String inputSymbolToRead, String symbolToPop, String nextState, String symbolsToPush) {
         this.currentState = new MySymbol(currentState);
@@ -24,6 +26,12 @@ public class Transition {
         this.symbolToPop = new MySymbol(symbolToPop);
         this.nextState = new MySymbol(nextState);
         this.symbolsToPush = convertStringToList(symbolsToPush);
+        this.transitionType = TransitionType.NORMAL;
+    }
+
+    public Transition(String currentState, TransitionType transitionType) {
+        this.currentState = new MySymbol(currentState);
+        this.transitionType = transitionType;
     }
 
     private List<MySymbol> convertStringToList(String symbolsToPush) {
@@ -41,6 +49,6 @@ public class Transition {
     @Override
     public String toString() {
         return "δ(" + currentState + ", " + inputSymbolToRead + ", " + symbolToPop + ") -> " +
-                "(" + nextState + ", " + symbolsToPush.stream().map(MySymbol::getName).collect(Collectors.joining()) + ")";
+                "(" + nextState + ", " + (symbolsToPush == null ? "" :symbolsToPush.stream().map(MySymbol::getName).collect(Collectors.joining())) + ")";
     }
 }

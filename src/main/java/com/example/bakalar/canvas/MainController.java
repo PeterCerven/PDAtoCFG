@@ -284,7 +284,7 @@ public class MainController {
     }
 
     public void convertPDA() {
-        conversionLogic.convertPDA(primaryStage);
+        conversionLogic.convertPDA();
     }
 
     public void testBoard() {
