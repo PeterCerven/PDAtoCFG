@@ -133,14 +133,17 @@ public class Board {
         Set<String> stackAlphabet = new HashSet<>();
         stackAlphabet.add(STARTING_Z);
         for (Arrow arrow : arrows) {
-            for (NodeTransition nodeTransition: arrow.getTransitions()) {
-                if (!nodeTransition.getPush().equals(EPSILON)) {
-                    String pushString = nodeTransition.getPush();
-                    for (int i = 0; i < nodeTransition.getPush().length(); i++) {
-                        stackAlphabet.add((String) pushString.subSequence(i, i + 1));
-                    }
+            for (NodeTransition nodeTransition : arrow.getTransitions()) {
+                String pushString = nodeTransition.getPush();
+                String popString = nodeTransition.getPop();
+                if (!popString.equals(EPSILON))
+                    stackAlphabet.add(popString);
+                for (int i = 0; i < nodeTransition.getPush().length(); i++) {
+                    String substring = pushString.substring(i, i + 1);
+                    if (!substring.equals(EPSILON))
+                        stackAlphabet.add(substring);
                 }
-        }
+            }
         }
         return stackAlphabet;
     }

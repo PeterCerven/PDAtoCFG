@@ -61,14 +61,23 @@ public abstract class Arrow extends Group {
     }
 
     public void addSymbolContainer(NodeTransition nodeTransition) {
-        HBox container = new HBox(NODE_RADIUS / 6.0);
+        HBox container = new HBox(NODE_RADIUS / 5.0);
         Text readSymbol = new Text(nodeTransition.getRead());
         Text popSymbol = new Text(nodeTransition.getPop());
         Text pushSymbol = new Text(nodeTransition.getPush());
         container.getChildren().addAll(readSymbol, popSymbol, pushSymbol);
         container.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
             if (event.getButton() == MouseButton.SECONDARY) {
-                board.createArrowTransition(nodeTransition.getRead(), nodeTransition.getPop(), nodeTransition.getPush());
+                NodeTransition newNodeTransition = board.createArrowTransition(nodeTransition.getRead(), nodeTransition.getPop(), nodeTransition.getPush());
+                nodeTransition.setRead(newNodeTransition.getRead());
+                nodeTransition.setPop(newNodeTransition.getPop());
+                nodeTransition.setPush(newNodeTransition.getPush());
+                container.getChildren().clear();
+                readSymbol.setText(newNodeTransition.getRead());
+                popSymbol.setText(newNodeTransition.getPop());
+                pushSymbol.setText(newNodeTransition.getPush());
+                container.getChildren().addAll(readSymbol, popSymbol, pushSymbol);
+                this.board.updateAllDescribePDA();
             }
         });
         container.layoutBoundsProperty().addListener((observable, oldValue, newValue) -> {
