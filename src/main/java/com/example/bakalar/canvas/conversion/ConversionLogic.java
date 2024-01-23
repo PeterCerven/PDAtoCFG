@@ -14,10 +14,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.example.bakalar.canvas.Board.STARTING_Z;
 
@@ -94,7 +91,10 @@ public class ConversionLogic {
         List<ConvertedTransitions> convertedTransitions = this.convertedTransitions.get(currentIndex);
         convertedTransitionBox.getChildren().clear();
         for (ConvertedTransitions convertedTransition : convertedTransitions) {
-            convertedTransitionBox.getChildren().add(new TextField(convertedTransition.toString()));
+            TextField textField = new TextField(convertedTransition.toString());
+            textField.setEditable(false);
+            textField.setFont(new Font("Arial", 16));
+            convertedTransitionBox.getChildren().add(textField);
         }
     }
 
@@ -104,8 +104,16 @@ public class ConversionLogic {
             case START -> convertedTransitions.addAll(startMove(transition));
             case END -> convertedTransitions.addAll(endMove(transition));
             case NORMAL -> convertedTransitions.addAll(pushMove(transition));
+            case TERMINAL -> convertedTransitions.addAll(terminalMove(transition));
         }
         return convertedTransitions;
+    }
+
+    private List<ConvertedTransitions> terminalMove(Transition transition) {
+        ConvertedTransitions convertedTransition = new ConvertedTransitions();
+        convertedTransition.setLeftSide(new MySymbol("[" + transition.getCurrentState() + ", " + transition.getSymbolToPop() + ", " + transition.getNextState() + "]"));
+        convertedTransition.setRightSide(List.of(transition.getInputSymbolToRead()));
+        return List.of(convertedTransition);
     }
 
     private List<ConvertedTransitions> endMove(Transition transition) {
@@ -113,43 +121,52 @@ public class ConversionLogic {
     }
 
     private List<ConvertedTransitions> pushMove(Transition transition) {
-        List<MySymbol> allStateSymbols = board.getNodes().stream().map(node -> new MySymbol(node.getName())).toList();
         List<ConvertedTransitions> convertedTransitions = new ArrayList<>();
-        // convert transition to cfg rules
-        for (MySymbol stateSymbol : allStateSymbols) {
-            for (MySymbol nextStateSymbol : allStateSymbols) {
-                ConvertedTransitions convertedTransition = new ConvertedTransitions();
-
-                // Construct the left-hand side of the CFG rule
-                MySymbol leftSide = new MySymbol("[" + transition.getCurrentState() + ", "
-                        + transition.getSymbolToPop() + ", "
-                        + stateSymbol + "]");
-                convertedTransition.setLeftSide(leftSide);
-
-                // Construct the right-hand side of the CFG rule
-                List<MySymbol> rightSide = new ArrayList<>();
-                if (!transition.getInputSymbolToRead().getName().equals("ε")) {
-                    rightSide.add(transition.getInputSymbolToRead());
-                }
-
-                MySymbol startSymbol = transition.getNextState();
-                MySymbol endSymbol = nextStateSymbol;
-                for (MySymbol symbolToPush : transition.getSymbolsToPush()) {
-                    rightSide.add(new MySymbol("[" + startSymbol + ", " + symbolToPush + ", " + endSymbol + "]"));
-                    startSymbol = endSymbol;
-                    endSymbol = stateSymbol;
-                }
-
-                if (transition.getSymbolsToPush().isEmpty()) {
-                    rightSide.add(new MySymbol("ε"));
-                }
-
-                convertedTransition.setRightSide(rightSide);
-                convertedTransitions.add(convertedTransition);
-            }
-        }
+        recursiveLoop(transition.getSymbolsToPush().size(), board.getNodes().size(), new String[board.getNodes().size()], 0, transition, convertedTransitions);
         return convertedTransitions;
     }
+
+    private void recursiveLoop(int totalLoops, int iterations, String[] statesPos, int currentLoop, Transition transition, List<ConvertedTransitions> convertedTransitions) {
+        if (currentLoop == totalLoops) {
+            ConvertedTransitions convertedTransition = createRule(statesPos, transition);
+            convertedTransitions.add(convertedTransition);
+            return;
+        }
+
+        for (int i = 0; i < iterations; i++) {
+            statesPos[currentLoop] = board.getNodes().get(i).getName();
+            recursiveLoop(totalLoops, iterations, statesPos, currentLoop + 1, transition, convertedTransitions);
+        }
+    }
+
+    private ConvertedTransitions createRule(String[] statesPos, Transition transition) {
+        ConvertedTransitions convertedTransition = new ConvertedTransitions();
+        int posCounter = 0;
+
+        MySymbol leftSide = new MySymbol("[" + transition.getCurrentState() + ", "
+                + transition.getSymbolToPop() + ", "
+                + statesPos[posCounter++] + "]");
+
+        List<MySymbol> rightSide = new ArrayList<>();
+        if (!transition.getInputSymbolToRead().getName().equals("ε")) {
+            rightSide.add(transition.getInputSymbolToRead());
+        }
+        MySymbol nextStateSymbol = new MySymbol(transition.getNextState().getName());
+        for (int i = 0; i < transition.getSymbolsToPush().size(); i++) {
+            if (i == transition.getSymbolsToPush().size() - 1) {
+                rightSide.add(new MySymbol("[" + nextStateSymbol + ", " + transition.getSymbolsToPush().get(i) + ", " + statesPos[0] + "]"));
+                break;
+            }
+            rightSide.add(new MySymbol("[" + nextStateSymbol + ", " + transition.getSymbolsToPush().get(i) + ", " + statesPos[posCounter] + "]"));
+            nextStateSymbol = new MySymbol(statesPos[posCounter]);
+            posCounter++;
+        }
+
+        convertedTransition.setLeftSide(leftSide);
+        convertedTransition.setRightSide(rightSide);
+        return convertedTransition;
+    }
+
 
     private List<ConvertedTransitions> startMove(Transition transition) {
         List<MySymbol> allStateSymbols = board.getNodes().stream().map(node -> new MySymbol(node.getName())).toList();

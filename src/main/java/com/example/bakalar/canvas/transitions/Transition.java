@@ -2,11 +2,9 @@ package com.example.bakalar.canvas.transitions;
 
 import com.example.bakalar.canvas.conversion.TransitionType;
 import com.example.bakalar.character.MySymbol;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,6 +25,9 @@ public class Transition {
         this.nextState = new MySymbol(nextState);
         this.symbolsToPush = convertStringToList(symbolsToPush);
         this.transitionType = TransitionType.NORMAL;
+        if (this.symbolsToPush.size() == 1 && this.symbolsToPush.get(0).getName().equals("ε")) {
+            this.transitionType = TransitionType.TERMINAL;
+        }
     }
 
     public Transition(String currentState, TransitionType transitionType) {
