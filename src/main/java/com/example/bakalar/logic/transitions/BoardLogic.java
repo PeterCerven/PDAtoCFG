@@ -1,10 +1,10 @@
-package com.example.bakalar.canvas.transitions;
+package com.example.bakalar.logic.transitions;
 
-import com.example.bakalar.canvas.Board;
+import com.example.bakalar.logic.Board;
 import com.example.bakalar.canvas.arrow.Arrow;
 import com.example.bakalar.canvas.node.MyNode;
 import com.example.bakalar.canvas.node.NodeTransition;
-import com.example.bakalar.character.MySymbol;
+import com.example.bakalar.logic.character.MySymbol;
 import javafx.scene.layout.HBox;
 
 import java.util.ArrayList;

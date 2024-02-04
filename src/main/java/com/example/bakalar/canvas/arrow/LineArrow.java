@@ -1,6 +1,6 @@
 package com.example.bakalar.canvas.arrow;
 
-import com.example.bakalar.canvas.Board;
+import com.example.bakalar.logic.Board;
 import com.example.bakalar.canvas.node.MyNode;
 import com.example.bakalar.canvas.node.NodeTransition;
 import javafx.geometry.Point2D;
@@ -11,10 +11,10 @@ import javafx.scene.shape.StrokeType;
 import javafx.scene.transform.Rotate;
 import lombok.Getter;
 
-import static com.example.bakalar.canvas.MainController.NODE_RADIUS;
+import static com.example.bakalar.logic.MainController.NODE_RADIUS;
 
 @Getter
-public class LineArrow extends Arrow {
+public class LineArrow extends Arrow implements Cloneable{
 
     private QuadCurve line;
     private Circle controlIndicator;
@@ -31,12 +31,15 @@ public class LineArrow extends Arrow {
         super(from, to, board, nodeTransition);
 
         createLine();
+        resetLine();
         createControlIndicator();
         setLinePoints(true);
 
         this.getChildren().addAll(line, controlIndicator);
         this.updateObjects(true);
     }
+
+
 
     public LineArrow(MyNode from, MyNode to, double change, Board board, NodeTransition nodeTransition) {
         this(from, to, board,nodeTransition);
@@ -61,6 +64,28 @@ public class LineArrow extends Arrow {
         double pointY = midY - change * vectorXNormal;
         return new Point2D(pointX, pointY);
     }
+
+    @Override
+    public LineArrow clone() {
+        LineArrow cloned = (LineArrow) super.clone();
+
+        // Clone mutable fields
+        cloned.line = new QuadCurve(this.line.getStartX(), this.line.getStartY(),
+                this.line.getControlX(), this.line.getControlY(),
+                this.line.getEndX(), this.line.getEndY());
+        cloned.controlIndicator = new Circle(this.controlIndicator.getCenterX(),
+                this.controlIndicator.getCenterY(),
+                this.controlIndicator.getRadius());
+        // Set color and other properties if needed
+        cloned.controlIndicator.setFill(this.controlIndicator.getFill());
+        cloned.controlIndicator.setStroke(this.controlIndicator.getStroke());
+
+        // Clone other fields if they are mutable and not handled by super.clone()
+        // e.g., cloned.someMutableField = this.someMutableField.clone();
+
+        return cloned;
+    }
+
 
     private void setLinePoints(boolean toEdge) {
         startX = from.getAbsoluteCentrePosX();
@@ -178,7 +203,6 @@ public class LineArrow extends Arrow {
         line.setStrokeWidth(2);
         line.setFill(Color.TRANSPARENT);
         line.setStroke(Color.BLACK);
-        resetLine();
     }
 
     public void resetControlPoint() {

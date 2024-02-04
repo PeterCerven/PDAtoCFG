@@ -1,7 +1,7 @@
-package com.example.bakalar.canvas.transitions;
+package com.example.bakalar.logic.transitions;
 
-import com.example.bakalar.canvas.conversion.TransitionType;
-import com.example.bakalar.character.MySymbol;
+import com.example.bakalar.logic.conversion.TransitionType;
+import com.example.bakalar.logic.character.MySymbol;
 import lombok.Getter;
 import lombok.Setter;
 

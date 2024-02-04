@@ -1,9 +1,8 @@
 package com.example.bakalar.canvas.arrow;
 
-import com.example.bakalar.canvas.Board;
+import com.example.bakalar.logic.Board;
 import com.example.bakalar.canvas.node.MyNode;
 import com.example.bakalar.canvas.node.NodeTransition;
-import com.example.bakalar.canvas.transitions.Transition;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
 import javafx.scene.input.MouseButton;
@@ -11,7 +10,9 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 import javafx.scene.shape.Polygon;
+import javafx.scene.shape.QuadCurve;
 import javafx.scene.text.Text;
 import lombok.Getter;
 import lombok.Setter;
@@ -20,12 +21,13 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
-import static com.example.bakalar.canvas.MainController.NODE_RADIUS;
+import static com.example.bakalar.logic.MainController.NODE_RADIUS;
 
 @Getter
 @Setter
-public abstract class Arrow extends Group {
+public abstract class Arrow extends Group implements Cloneable{
     public static final int ARROW_HEAD_SZIE = NODE_RADIUS / 2;
     public static final String EPSILON = "ε";
     protected static final Logger log = LogManager.getLogger(Arrow.class.getName());
@@ -49,6 +51,65 @@ public abstract class Arrow extends Group {
         createArrowHead();
         addSymbolContainer(nodeTransition);
         this.getChildren().addAll(arrowHead, symbolContainers);
+    }
+
+    @Override
+    public Arrow clone() {
+        try {
+            Arrow cloned = (Arrow) super.clone();
+
+            // Deep clone the transitions list
+            cloned.transitions = this.transitions.stream()
+                    .map(NodeTransition::clone) // Assuming NodeTransition implements Cloneable
+                    .collect(Collectors.toList());
+
+            // Clone and recreate the symbolContainers and arrowHead
+            cloned.symbolContainers = new VBox();
+            for (NodeTransition transition : cloned.transitions) {
+                // Recreate symbol containers for each transition
+                // This assumes you have a method to create a container from a NodeTransition
+                HBox container = createSymbolContainerForTransition(transition);
+                cloned.symbolContainers.getChildren().add(container);
+            }
+
+            cloned.createArrowHead(); // Assuming this method initializes arrowHead properly
+
+            // Add the cloned components to the children of the cloned Arrow
+            cloned.getChildren().clear();
+            cloned.getChildren().addAll(cloned.arrowHead, cloned.symbolContainers);
+
+            return cloned;
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError(); // Can never happen if Cloneable is implemented
+        }
+    }
+
+    private HBox createSymbolContainerForTransition(NodeTransition transition) {
+        HBox container = new HBox(NODE_RADIUS / 5.0);
+        Text readSymbol = new Text(transition.getRead());
+        Text popSymbol = new Text(transition.getPop());
+        Text pushSymbol = new Text(transition.getPush());
+        container.getChildren().addAll(readSymbol, popSymbol, pushSymbol);
+        container.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
+            if (event.getButton() == MouseButton.SECONDARY) {
+                NodeTransition newNodeTransition = board.createArrowTransition(transition.getRead(), transition.getPop(), transition.getPush());
+                transition.setRead(newNodeTransition.getRead());
+                transition.setPop(newNodeTransition.getPop());
+                transition.setPush(newNodeTransition.getPush());
+                container.getChildren().clear();
+                readSymbol.setText(newNodeTransition.getRead());
+                popSymbol.setText(newNodeTransition.getPop());
+                pushSymbol.setText(newNodeTransition.getPush());
+                container.getChildren().addAll(readSymbol, popSymbol, pushSymbol);
+                this.board.updateAllDescribePDA();
+            }
+        });
+        container.layoutBoundsProperty().addListener((observable, oldValue, newValue) -> {
+            container.setLayoutX(newValue.getWidth());
+            container.setLayoutX(newValue.getHeight());
+            updateSymbolContainerPosition();
+        });
+        return container;
     }
 
 

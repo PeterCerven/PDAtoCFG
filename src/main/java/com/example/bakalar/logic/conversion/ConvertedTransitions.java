@@ -1,6 +1,6 @@
-package com.example.bakalar.canvas.conversion;
+package com.example.bakalar.logic.conversion;
 
-import com.example.bakalar.character.MySymbol;
+import com.example.bakalar.logic.character.MySymbol;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,15 +9,11 @@ import java.util.stream.Collectors;
 
 @Getter
 @Setter
-public class Rule {
-
+public class ConvertedTransitions {
     private MySymbol leftSide;
     private List<MySymbol> rightSide;
 
-    public Rule(MySymbol leftSide, MySymbol readSymbol, List<MySymbol> rightSide) {
-        this.leftSide = leftSide;
-        rightSide.add(0, readSymbol);
-        this.rightSide = rightSide;
+    public ConvertedTransitions() {
     }
 
     @Override

@@ -1,6 +1,6 @@
 package com.example.bakalar;
 
-import com.example.bakalar.canvas.MainController;
+import com.example.bakalar.logic.MainController;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;

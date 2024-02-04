@@ -1,13 +1,14 @@
-package com.example.bakalar.canvas;
+package com.example.bakalar.logic;
 
 import com.example.bakalar.canvas.arrow.Arrow;
 import com.example.bakalar.canvas.arrow.LineArrow;
 import com.example.bakalar.canvas.arrow.SelfLoopArrow;
-import com.example.bakalar.canvas.conversion.Rule;
+import com.example.bakalar.logic.conversion.Rule;
 import com.example.bakalar.canvas.node.MyNode;
 import com.example.bakalar.canvas.node.NodeTransition;
 import com.example.bakalar.canvas.node.StartNodeArrow;
-import com.example.bakalar.canvas.transitions.Transition;
+import com.example.bakalar.logic.transitions.BoardLogic;
+import com.example.bakalar.logic.transitions.Transition;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.*;
@@ -76,6 +77,23 @@ public class Board {
         this.describeAlphabet = describeFields.get(1);
         this.describeStackAlphabet = describeFields.get(2);
         this.describeEndStates = describeFields.get(3);
+    }
+
+    public BoardHistory createBoardHistory() {
+        return new BoardHistory(nodes, arrows);
+    }
+
+    public void restoreBoardFromHistory(BoardHistory history) {
+        this.nodes = new ArrayList<>(history.getNodes()); // Deep copy if necessary
+        this.arrows = new ArrayList<>(history.getArrows()); // Deep copy if necessary
+        this.getMainPane().getChildren().clear();
+        this.getMainPane().getChildren().addAll(nodes);
+        this.getMainPane().getChildren().addAll(arrows);
+        for (MyNode node : nodes) {
+            node.updatePosition();
+            node.updateArrows(true);
+        }
+        updateAllDescribePDA();
     }
 
     // describe functions
@@ -392,19 +410,6 @@ public class Board {
     }
 
     // rules
-
-    public void addConversions() {
-        this.rulesContainer.getChildren().clear();
-        for (Rule rule : rules) {
-            TextField textField = new TextField(rule.toString());
-            textField.setEditable(false);
-            this.rulesContainer.getChildren().add(textField);
-        }
-    }
-
-    public void addRule(Rule rule) {
-        rules.add(rule);
-    }
 
     public void testBoard() {
         clearBoard();

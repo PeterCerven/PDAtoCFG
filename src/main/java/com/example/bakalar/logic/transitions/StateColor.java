@@ -1,4 +1,4 @@
-package com.example.bakalar.canvas.transitions;
+package com.example.bakalar.logic.transitions;
 
 import lombok.Getter;
 

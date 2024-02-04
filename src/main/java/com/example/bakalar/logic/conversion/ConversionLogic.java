@@ -1,8 +1,8 @@
-package com.example.bakalar.canvas.conversion;
+package com.example.bakalar.logic.conversion;
 
-import com.example.bakalar.canvas.Board;
-import com.example.bakalar.canvas.transitions.Transition;
-import com.example.bakalar.character.MySymbol;
+import com.example.bakalar.logic.Board;
+import com.example.bakalar.logic.transitions.Transition;
+import com.example.bakalar.logic.character.MySymbol;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -16,7 +16,7 @@ import javafx.stage.Stage;
 
 import java.util.*;
 
-import static com.example.bakalar.canvas.Board.STARTING_Z;
+import static com.example.bakalar.logic.Board.STARTING_Z;
 
 public class ConversionLogic {
     private final Board board;

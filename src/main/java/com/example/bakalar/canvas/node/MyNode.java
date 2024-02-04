@@ -12,12 +12,13 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
-import static com.example.bakalar.canvas.MainController.NODE_RADIUS;
+import static com.example.bakalar.logic.MainController.NODE_RADIUS;
 
 @Getter
 @Setter
-public class MyNode extends Group {
+public class MyNode extends Group implements Cloneable {
     private static final Logger log = LogManager.getLogger(MyNode.class.getName());
     private Circle circle;
     private Text nameText;
@@ -52,6 +53,47 @@ public class MyNode extends Group {
         this.getChildren().addAll(circle, endNode, nameText, startNodeArrow);
         this.arrowsFrom = new ArrayList<>();
         this.arrowsTo = new ArrayList<>();
+    }
+
+    @Override
+    public MyNode clone() {
+        try {
+            MyNode cloned = (MyNode) super.clone();
+
+            // Clone mutable fields
+            cloned.circle = new Circle(this.circle.getCenterX(), this.circle.getCenterY(), this.circle.getRadius());
+            cloned.circle.setFill(this.circle.getFill());
+            cloned.circle.setStroke(this.circle.getStroke());
+
+            cloned.nameText = new Text(this.nameText.getText());
+            cloned.nameText.setFont(this.nameText.getFont());
+            cloned.nameText.setX(this.nameText.getX());
+            cloned.nameText.setY(this.nameText.getY());
+
+            // Clone other components if they are mutable
+            cloned.endNode = new EndNode(this.endNode.getCenterX(), this.endNode.getCenterY(), this.endNode.getRadius());
+            cloned.endNode.setVisible(this.endNode.isVisible());
+
+            cloned.startNodeArrow = new StartNodeArrow(this.circle.getCenterX(), this.circle.getCenterY(), this.circle.getRadius());
+            cloned.startNodeArrow.setVisible(this.startNodeArrow.isVisible());
+
+            // Clone collections
+            // This assumes Arrow implements Cloneable and has a properly overridden clone method.
+            cloned.arrowsFrom = this.arrowsFrom.stream()
+                    .map(Arrow::clone)
+                    .collect(Collectors.toCollection(ArrayList::new));
+            cloned.arrowsTo = this.arrowsTo.stream()
+                    .map(Arrow::clone)
+                    .collect(Collectors.toCollection(ArrayList::new));
+
+            // Add cloned children
+            cloned.getChildren().clear();
+            cloned.getChildren().addAll(cloned.circle, cloned.endNode, cloned.nameText, cloned.startNodeArrow);
+
+            return cloned;
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError(); // Can never happen if Cloneable is implemented
+        }
     }
 
     public double getAbsoluteCentrePosX() {
@@ -125,13 +167,8 @@ public class MyNode extends Group {
         return allArrows;
     }
 
-    public List<NodeTransition> getTransitions() {
-        List<NodeTransition> nodeTransitions = new ArrayList<>();
-        for (Arrow arrow : arrowsFrom) {
-            nodeTransitions.addAll(arrow.getTransitions());
-        }
-        return nodeTransitions;
+    public void updatePosition() {
+        this.setTranslateX(this.getTranslateX());
+        this.setTranslateY(this.getTranslateY());
     }
-
-
 }

@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class NodeTransition {
+public class NodeTransition implements Cloneable {
     private String read;
     private String pop;
     private String push;
@@ -15,4 +15,17 @@ public class NodeTransition {
         this.pop = pop;
         this.push = push;
     }
+
+    @Override
+    public NodeTransition clone() {
+        try {
+            // As String is immutable, shallow copying the fields is adequate
+            return (NodeTransition) super.clone();
+        } catch (CloneNotSupportedException e) {
+            // This should never happen since we're Cloneable
+            throw new AssertionError(e);
+        }
+    }
+
+
 }

@@ -1,11 +1,11 @@
-package com.example.bakalar.canvas;
+package com.example.bakalar.logic;
 
 import com.example.bakalar.canvas.arrow.Arrow;
 import com.example.bakalar.canvas.arrow.LineArrow;
-import com.example.bakalar.canvas.button.ButtonState;
-import com.example.bakalar.canvas.conversion.ConversionLogic;
 import com.example.bakalar.canvas.node.MyNode;
-import com.example.bakalar.canvas.transitions.BoardLogic;
+import com.example.bakalar.logic.button.ButtonState;
+import com.example.bakalar.logic.conversion.ConversionLogic;
+import com.example.bakalar.logic.transitions.BoardLogic;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -22,15 +22,24 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.List;
+import java.util.Stack;
 
-import static com.example.bakalar.canvas.Board.EPSILON;
-import static com.example.bakalar.canvas.Board.STARTING_Z;
+import static com.example.bakalar.logic.Board.EPSILON;
+import static com.example.bakalar.logic.Board.STARTING_Z;
 
 
 public class MainController {
 
     public static final int NODE_RADIUS = 30;
     private static final Logger log = LogManager.getLogger(MainController.class.getName());
+    private static final String ARROW_ICON_PATH = "file:src/main/resources/icons/Arrow.png";
+    private static final String ERASER_ICON_PATH = "file:src/main/resources/icons/Eraser.png";
+    private static final String NODE_ICON_PATH = "file:src/main/resources/icons/Node.png";
+    private static final String START_ICON_PATH = "file:src/main/resources/icons/Start.png";
+    private static final String STEP_ICON_PATH = "file:src/main/resources/icons/Step.png";
+    private static final String ERASE_ALL_ICON_PATH = "file:src/main/resources/icons/EraseAll.png";
+    private static final String UNDO_ICON_PATH = "file:src/main/resources/icons/Undo.png";
+    private static final String REDO_ICON_PATH = "file:src/main/resources/icons/Redo.png";
     private Stage primaryStage;
     @FXML
     private AnchorPane mainPane;
@@ -72,71 +81,99 @@ public class MainController {
     private VBox transFunctions;
     @FXML
     private VBox rulesContainer;
-
-
     private ButtonState currentState = ButtonState.SELECT;
     private MyNode selectedNode;
     private double startX, startY;
-    private Board board;
+    private Board currentBoard;
+    private Stack<BoardHistory> undoStack;
+    private Stack<BoardHistory> redoStack;
     private BoardLogic boardLogic;
     private ConversionLogic conversionLogic;
+    private boolean arrowMoved = false;
+    private boolean nodeMoved = false;
 
 
     @FXML
     private void initialize() {
+        setupBoard();
+        setButtonImages();
+    }
+
+    private void setupBoard() {
+        undoStack = new Stack<>();
+        redoStack = new Stack<>();
         this.begSymbol.setText(STARTING_Z);
         List<TextField> describeFields = List.of(describeStates, describeAlphabet, describeStackAlphabet, describeEndStates);
-        board = new Board(mainPane, inputFieldAlphabet, describeFields, transFunctions, rulesContainer);
-        this.boardLogic = new BoardLogic(board, this.stateContainer);
-        this.conversionLogic = new ConversionLogic(board);
+        currentBoard = new Board(mainPane, inputFieldAlphabet, describeFields, transFunctions, rulesContainer);
+        this.boardLogic = new BoardLogic(currentBoard, this.stateContainer);
+        this.conversionLogic = new ConversionLogic(currentBoard);
         inputFieldAlphabet.textProperty().addListener((observable, oldValue, newValue) -> {
-            board.updateAllDescribePDA();
+            currentBoard.updateAllDescribePDA();
         });
-        setButtonImages();
-
     }
 
     public void setPrimaryStage(Stage stage) {
         this.primaryStage = stage;
     }
 
+    // Board history
+
+    public void saveCurrentState() {
+        undoStack.push(currentBoard.createBoardHistory());
+        redoStack.clear(); // Clear redo stack on new action
+    }
+
+    public void undo() {
+        if (!undoStack.isEmpty()) {
+            redoStack.push(currentBoard.createBoardHistory());
+            BoardHistory previousState = undoStack.pop();
+            currentBoard.restoreBoardFromHistory(previousState);
+        }
+    }
+
+    public void redo() {
+        if (!redoStack.isEmpty()) {
+            undoStack.push(currentBoard.createBoardHistory());
+            BoardHistory nextState = redoStack.pop();
+            currentBoard.restoreBoardFromHistory(nextState);
+        }
+    }
 
     // set images
 
 
     private void setButtonImages() {
-        Image image = new Image("file:src/main/resources/icons/Arrow.png");
+        Image image = new Image(ARROW_ICON_PATH);
         ImageView imageView = new ImageView(image);
         this.arrowBtn.setGraphic(imageView);
 
-        image = new Image("file:src/main/resources/icons/Eraser.png");
+        image = new Image(ERASER_ICON_PATH);
         imageView = new ImageView(image);
         this.eraseBtn.setGraphic(imageView);
 
-        image = new Image("file:src/main/resources/icons/Node.png");
+        image = new Image(NODE_ICON_PATH);
         imageView = new ImageView(image);
         this.nodeBtn.setGraphic(imageView);
 
-        image = new Image("file:src/main/resources/icons/Start.png");
+        image = new Image(START_ICON_PATH);
         imageView = new ImageView(image);
         this.startButton.setGraphic(imageView);
 
-        image = new Image("file:src/main/resources/icons/Step.png");
+        image = new Image(STEP_ICON_PATH);
         imageView = new ImageView(image);
         this.stepButton.setGraphic(imageView);
 
-        image = new Image("file:src/main/resources/icons/EraseAll.png");
+        image = new Image(ERASE_ALL_ICON_PATH);
         imageView = new ImageView(image);
         this.resetBtn.setGraphic(imageView);
 
-        image = new Image("file:src/main/resources/icons/Undo.png");
+        image = new Image(UNDO_ICON_PATH);
         imageView = new ImageView(image);
         this.undoBtn.setGraphic(imageView);
 
-        image = new Image("file:src/main/resources/icons/Redo.png");
+        image = new Image(REDO_ICON_PATH);
         imageView = new ImageView(image);
         this.reUndoBtn.setGraphic(imageView);
-
     }
 
 
@@ -144,6 +181,7 @@ public class MainController {
 
     public void createNode(MouseEvent event) {
         if (currentState.equals(ButtonState.NODE) && event.getButton() == MouseButton.PRIMARY) {
+            saveCurrentState();
             createMyNode(event.getX(), event.getY());
         }
     }
@@ -152,33 +190,25 @@ public class MainController {
         MyNode myNode = new MyNode(x, y, NODE_RADIUS);
         makeDraggable(myNode);
         enableArrowCreation(myNode);
-        board.addObject(myNode);
+        currentBoard.addObject(myNode);
         return myNode;
     }
 
     private void createArrow(MyNode node) {
         if (selectedNode != null) {
-            createMyArrow(selectedNode, node);
-            board.selectNode(selectedNode, false);
+            createMyArrow(selectedNode, node, null, null, null);
+            currentBoard.selectNode(selectedNode, false);
             selectedNode = null;
         } else {
             selectedNode = node;
-            board.selectNode(node, true);
+            currentBoard.selectNode(node, true);
         }
     }
 
-    private void createMyArrow(MyNode from, MyNode to) {
-        Arrow arrow = board.createArrow(from, to, null, null, null);
-        if (arrow != null) {
-            makeErasable(arrow);
-            if (arrow instanceof LineArrow lineArrow) {
-                makeCurveDraggable(lineArrow);
-            }
-        }
-    }
 
     private void createMyArrow(MyNode from, MyNode to, String input, String stackTop, String stackPush) {
-        Arrow arrow = board.createArrow(from, to, input, stackTop, stackPush);
+        saveCurrentState();
+        Arrow arrow = currentBoard.createArrow(from, to, input, stackTop, stackPush);
         if (arrow != null) {
             makeErasable(arrow);
             if (arrow instanceof LineArrow lineArrow) {
@@ -204,7 +234,17 @@ public class MainController {
 
         arrow.getControlIndicator().setOnMouseDragged(e -> {
             if (currentState.equals(ButtonState.SELECT)) {
+                if (!arrowMoved) {
+                    saveCurrentState();
+                }
                 arrow.moveControlPoint(e.getSceneX() - startX, e.getSceneY() - startY);
+                arrowMoved = true;
+            }
+        });
+
+        arrow.getControlIndicator().setOnMouseReleased(event -> {
+            if (currentState.equals(ButtonState.SELECT)) {
+                arrowMoved = false;
             }
         });
     }
@@ -214,7 +254,7 @@ public class MainController {
         node.setOnMousePressed(event -> {
             if (currentState.equals(ButtonState.SELECT)) {
                 if (event.getButton() == MouseButton.SECONDARY) {
-                    board.showDialog(node);
+                    currentBoard.showDialog(node);
                 } else if (event.getButton() == MouseButton.PRIMARY) {
                     startX = event.getSceneX() - node.getTranslateX();
                     startY = event.getSceneY() - node.getTranslateY();
@@ -224,13 +264,18 @@ public class MainController {
 
         node.setOnMouseDragged(e -> {
             if (currentState.equals(ButtonState.SELECT)) {
+                if (!nodeMoved) {
+                    saveCurrentState();
+                }
                 node.move(e.getSceneX() - startX, e.getSceneY() - startY);
                 node.updateArrows(false);
+                nodeMoved = true;
             }
         });
 
         node.setOnMouseReleased(event -> {
             if (currentState.equals(ButtonState.SELECT)) {
+                nodeMoved = false;
                 node.updateArrows(true);
             }
         });
@@ -242,7 +287,8 @@ public class MainController {
             if (currentState.equals(ButtonState.ARROW) && event.getButton() == MouseButton.PRIMARY) {
                 createArrow(node);
             } else if (currentState.equals(ButtonState.ERASE) && event.getButton() == MouseButton.PRIMARY) {
-                board.removeObject(node);
+                saveCurrentState();
+                currentBoard.removeObject(node);
             }
         });
     }
@@ -250,7 +296,8 @@ public class MainController {
     private void makeErasable(Node node) {
         node.setOnMouseClicked(event -> {
             if (currentState.equals(ButtonState.ERASE) && event.getButton() == MouseButton.PRIMARY) {
-                board.removeObject(node);
+                saveCurrentState();
+                currentBoard.removeObject(node);
             }
         });
     }
@@ -258,7 +305,8 @@ public class MainController {
     // Buttons actions
 
     public void resetAll() {
-        board.clearBoard();
+        saveCurrentState();
+        currentBoard.clearBoard();
         currentState = ButtonState.SELECT;
         selectedNode = null;
         updateButtonStates();
@@ -273,14 +321,12 @@ public class MainController {
         boardLogic.step();
     }
 
-    public void reUndo() {
-        log.info("ReUndo");
-        // TODO reUndo
+    public void buttonRedo() {
+        redo();
     }
 
-    public void undo() {
-        log.info("Undo");
-        // TODO undo
+    public void buttonUndo() {
+        undo();
     }
 
     public void convertPDA() {
@@ -288,12 +334,13 @@ public class MainController {
     }
 
     public void testBoard() {
-        board.testBoard();
+        saveCurrentState();
+        currentBoard.testBoard();
         MyNode firstNode = createMyNode(120, 150);
-        board.setStarting(firstNode, true);
-        MyNode  secondNode = createMyNode(320, 150);
-        board.setEnding(firstNode, true);
-        board.getInputFieldAlphabet().setText("111000");
+        currentBoard.setStarting(firstNode, true);
+        MyNode secondNode = createMyNode(320, 150);
+        currentBoard.setEnding(firstNode, true);
+        currentBoard.getInputFieldAlphabet().setText("111000");
         createMyArrow(firstNode, firstNode, "1", "Z", "XZ");
         createMyArrow(firstNode, firstNode, "1", "X", "XX");
         createMyArrow(firstNode, firstNode, EPSILON, "X", EPSILON);

@@ -1,16 +1,16 @@
 package com.example.bakalar.canvas.arrow;
 
-import com.example.bakalar.canvas.Board;
 import com.example.bakalar.canvas.node.MyNode;
 import com.example.bakalar.canvas.node.NodeTransition;
+import com.example.bakalar.logic.Board;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Arc;
 import javafx.scene.shape.ArcType;
 import javafx.scene.shape.StrokeType;
 
-import static com.example.bakalar.canvas.MainController.NODE_RADIUS;
+import static com.example.bakalar.logic.MainController.NODE_RADIUS;
 
-public class SelfLoopArrow extends Arrow {
+public class SelfLoopArrow extends Arrow implements Cloneable {
 
     public static double ARC_WIDTH = NODE_RADIUS / 2.0;
     public static double ARC_HEIGHT = (NODE_RADIUS / 2.0) * 3;
@@ -35,6 +35,24 @@ public class SelfLoopArrow extends Arrow {
         arc.setLength(ARC_LENGTH);
         arc.setStartAngle(ARC_START_ANGLE);
         arc.setStrokeWidth(2);
+    }
+
+    @Override
+    public SelfLoopArrow clone() {
+        SelfLoopArrow cloned = (SelfLoopArrow) super.clone();
+
+        // Clone the Arc object
+        cloned.arc = new Arc();
+        cloned.arc.setCenterX(this.arc.getCenterX());
+        cloned.arc.setCenterY(this.arc.getCenterY());
+        cloned.arc.setRadiusX(this.arc.getRadiusX());
+        cloned.arc.setRadiusY(this.arc.getRadiusY());
+        cloned.arc.setStartAngle(this.arc.getStartAngle());
+
+        // Add the cloned Arc to the children of the cloned SelfLoopArrow
+        cloned.getChildren().add(cloned.arc);
+
+        return cloned;
     }
 
     @Override

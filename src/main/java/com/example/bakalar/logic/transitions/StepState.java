@@ -1,8 +1,8 @@
-package com.example.bakalar.canvas.transitions;
+package com.example.bakalar.logic.transitions;
 
-import com.example.bakalar.canvas.MainController;
+import com.example.bakalar.logic.MainController;
 import com.example.bakalar.canvas.node.MyNode;
-import com.example.bakalar.character.MySymbol;
+import com.example.bakalar.logic.character.MySymbol;
 import javafx.geometry.Pos;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.Pane;

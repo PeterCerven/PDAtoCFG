@@ -1,4 +1,4 @@
-package com.example.bakalar.character;
+package com.example.bakalar.logic.character;
 
 import lombok.Getter;
 import lombok.Setter;
