@@ -7,7 +7,6 @@ import com.example.bakalar.logic.conversion.Rule;
 import com.example.bakalar.canvas.node.MyNode;
 import com.example.bakalar.canvas.node.NodeTransition;
 import com.example.bakalar.canvas.node.StartNodeArrow;
-import com.example.bakalar.logic.transitions.BoardLogic;
 import com.example.bakalar.logic.transitions.Transition;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
@@ -51,6 +50,7 @@ public class Board {
     private VBox transFunctions;
     private VBox rulesContainer;
     private List<Rule> rules;
+    private int idNodeCounter;
 
 
     public Board(AnchorPane mainPane, TextField inputFieldAlphabet, List<TextField> describeFields, VBox transFunctions, VBox rulesContainer) {
@@ -68,6 +68,7 @@ public class Board {
         this.nodeCounter = 0;
         this.startingCheckBox = new CheckBox("Starting Node");
         this.endingCheckBox = new CheckBox("End Node");
+        this.idNodeCounter = 0;
     }
 
     // init functions
@@ -80,12 +81,12 @@ public class Board {
     }
 
     public BoardHistory createBoardHistory() {
-        return new BoardHistory(nodes, arrows);
+        return new BoardHistory(nodes);
     }
 
     public void restoreBoardFromHistory(BoardHistory history) {
-        this.nodes = new ArrayList<>(history.getNodes()); // Deep copy if necessary
-        this.arrows = new ArrayList<>(history.getArrows()); // Deep copy if necessary
+        this.nodes = new ArrayList<>(history.getNodes());
+        this.arrows = new ArrayList<>(history.getArrows());
         this.getMainPane().getChildren().clear();
         this.getMainPane().getChildren().addAll(nodes);
         this.getMainPane().getChildren().addAll(arrows);
@@ -271,6 +272,7 @@ public class Board {
         } else if (node instanceof MyNode myNode) {
             char character = (char) (nodeCounter + '₀');
             String name = "q" + character;
+            myNode.setNodeId(idNodeCounter++);
 
             myNode.setName(name);
             nodeCounter++;

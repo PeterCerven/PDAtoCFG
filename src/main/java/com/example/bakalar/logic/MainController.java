@@ -119,8 +119,8 @@ public class MainController {
     // Board history
 
     public void saveCurrentState() {
-        undoStack.push(currentBoard.createBoardHistory());
-        redoStack.clear(); // Clear redo stack on new action
+//        undoStack.push(currentBoard.createBoardHistory());
+//        redoStack.clear(); // Clear redo stack on new action
     }
 
     public void undo() {
@@ -196,9 +196,11 @@ public class MainController {
 
     private void createArrow(MyNode node) {
         if (selectedNode != null) {
+            saveCurrentState();
             createMyArrow(selectedNode, node, null, null, null);
             currentBoard.selectNode(selectedNode, false);
             selectedNode = null;
+
         } else {
             selectedNode = node;
             currentBoard.selectNode(node, true);
@@ -207,7 +209,6 @@ public class MainController {
 
 
     private void createMyArrow(MyNode from, MyNode to, String input, String stackTop, String stackPush) {
-        saveCurrentState();
         Arrow arrow = currentBoard.createArrow(from, to, input, stackTop, stackPush);
         if (arrow != null) {
             makeErasable(arrow);
@@ -235,7 +236,7 @@ public class MainController {
         arrow.getControlIndicator().setOnMouseDragged(e -> {
             if (currentState.equals(ButtonState.SELECT)) {
                 if (!arrowMoved) {
-                    saveCurrentState();
+//                    saveCurrentState();
                 }
                 arrow.moveControlPoint(e.getSceneX() - startX, e.getSceneY() - startY);
                 arrowMoved = true;
@@ -265,7 +266,7 @@ public class MainController {
         node.setOnMouseDragged(e -> {
             if (currentState.equals(ButtonState.SELECT)) {
                 if (!nodeMoved) {
-                    saveCurrentState();
+//                    saveCurrentState();
                 }
                 node.move(e.getSceneX() - startX, e.getSceneY() - startY);
                 node.updateArrows(false);
@@ -322,11 +323,11 @@ public class MainController {
     }
 
     public void buttonRedo() {
-        redo();
+//        redo();
     }
 
     public void buttonUndo() {
-        undo();
+//        undo();
     }
 
     public void convertPDA() {

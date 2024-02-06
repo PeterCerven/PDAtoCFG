@@ -4,12 +4,15 @@ import com.example.bakalar.logic.Board;
 import com.example.bakalar.canvas.node.MyNode;
 import com.example.bakalar.canvas.node.NodeTransition;
 import javafx.geometry.Point2D;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.QuadCurve;
 import javafx.scene.shape.StrokeType;
 import javafx.scene.transform.Rotate;
 import lombok.Getter;
+
+import java.util.HashMap;
 
 import static com.example.bakalar.logic.MainController.NODE_RADIUS;
 
@@ -30,9 +33,9 @@ public class LineArrow extends Arrow implements Cloneable{
     public LineArrow(MyNode from, MyNode to, Board board, NodeTransition nodeTransition) {
         super(from, to, board, nodeTransition);
 
-        createLine();
+        this.line = createLine();
         resetLine();
-        createControlIndicator();
+        this.controlIndicator = createControlIndicator();
         setLinePoints(true);
 
         this.getChildren().addAll(line, controlIndicator);
@@ -67,21 +70,44 @@ public class LineArrow extends Arrow implements Cloneable{
 
     @Override
     public LineArrow clone() {
-        LineArrow cloned = (LineArrow) super.clone();
+        HashMap<Object, Object> clonedObjects = new HashMap<>();
+        try {
+            return clone(clonedObjects);
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError(); // Can never happen if Cloneable is implemented
+        }
+    }
 
-        // Clone mutable fields
-        cloned.line = new QuadCurve(this.line.getStartX(), this.line.getStartY(),
-                this.line.getControlX(), this.line.getControlY(),
-                this.line.getEndX(), this.line.getEndY());
-        cloned.controlIndicator = new Circle(this.controlIndicator.getCenterX(),
-                this.controlIndicator.getCenterY(),
-                this.controlIndicator.getRadius());
+    @Override
+    public LineArrow clone(HashMap<Object, Object> clonedObjects) throws CloneNotSupportedException {
+        if (clonedObjects.containsKey(this)) {
+            return (LineArrow) clonedObjects.get(this);
+        }
+        LineArrow cloned = (LineArrow) super.clone(clonedObjects);
+        cloned.line = createLine();
+        cloned.line.setStartX(this.line.getStartX());
+        cloned.line.setStartY(this.line.getStartY());
+        cloned.line.setControlX(this.line.getControlX());
+        cloned.line.setControlY(this.line.getControlY());
+        cloned.line.setEndX(this.line.getEndX());
+        cloned.line.setEndY(this.line.getEndY());
+
+        cloned.controlIndicator = createControlIndicator();
+        cloned.controlIndicator.setCenterX(this.controlIndicator.getCenterX());
+        cloned.controlIndicator.setCenterY(this.controlIndicator.getCenterY());
+        cloned.controlIndicator.setRadius(this.controlIndicator.getRadius());
+
         // Set color and other properties if needed
         cloned.controlIndicator.setFill(this.controlIndicator.getFill());
         cloned.controlIndicator.setStroke(this.controlIndicator.getStroke());
 
-        // Clone other fields if they are mutable and not handled by super.clone()
-        // e.g., cloned.someMutableField = this.someMutableField.clone();
+        cloned.arrowHead.getPoints().setAll(this.arrowHead.getPoints());
+
+        cloned.symbolContainers = updateSymbolContainerPosition(cloned.symbolContainers);
+
+
+
+        cloned.getChildren().addAll(cloned.line, cloned.controlIndicator);
 
         return cloned;
     }
@@ -116,7 +142,7 @@ public class LineArrow extends Arrow implements Cloneable{
         setLinePoints(toEdge);
         updateControlPointPos(this.controlPointChangeX, this.controlPointChangeY);
         updateArrowHead();
-        updateSymbolContainerPosition();
+        this.symbolContainers = updateSymbolContainerPosition(this.symbolContainers);
     }
 
     public void moveControlPoint(double controlIndicatorPointX, double controlIndicatorPointY) {
@@ -124,7 +150,7 @@ public class LineArrow extends Arrow implements Cloneable{
         this.controlPointChangeY = (startY + endY) / 2.0 - controlIndicatorPointY;
         updateControlPointPos(this.controlPointChangeX, this.controlPointChangeY);
         updateArrowHead();
-        updateSymbolContainerPosition();
+        this.symbolContainers = updateSymbolContainerPosition(this.symbolContainers);
     }
 
     private void updateControlPointPos(double controlIndicatorPointX, double controlIndicatorPointY) {
@@ -154,7 +180,7 @@ public class LineArrow extends Arrow implements Cloneable{
     }
 
     @Override
-    public void updateSymbolContainerPosition() {
+    public VBox updateSymbolContainerPosition(VBox symbolContainers) {
         double startX = line.getStartX();
         double startY = line.getStartY();
         double endX = line.getEndX();
@@ -177,6 +203,7 @@ public class LineArrow extends Arrow implements Cloneable{
         Rotate rotate = new Rotate(angle, symbolContainers.getWidth() / 2.0, symbolContainers.getHeight());
         symbolContainers.getTransforms().clear();
         symbolContainers.getTransforms().add(rotate);
+        return symbolContainers;
     }
 
     private Point2D findHighestPoint(double startX, double startY, double controlX, double controlY, double endX, double endY, double t) {
@@ -197,19 +224,20 @@ public class LineArrow extends Arrow implements Cloneable{
         this.updateObjects(toEdge);
     }
 
-    private void createLine() {
-        line = new QuadCurve();
+    private QuadCurve createLine() {
+        QuadCurve line = new QuadCurve();
         line.setStrokeType(StrokeType.OUTSIDE);
         line.setStrokeWidth(2);
         line.setFill(Color.TRANSPARENT);
         line.setStroke(Color.BLACK);
+        return line;
     }
 
     public void resetControlPoint() {
         resetLine();
         updateControlPointPos(this.controlPointChangeX, this.controlPointChangeY);
         updateArrowHead();
-        updateSymbolContainerPosition();
+        this.symbolContainers = updateSymbolContainerPosition(this.symbolContainers);
     }
 
     private void resetLine() {
@@ -233,11 +261,12 @@ public class LineArrow extends Arrow implements Cloneable{
         line.setEndY(endY);
     }
 
-    private void createControlIndicator() {
-        controlIndicator = new Circle(NODE_RADIUS / 6.0 ,  Color.WHITE);
+    private Circle createControlIndicator() {
+        Circle controlIndicator = new Circle(NODE_RADIUS / 6.0 ,  Color.WHITE);
         controlIndicator.setStroke(Color.BLACK);
         controlIndicator.setTranslateX(controlX);
         controlIndicator.setTranslateY(controlY);
+        return controlIndicator;
     }
 
 }

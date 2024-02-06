@@ -19,13 +19,27 @@ public class NodeTransition implements Cloneable {
     @Override
     public NodeTransition clone() {
         try {
-            // As String is immutable, shallow copying the fields is adequate
             return (NodeTransition) super.clone();
         } catch (CloneNotSupportedException e) {
-            // This should never happen since we're Cloneable
             throw new AssertionError(e);
         }
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof NodeTransition that)) return false;
 
+        if (getRead() != null ? !getRead().equals(that.getRead()) : that.getRead() != null) return false;
+        if (getPop() != null ? !getPop().equals(that.getPop()) : that.getPop() != null) return false;
+        return getPush() != null ? getPush().equals(that.getPush()) : that.getPush() == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = getRead() != null ? getRead().hashCode() : 0;
+        result = 31 * result + (getPop() != null ? getPop().hashCode() : 0);
+        result = 31 * result + (getPush() != null ? getPush().hashCode() : 0);
+        return result;
+    }
 }

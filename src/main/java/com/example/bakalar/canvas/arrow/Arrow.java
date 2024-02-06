@@ -1,8 +1,8 @@
 package com.example.bakalar.canvas.arrow;
 
-import com.example.bakalar.logic.Board;
 import com.example.bakalar.canvas.node.MyNode;
 import com.example.bakalar.canvas.node.NodeTransition;
+import com.example.bakalar.logic.Board;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
 import javafx.scene.input.MouseButton;
@@ -10,9 +10,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
 import javafx.scene.shape.Polygon;
-import javafx.scene.shape.QuadCurve;
 import javafx.scene.text.Text;
 import lombok.Getter;
 import lombok.Setter;
@@ -20,6 +18,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,7 +26,7 @@ import static com.example.bakalar.logic.MainController.NODE_RADIUS;
 
 @Getter
 @Setter
-public abstract class Arrow extends Group implements Cloneable{
+public abstract class Arrow extends Group implements Cloneable {
     public static final int ARROW_HEAD_SZIE = NODE_RADIUS / 2;
     public static final String EPSILON = "ε";
     protected static final Logger log = LogManager.getLogger(Arrow.class.getName());
@@ -48,7 +47,7 @@ public abstract class Arrow extends Group implements Cloneable{
 
         this.symbolContainers = new VBox();
         setViewOrder(1);
-        createArrowHead();
+        this.arrowHead = createArrowHead();
         addSymbolContainer(nodeTransition);
         this.getChildren().addAll(arrowHead, symbolContainers);
     }
@@ -56,32 +55,45 @@ public abstract class Arrow extends Group implements Cloneable{
     @Override
     public Arrow clone() {
         try {
-            Arrow cloned = (Arrow) super.clone();
-
-            // Deep clone the transitions list
-            cloned.transitions = this.transitions.stream()
-                    .map(NodeTransition::clone) // Assuming NodeTransition implements Cloneable
-                    .collect(Collectors.toList());
-
-            // Clone and recreate the symbolContainers and arrowHead
-            cloned.symbolContainers = new VBox();
-            for (NodeTransition transition : cloned.transitions) {
-                // Recreate symbol containers for each transition
-                // This assumes you have a method to create a container from a NodeTransition
-                HBox container = createSymbolContainerForTransition(transition);
-                cloned.symbolContainers.getChildren().add(container);
-            }
-
-            cloned.createArrowHead(); // Assuming this method initializes arrowHead properly
-
-            // Add the cloned components to the children of the cloned Arrow
-            cloned.getChildren().clear();
-            cloned.getChildren().addAll(cloned.arrowHead, cloned.symbolContainers);
-
-            return cloned;
+            HashMap<Object, Object> clonedObjects = new HashMap<>();
+            return clone(clonedObjects);
         } catch (CloneNotSupportedException e) {
             throw new AssertionError(); // Can never happen if Cloneable is implemented
         }
+    }
+
+    public Arrow clone(HashMap<Object, Object> clonedObjects) throws CloneNotSupportedException {
+        if (clonedObjects.containsKey(this)) {
+            return (Arrow) clonedObjects.get(this);
+        }
+        Arrow cloned = (Arrow) super.clone();
+
+        // Deep clone the transitions list
+        cloned.transitions = this.transitions.stream()
+                .map(NodeTransition::clone) // Assuming NodeTransition implements Cloneable
+                .collect(Collectors.toList());
+
+        // Clone and recreate the symbolContainers and arrowHead
+        cloned.symbolContainers = new VBox();
+        for (NodeTransition transition : cloned.transitions) {
+            HBox container = createSymbolContainerForTransition(transition);
+            container.layoutBoundsProperty().addListener((observable, oldValue, newValue) -> {
+                container.setLayoutX(newValue.getWidth());
+                container.setLayoutX(newValue.getHeight());
+                cloned.symbolContainers = updateSymbolContainerPosition(cloned.symbolContainers);
+            });
+            cloned.symbolContainers.getChildren().add(container);
+        }
+
+        cloned.arrowHead = this.createArrowHead();
+        cloned.setViewOrder(1);
+        // Add the cloned components to the children of the cloned Arrow
+        cloned.getChildren().clear();
+        cloned.getChildren().addAll(cloned.arrowHead, cloned.symbolContainers);
+
+        clonedObjects.put(this, cloned);
+
+        return cloned;
     }
 
     private HBox createSymbolContainerForTransition(NodeTransition transition) {
@@ -104,21 +116,17 @@ public abstract class Arrow extends Group implements Cloneable{
                 this.board.updateAllDescribePDA();
             }
         });
-        container.layoutBoundsProperty().addListener((observable, oldValue, newValue) -> {
-            container.setLayoutX(newValue.getWidth());
-            container.setLayoutX(newValue.getHeight());
-            updateSymbolContainerPosition();
-        });
         return container;
     }
 
 
-    private void createArrowHead() {
-        arrowHead = new Polygon();
+    private Polygon createArrowHead() {
+        Polygon arrowHead = new Polygon();
         arrowHead.setStroke(Color.BLUE);
         arrowHead.setStrokeWidth(3);
         arrowHead.setFill(Color.BLUE);
         arrowHead.setViewOrder(-1);
+        return arrowHead;
     }
 
     public void addSymbolContainer(NodeTransition nodeTransition) {
@@ -144,7 +152,7 @@ public abstract class Arrow extends Group implements Cloneable{
         container.layoutBoundsProperty().addListener((observable, oldValue, newValue) -> {
             container.setLayoutX(newValue.getWidth());
             container.setLayoutX(newValue.getHeight());
-            updateSymbolContainerPosition();
+            this.symbolContainers = updateSymbolContainerPosition(this.symbolContainers);
         });
         this.transitions.add(nodeTransition);
         this.symbolContainers.getChildren().add(container);
@@ -153,7 +161,7 @@ public abstract class Arrow extends Group implements Cloneable{
 
     public abstract void updateObjects(boolean toEdge);
 
-    public abstract void updateSymbolContainerPosition();
+    public abstract VBox updateSymbolContainerPosition(VBox symbolContainers);
 
 
     protected Point2D getNodeEdgePoint(MyNode node, double targetX, double targetY) {
@@ -189,6 +197,21 @@ public abstract class Arrow extends Group implements Cloneable{
 
 
     public abstract void move(boolean toEdge);
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Arrow arrow)) return false;
+
+        if (!getFrom().equals(arrow.getFrom())) return false;
+        if (!getTo().equals(arrow.getTo())) return false;
+        return getTransitions().equals(arrow.getTransitions());
+    }
+
+    @Override
+    public int hashCode() {
+        return 31 * getTransitions().hashCode();
+    }
 }
 
 

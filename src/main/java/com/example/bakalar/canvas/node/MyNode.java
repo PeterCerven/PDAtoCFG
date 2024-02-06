@@ -1,6 +1,8 @@
 package com.example.bakalar.canvas.node;
 
 import com.example.bakalar.canvas.arrow.Arrow;
+import com.example.bakalar.canvas.arrow.LineArrow;
+import com.example.bakalar.canvas.arrow.SelfLoopArrow;
 import javafx.scene.Group;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -11,8 +13,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.example.bakalar.logic.MainController.NODE_RADIUS;
 
@@ -30,12 +32,13 @@ public class MyNode extends Group implements Cloneable {
     private EndNode endNode;
     private StartNodeArrow startNodeArrow;
     private boolean selected;
+    private int nodeId;
 
     public MyNode(double x, double y, double radius) {
         super();
-        circle = new Circle(x, y, radius);
-        circle.setFill(Color.WHITE);
-        circle.setStroke(Color.BLACK);
+
+        circle = createCircle(x, y, radius);
+        nameText = createNameText("Node");
 
         endNode = new EndNode(x, y, radius);
         endNode.setVisible(false);
@@ -43,57 +46,72 @@ public class MyNode extends Group implements Cloneable {
         startNodeArrow = new StartNodeArrow(x, y, radius);
         startNodeArrow.setVisible(false);
 
-        name = "Node";
-        nameText = new Text(name);
-        nameText.setFont(javafx.scene.text.Font.font(NODE_RADIUS / 1.5));
-        nameText.setX(circle.getCenterX() - nameText.getBoundsInLocal().getWidth() / 2);
-        nameText.setY(circle.getCenterY() + nameText.getBoundsInLocal().getHeight() / 4);
-
-
         this.getChildren().addAll(circle, endNode, nameText, startNodeArrow);
         this.arrowsFrom = new ArrayList<>();
         this.arrowsTo = new ArrayList<>();
     }
 
+    private Circle createCircle(double x, double y, double radius) {
+        Circle c = new Circle(x, y, radius, Color.WHITE);
+        c.setStroke(Color.BLACK);
+        return c;
+    }
+
+    private Text createNameText(String name) {
+        Text text = new Text(name);
+        text.setFont(javafx.scene.text.Font.font(NODE_RADIUS / 1.5));
+        text.setX(circle.getCenterX() - text.getBoundsInLocal().getWidth() / 2);
+        text.setY(circle.getCenterY() + text.getBoundsInLocal().getHeight() / 4);
+        return text;
+    }
+
+
     @Override
     public MyNode clone() {
         try {
-            MyNode cloned = (MyNode) super.clone();
-
-            // Clone mutable fields
-            cloned.circle = new Circle(this.circle.getCenterX(), this.circle.getCenterY(), this.circle.getRadius());
-            cloned.circle.setFill(this.circle.getFill());
-            cloned.circle.setStroke(this.circle.getStroke());
-
-            cloned.nameText = new Text(this.nameText.getText());
-            cloned.nameText.setFont(this.nameText.getFont());
-            cloned.nameText.setX(this.nameText.getX());
-            cloned.nameText.setY(this.nameText.getY());
-
-            // Clone other components if they are mutable
-            cloned.endNode = new EndNode(this.endNode.getCenterX(), this.endNode.getCenterY(), this.endNode.getRadius());
-            cloned.endNode.setVisible(this.endNode.isVisible());
-
-            cloned.startNodeArrow = new StartNodeArrow(this.circle.getCenterX(), this.circle.getCenterY(), this.circle.getRadius());
-            cloned.startNodeArrow.setVisible(this.startNodeArrow.isVisible());
-
-            // Clone collections
-            // This assumes Arrow implements Cloneable and has a properly overridden clone method.
-            cloned.arrowsFrom = this.arrowsFrom.stream()
-                    .map(Arrow::clone)
-                    .collect(Collectors.toCollection(ArrayList::new));
-            cloned.arrowsTo = this.arrowsTo.stream()
-                    .map(Arrow::clone)
-                    .collect(Collectors.toCollection(ArrayList::new));
-
-            // Add cloned children
-            cloned.getChildren().clear();
-            cloned.getChildren().addAll(cloned.circle, cloned.endNode, cloned.nameText, cloned.startNodeArrow);
-
-            return cloned;
+            return clone(new HashMap<>());
         } catch (CloneNotSupportedException e) {
-            throw new AssertionError(); // Can never happen if Cloneable is implemented
+            throw new AssertionError();
         }
+    }
+
+    public MyNode clone(HashMap<Object, Object> clonedObjects) throws CloneNotSupportedException {
+        if (clonedObjects.containsKey(this)) {
+            return (MyNode) clonedObjects.get(this);
+        }
+        MyNode cloned = (MyNode) super.clone();
+
+        // Clone mutable fields
+        cloned.circle = createCircle(this.circle.getCenterX(), this.circle.getCenterY(), this.circle.getRadius());
+
+        cloned.nameText = createNameText(this.getName());
+
+        // Clone other components if they are mutable
+        cloned.endNode = new EndNode(this.endNode.getCenterX(), this.endNode.getCenterY(), this.endNode.getRadius());
+        cloned.endNode.setVisible(this.endNode.isVisible());
+
+        cloned.startNodeArrow = new StartNodeArrow(this.circle.getCenterX(), this.circle.getCenterY(), this.circle.getRadius());
+        cloned.startNodeArrow.setVisible(this.startNodeArrow.isVisible());
+
+        // Add cloned children
+        cloned.getChildren().clear();
+        cloned.getChildren().addAll(cloned.circle, cloned.endNode, cloned.nameText, cloned.startNodeArrow);
+        clonedObjects.put(this, cloned);
+
+        // Deep clone incomingArrows and outgoingArrows with respect to circular references
+        cloned.arrowsTo = new ArrayList<>();
+        for (Arrow arrow : arrowsTo) {
+            Arrow clonedArrow = arrow.clone(clonedObjects);
+            cloned.arrowsTo.add(clonedArrow);
+            clonedArrow.setTo(cloned);
+        }
+        cloned.arrowsFrom = new ArrayList<>();
+        for (Arrow arrow : arrowsFrom) {
+            Arrow clonedArrow = arrow.clone(clonedObjects);
+            cloned.arrowsFrom.add(clonedArrow);
+            clonedArrow.setFrom(cloned);
+        }
+        return cloned;
     }
 
     public double getAbsoluteCentrePosX() {
@@ -170,5 +188,18 @@ public class MyNode extends Group implements Cloneable {
     public void updatePosition() {
         this.setTranslateX(this.getTranslateX());
         this.setTranslateY(this.getTranslateY());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof MyNode myNode)) return false;
+
+        return getNodeId() == myNode.getNodeId();
+    }
+
+    @Override
+    public int hashCode() {
+        return getNodeId();
     }
 }

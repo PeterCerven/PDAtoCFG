@@ -3,6 +3,7 @@ package com.example.bakalar.canvas.arrow;
 import com.example.bakalar.canvas.node.MyNode;
 import com.example.bakalar.canvas.node.NodeTransition;
 import com.example.bakalar.logic.Board;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Arc;
 import javafx.scene.shape.ArcType;
@@ -63,11 +64,11 @@ public class SelfLoopArrow extends Arrow implements Cloneable {
         arc.setRadiusY(from.getCircle().getRadius() + ARC_HEIGHT);
 
         updateArrowHead();
-        updateSymbolContainerPosition();
+        this.symbolContainers = updateSymbolContainerPosition(this.symbolContainers);
     }
 
     @Override
-    public void updateSymbolContainerPosition() {
+    public VBox updateSymbolContainerPosition(VBox symbolContainers) {
         double midX = from.getAbsoluteCentrePosX();
         double midY = from.getAbsoluteCentrePosY() - (from.getCircle().getRadius() + ARC_HEIGHT);
 
@@ -77,6 +78,7 @@ public class SelfLoopArrow extends Arrow implements Cloneable {
 
         symbolContainers.setLayoutX(midX + offsetX);
         symbolContainers.setLayoutY(midY + offsetY);
+        return symbolContainers;
     }
 
     @Override
