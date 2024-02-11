@@ -5,6 +5,8 @@ import com.example.bakalar.canvas.arrow.LineArrow;
 import com.example.bakalar.canvas.node.MyNode;
 import com.example.bakalar.logic.button.ButtonState;
 import com.example.bakalar.logic.conversion.ConversionLogic;
+import com.example.bakalar.logic.history.BoardHistory;
+import com.example.bakalar.logic.history.MyHistory;
 import com.example.bakalar.logic.transitions.BoardLogic;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -85,8 +87,8 @@ public class MainController {
     private MyNode selectedNode;
     private double startX, startY;
     private Board currentBoard;
-    private Stack<BoardHistory> undoStack;
-    private Stack<BoardHistory> redoStack;
+    private Stack<MyHistory> undoStack;
+    private Stack<MyHistory> redoStack;
     private BoardLogic boardLogic;
     private ConversionLogic conversionLogic;
     private boolean arrowMoved = false;
@@ -104,7 +106,7 @@ public class MainController {
         redoStack = new Stack<>();
         this.begSymbol.setText(STARTING_Z);
         List<TextField> describeFields = List.of(describeStates, describeAlphabet, describeStackAlphabet, describeEndStates);
-        currentBoard = new Board(mainPane, inputFieldAlphabet, describeFields, transFunctions, rulesContainer);
+        currentBoard = new Board(mainPane, inputFieldAlphabet, describeFields, transFunctions, rulesContainer, currentState, undoStack, redoStack);
         this.boardLogic = new BoardLogic(currentBoard, this.stateContainer);
         this.conversionLogic = new ConversionLogic(currentBoard);
         inputFieldAlphabet.textProperty().addListener((observable, oldValue, newValue) -> {
@@ -119,22 +121,23 @@ public class MainController {
     // Board history
 
     public void saveCurrentState() {
-//        undoStack.push(currentBoard.createBoardHistory());
-//        redoStack.clear(); // Clear redo stack on new action
+        MyHistory myHistory = currentBoard.createHistory();
+        undoStack.push(myHistory);
+        redoStack.clear();
     }
 
     public void undo() {
         if (!undoStack.isEmpty()) {
-            redoStack.push(currentBoard.createBoardHistory());
-            BoardHistory previousState = undoStack.pop();
-            currentBoard.restoreBoardFromHistory(previousState);
+            redoStack.push(currentBoard.createHistory());
+            MyHistory boardHistory = undoStack.pop();
+            currentBoard.restoreBoardFromHistory(boardHistory);
         }
     }
 
     public void redo() {
         if (!redoStack.isEmpty()) {
-            undoStack.push(currentBoard.createBoardHistory());
-            BoardHistory nextState = redoStack.pop();
+            undoStack.push(currentBoard.createHistory());
+            MyHistory nextState = redoStack.pop();
             currentBoard.restoreBoardFromHistory(nextState);
         }
     }
@@ -188,119 +191,10 @@ public class MainController {
 
     private MyNode createMyNode(double x, double y) {
         MyNode myNode = new MyNode(x, y, NODE_RADIUS);
-        makeDraggable(myNode);
-        enableArrowCreation(myNode);
+        this.currentBoard.makeDraggable(myNode);
+        this.currentBoard.enableArrowCreation(myNode);
         currentBoard.addObject(myNode);
         return myNode;
-    }
-
-    private void createArrow(MyNode node) {
-        if (selectedNode != null) {
-            saveCurrentState();
-            createMyArrow(selectedNode, node, null, null, null);
-            currentBoard.selectNode(selectedNode, false);
-            selectedNode = null;
-
-        } else {
-            selectedNode = node;
-            currentBoard.selectNode(node, true);
-        }
-    }
-
-
-    private void createMyArrow(MyNode from, MyNode to, String input, String stackTop, String stackPush) {
-        Arrow arrow = currentBoard.createArrow(from, to, input, stackTop, stackPush);
-        if (arrow != null) {
-            makeErasable(arrow);
-            if (arrow instanceof LineArrow lineArrow) {
-                makeCurveDraggable(lineArrow);
-            }
-        }
-    }
-
-    // Event handlers
-
-
-    private void makeCurveDraggable(LineArrow arrow) {
-        arrow.getControlIndicator().setOnMousePressed(event -> {
-            if (currentState.equals(ButtonState.SELECT)) {
-                if (event.getButton() == MouseButton.PRIMARY) {
-                    startX = event.getSceneX() - arrow.getControlIndicator().getTranslateX();
-                    startY = event.getSceneY() - arrow.getControlIndicator().getTranslateY();
-                } else if (event.getButton() == MouseButton.SECONDARY) {
-                    arrow.resetControlPoint();
-                }
-            }
-        });
-
-        arrow.getControlIndicator().setOnMouseDragged(e -> {
-            if (currentState.equals(ButtonState.SELECT)) {
-                if (!arrowMoved) {
-//                    saveCurrentState();
-                }
-                arrow.moveControlPoint(e.getSceneX() - startX, e.getSceneY() - startY);
-                arrowMoved = true;
-            }
-        });
-
-        arrow.getControlIndicator().setOnMouseReleased(event -> {
-            if (currentState.equals(ButtonState.SELECT)) {
-                arrowMoved = false;
-            }
-        });
-    }
-
-
-    private void makeDraggable(MyNode node) {
-        node.setOnMousePressed(event -> {
-            if (currentState.equals(ButtonState.SELECT)) {
-                if (event.getButton() == MouseButton.SECONDARY) {
-                    currentBoard.showDialog(node);
-                } else if (event.getButton() == MouseButton.PRIMARY) {
-                    startX = event.getSceneX() - node.getTranslateX();
-                    startY = event.getSceneY() - node.getTranslateY();
-                }
-            }
-        });
-
-        node.setOnMouseDragged(e -> {
-            if (currentState.equals(ButtonState.SELECT)) {
-                if (!nodeMoved) {
-//                    saveCurrentState();
-                }
-                node.move(e.getSceneX() - startX, e.getSceneY() - startY);
-                node.updateArrows(false);
-                nodeMoved = true;
-            }
-        });
-
-        node.setOnMouseReleased(event -> {
-            if (currentState.equals(ButtonState.SELECT)) {
-                nodeMoved = false;
-                node.updateArrows(true);
-            }
-        });
-    }
-
-
-    private void enableArrowCreation(MyNode node) {
-        node.setOnMouseClicked(event -> {
-            if (currentState.equals(ButtonState.ARROW) && event.getButton() == MouseButton.PRIMARY) {
-                createArrow(node);
-            } else if (currentState.equals(ButtonState.ERASE) && event.getButton() == MouseButton.PRIMARY) {
-                saveCurrentState();
-                currentBoard.removeObject(node);
-            }
-        });
-    }
-
-    private void makeErasable(Node node) {
-        node.setOnMouseClicked(event -> {
-            if (currentState.equals(ButtonState.ERASE) && event.getButton() == MouseButton.PRIMARY) {
-                saveCurrentState();
-                currentBoard.removeObject(node);
-            }
-        });
     }
 
     // Buttons actions
@@ -323,11 +217,11 @@ public class MainController {
     }
 
     public void buttonRedo() {
-//        redo();
+        redo();
     }
 
     public void buttonUndo() {
-//        undo();
+        undo();
     }
 
     public void convertPDA() {
@@ -342,12 +236,12 @@ public class MainController {
         MyNode secondNode = createMyNode(320, 150);
         currentBoard.setEnding(firstNode, true);
         currentBoard.getInputFieldAlphabet().setText("111000");
-        createMyArrow(firstNode, firstNode, "1", "Z", "XZ");
-        createMyArrow(firstNode, firstNode, "1", "X", "XX");
-        createMyArrow(firstNode, firstNode, EPSILON, "X", EPSILON);
-        createMyArrow(firstNode, secondNode, "0", "X", "X");
-        createMyArrow(secondNode, secondNode, "1", "X", EPSILON);
-        createMyArrow(secondNode, firstNode, "0", "Z", "Z");
+        currentBoard.createMyArrow(firstNode, firstNode, "1", "Z", "XZ");
+        currentBoard.createMyArrow(firstNode, firstNode, "1", "X", "XX");
+        currentBoard.createMyArrow(firstNode, firstNode, EPSILON, "X", EPSILON);
+        currentBoard.createMyArrow(firstNode, secondNode, "0", "X", "X");
+        currentBoard.createMyArrow(secondNode, secondNode, "1", "X", EPSILON);
+        currentBoard.createMyArrow(secondNode, firstNode, "0", "Z", "Z");
     }
 
     // Buttons toggle
@@ -378,6 +272,7 @@ public class MainController {
             currentState = newState;
         }
         updateButtonStates();
+        currentBoard.setCurrentState(currentState);
     }
 
 }

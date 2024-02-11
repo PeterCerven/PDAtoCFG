@@ -1,8 +1,6 @@
 package com.example.bakalar.canvas.node;
 
 import com.example.bakalar.canvas.arrow.Arrow;
-import com.example.bakalar.canvas.arrow.LineArrow;
-import com.example.bakalar.canvas.arrow.SelfLoopArrow;
 import javafx.scene.Group;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -12,15 +10,15 @@ import lombok.Setter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import static com.example.bakalar.logic.MainController.NODE_RADIUS;
 
 @Getter
 @Setter
-public class MyNode extends Group implements Cloneable {
+public class MyNode extends Group implements Serializable {
     private static final Logger log = LogManager.getLogger(MyNode.class.getName());
     private Circle circle;
     private Text nameText;
@@ -38,7 +36,7 @@ public class MyNode extends Group implements Cloneable {
         super();
 
         circle = createCircle(x, y, radius);
-        nameText = createNameText("Node");
+        nameText = createNameText();
 
         endNode = new EndNode(x, y, radius);
         endNode.setVisible(false);
@@ -51,67 +49,33 @@ public class MyNode extends Group implements Cloneable {
         this.arrowsTo = new ArrayList<>();
     }
 
+    public MyNode(String name, double x, double y, int nodeId, boolean isStarting, boolean isEnding) {
+        this(x, y, NODE_RADIUS);
+        this.name = name;
+        this.nodeId = nodeId;
+        this.starting = isStarting;
+        this.ending = isEnding;
+        this.setName(name);
+        if (isStarting) {
+            startNodeArrow.setVisible(true);
+        }
+        if (isEnding) {
+            endNode.setVisible(true);
+        }
+    }
+
     private Circle createCircle(double x, double y, double radius) {
         Circle c = new Circle(x, y, radius, Color.WHITE);
         c.setStroke(Color.BLACK);
         return c;
     }
 
-    private Text createNameText(String name) {
-        Text text = new Text(name);
+    private Text createNameText() {
+        Text text = new Text("Node");
         text.setFont(javafx.scene.text.Font.font(NODE_RADIUS / 1.5));
         text.setX(circle.getCenterX() - text.getBoundsInLocal().getWidth() / 2);
         text.setY(circle.getCenterY() + text.getBoundsInLocal().getHeight() / 4);
         return text;
-    }
-
-
-    @Override
-    public MyNode clone() {
-        try {
-            return clone(new HashMap<>());
-        } catch (CloneNotSupportedException e) {
-            throw new AssertionError();
-        }
-    }
-
-    public MyNode clone(HashMap<Object, Object> clonedObjects) throws CloneNotSupportedException {
-        if (clonedObjects.containsKey(this)) {
-            return (MyNode) clonedObjects.get(this);
-        }
-        MyNode cloned = (MyNode) super.clone();
-
-        // Clone mutable fields
-        cloned.circle = createCircle(this.circle.getCenterX(), this.circle.getCenterY(), this.circle.getRadius());
-
-        cloned.nameText = createNameText(this.getName());
-
-        // Clone other components if they are mutable
-        cloned.endNode = new EndNode(this.endNode.getCenterX(), this.endNode.getCenterY(), this.endNode.getRadius());
-        cloned.endNode.setVisible(this.endNode.isVisible());
-
-        cloned.startNodeArrow = new StartNodeArrow(this.circle.getCenterX(), this.circle.getCenterY(), this.circle.getRadius());
-        cloned.startNodeArrow.setVisible(this.startNodeArrow.isVisible());
-
-        // Add cloned children
-        cloned.getChildren().clear();
-        cloned.getChildren().addAll(cloned.circle, cloned.endNode, cloned.nameText, cloned.startNodeArrow);
-        clonedObjects.put(this, cloned);
-
-        // Deep clone incomingArrows and outgoingArrows with respect to circular references
-        cloned.arrowsTo = new ArrayList<>();
-        for (Arrow arrow : arrowsTo) {
-            Arrow clonedArrow = arrow.clone(clonedObjects);
-            cloned.arrowsTo.add(clonedArrow);
-            clonedArrow.setTo(cloned);
-        }
-        cloned.arrowsFrom = new ArrayList<>();
-        for (Arrow arrow : arrowsFrom) {
-            Arrow clonedArrow = arrow.clone(clonedObjects);
-            cloned.arrowsFrom.add(clonedArrow);
-            clonedArrow.setFrom(cloned);
-        }
-        return cloned;
     }
 
     public double getAbsoluteCentrePosX() {

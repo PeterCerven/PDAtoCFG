@@ -4,12 +4,13 @@ import com.example.bakalar.logic.character.MySymbol;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Getter
 @Setter
-public class Rule {
+public class Rule implements Serializable {
 
     private MySymbol leftSide;
     private List<MySymbol> rightSide;

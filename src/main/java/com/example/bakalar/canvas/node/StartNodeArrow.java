@@ -4,7 +4,9 @@ import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
 
-public class StartNodeArrow extends Path {
+import java.io.Serializable;
+
+public class StartNodeArrow extends Path implements Serializable {
 
 
     public StartNodeArrow(double nodeX, double nodeY, double nodeRadius) {
