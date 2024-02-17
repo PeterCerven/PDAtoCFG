@@ -28,6 +28,8 @@ import org.apache.logging.log4j.Logger;
 import java.io.Serializable;
 import java.util.*;
 
+import static com.example.bakalar.logic.MainController.NODE_RADIUS;
+
 @Getter
 @Setter
 public class Board implements Serializable {
@@ -251,13 +253,14 @@ public class Board implements Serializable {
             arrow.addSymbolContainer(nodeTransition);
             return arrow;
         }
+        List<NodeTransition> transitions = List.of(nodeTransition);
         if (from == to) {
-            arrow = new SelfLoopArrow(from, to, this, nodeTransition);
+            arrow = new SelfLoopArrow(from, to, this, transitions);
         } else {
             if (oppositeExists(from, to)) {
-                arrow = new LineArrow(from, to, 30, this, nodeTransition);
+                arrow = new LineArrow(from, to, 30, this, transitions);
             } else {
-                arrow = new LineArrow(from, to, this, nodeTransition);
+                arrow = new LineArrow(from, to, this, transitions);
             }
         }
         to.addArrow(arrow, "to");
@@ -415,7 +418,6 @@ public class Board implements Serializable {
 
     public void testBoard() {
         clearBoard();
-
     }
 
     // history
@@ -512,6 +514,30 @@ public class Board implements Serializable {
         MyHistory myHistory = this.createHistory();
         undoStack.push(myHistory);
         redoStack.clear();
+    }
+
+    public void undo() {
+        if (!undoStack.isEmpty()) {
+            redoStack.push(this.createHistory());
+            MyHistory boardHistory = undoStack.pop();
+            this.restoreBoardFromHistory(boardHistory);
+        }
+    }
+
+    public void redo() {
+        if (!redoStack.isEmpty()) {
+            undoStack.push(this.createHistory());
+            MyHistory nextState = redoStack.pop();
+            this.restoreBoardFromHistory(nextState);
+        }
+    }
+
+    public MyNode createMyNode(double x, double y) {
+        MyNode myNode = new MyNode(x, y, NODE_RADIUS);
+        this.makeDraggable(myNode);
+        this.enableArrowCreation(myNode);
+        this.addObject(myNode);
+        return myNode;
     }
 
     // Event handlers

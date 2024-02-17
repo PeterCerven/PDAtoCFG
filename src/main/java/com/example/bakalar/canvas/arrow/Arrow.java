@@ -39,21 +39,6 @@ public abstract class Arrow extends Group implements Serializable {
     protected int toId;
 
 
-    public Arrow(MyNode from, MyNode to, Board board, NodeTransition nodeTransition) {
-        super();
-        this.transitions = new ArrayList<>();
-        this.from = from;
-        this.to = to;
-        this.fromId = from.getNodeId();
-        this.toId = to.getNodeId();
-        this.board = board;
-
-        this.symbolContainers = new VBox();
-        setViewOrder(1);
-        this.arrowHead = createArrowHead();
-        addSymbolContainer(nodeTransition);
-        this.getChildren().addAll(arrowHead, symbolContainers);
-    }
 
     public Arrow(MyNode from, MyNode to, Board board, List<NodeTransition> nodeTransition) {
         super();

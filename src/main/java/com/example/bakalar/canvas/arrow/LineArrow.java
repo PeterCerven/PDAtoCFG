@@ -31,18 +31,6 @@ public class LineArrow extends Arrow {
     private double endX;
     private double endY;
 
-    public LineArrow(MyNode from, MyNode to, Board board, NodeTransition nodeTransition) {
-        super(from, to, board, nodeTransition);
-
-        this.line = createLine();
-        resetLine();
-        this.controlIndicator = createControlIndicator();
-        setLinePoints(true);
-
-        this.getChildren().addAll(line, controlIndicator);
-        this.updateObjects(true);
-    }
-
     public LineArrow(MyNode from, MyNode to, Board board, List<NodeTransition> nodeTransition) {
         super(from, to, board, nodeTransition);
 
@@ -57,7 +45,7 @@ public class LineArrow extends Arrow {
 
 
 
-    public LineArrow(MyNode from, MyNode to, double change, Board board, NodeTransition nodeTransition) {
+    public LineArrow(MyNode from, MyNode to, double change, Board board, List<NodeTransition> nodeTransition) {
         this(from, to, board,nodeTransition);
         Point2D thirdPoint = getThirdPoint(change);
         this.controlPointChangeX = thirdPoint.getX() - (startX + endX) / 2.0;

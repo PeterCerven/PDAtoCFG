@@ -84,15 +84,11 @@ public class MainController {
     @FXML
     private VBox rulesContainer;
     private ButtonState currentState = ButtonState.SELECT;
-    private MyNode selectedNode;
-    private double startX, startY;
     private Board currentBoard;
     private Stack<MyHistory> undoStack;
     private Stack<MyHistory> redoStack;
     private BoardLogic boardLogic;
     private ConversionLogic conversionLogic;
-    private boolean arrowMoved = false;
-    private boolean nodeMoved = false;
 
 
     @FXML
@@ -116,30 +112,6 @@ public class MainController {
 
     public void setPrimaryStage(Stage stage) {
         this.primaryStage = stage;
-    }
-
-    // Board history
-
-    public void saveCurrentState() {
-        MyHistory myHistory = currentBoard.createHistory();
-        undoStack.push(myHistory);
-        redoStack.clear();
-    }
-
-    public void undo() {
-        if (!undoStack.isEmpty()) {
-            redoStack.push(currentBoard.createHistory());
-            MyHistory boardHistory = undoStack.pop();
-            currentBoard.restoreBoardFromHistory(boardHistory);
-        }
-    }
-
-    public void redo() {
-        if (!redoStack.isEmpty()) {
-            undoStack.push(currentBoard.createHistory());
-            MyHistory nextState = redoStack.pop();
-            currentBoard.restoreBoardFromHistory(nextState);
-        }
     }
 
     // set images
@@ -184,26 +156,18 @@ public class MainController {
 
     public void createNode(MouseEvent event) {
         if (currentState.equals(ButtonState.NODE) && event.getButton() == MouseButton.PRIMARY) {
-            saveCurrentState();
-            createMyNode(event.getX(), event.getY());
+            currentBoard.saveCurrentState();
+            currentBoard.createMyNode(event.getX(), event.getY());
         }
-    }
-
-    private MyNode createMyNode(double x, double y) {
-        MyNode myNode = new MyNode(x, y, NODE_RADIUS);
-        this.currentBoard.makeDraggable(myNode);
-        this.currentBoard.enableArrowCreation(myNode);
-        currentBoard.addObject(myNode);
-        return myNode;
     }
 
     // Buttons actions
 
     public void resetAll() {
-        saveCurrentState();
+        currentBoard.saveCurrentState();
         currentBoard.clearBoard();
         currentState = ButtonState.SELECT;
-        selectedNode = null;
+        currentBoard.setSelectedNode(null);
         updateButtonStates();
     }
 
@@ -217,11 +181,11 @@ public class MainController {
     }
 
     public void buttonRedo() {
-        redo();
+        currentBoard.redo();
     }
 
     public void buttonUndo() {
-        undo();
+        currentBoard.undo();
     }
 
     public void convertPDA() {
@@ -229,11 +193,11 @@ public class MainController {
     }
 
     public void testBoard() {
-        saveCurrentState();
+        currentBoard.saveCurrentState();
         currentBoard.testBoard();
-        MyNode firstNode = createMyNode(120, 150);
+        MyNode firstNode = currentBoard.createMyNode(120, 150);
         currentBoard.setStarting(firstNode, true);
-        MyNode secondNode = createMyNode(320, 150);
+        MyNode secondNode = currentBoard.createMyNode(320, 150);
         currentBoard.setEnding(firstNode, true);
         currentBoard.getInputFieldAlphabet().setText("111000");
         currentBoard.createMyArrow(firstNode, firstNode, "1", "Z", "XZ");
