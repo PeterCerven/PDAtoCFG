@@ -12,12 +12,9 @@ module com.example.bakalar {
 
     opens com.example.bakalar to javafx.fxml;
     exports com.example.bakalar;
-    exports com.example.bakalar.logic.character;
-    exports com.example.bakalar.logic.button;
 
 
-
-    opens com.example.bakalar.logic to lombok, javafx.fxml; // Open the package to Lombok
+    opens com.example.bakalar.logic to lombok, javafx.fxml;
     exports com.example.bakalar.logic;
     exports com.example.bakalar.canvas.arrow;
     opens com.example.bakalar.canvas.arrow to javafx.fxml, lombok;
@@ -29,4 +26,5 @@ module com.example.bakalar {
     opens com.example.bakalar.logic.conversion to javafx.fxml, lombok;
     exports com.example.bakalar.logic.history;
     opens com.example.bakalar.logic.history to javafx.fxml, lombok;
+    exports com.example.bakalar.logic.utility;
 }

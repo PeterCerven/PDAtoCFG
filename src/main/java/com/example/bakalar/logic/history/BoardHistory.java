@@ -1,11 +1,7 @@
 package com.example.bakalar.logic.history;
 
-import com.example.bakalar.canvas.arrow.Arrow;
-import com.example.bakalar.canvas.node.MyNode;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.util.*;
 
 @Getter
 @Setter

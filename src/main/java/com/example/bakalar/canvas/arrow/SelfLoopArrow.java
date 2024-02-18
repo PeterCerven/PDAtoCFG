@@ -1,7 +1,6 @@
 package com.example.bakalar.canvas.arrow;
 
 import com.example.bakalar.canvas.node.MyNode;
-import com.example.bakalar.canvas.node.NodeTransition;
 import com.example.bakalar.logic.Board;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -22,8 +21,8 @@ public class SelfLoopArrow extends Arrow {
     private Arc arc;
 
 
-    public SelfLoopArrow(MyNode from, MyNode to, Board board, List<NodeTransition> nodeTransition) {
-        super(from, to, board, nodeTransition);
+    public SelfLoopArrow(MyNode from, MyNode to, Board board, List<TransitionInputs> transitionInputs) {
+        super(from, to, board, transitionInputs);
 
         createArc();
         this.getChildren().add(arc);

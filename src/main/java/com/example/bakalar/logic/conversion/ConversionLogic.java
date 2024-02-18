@@ -2,7 +2,7 @@ package com.example.bakalar.logic.conversion;
 
 import com.example.bakalar.logic.Board;
 import com.example.bakalar.logic.transitions.Transition;
-import com.example.bakalar.logic.character.MySymbol;
+import com.example.bakalar.logic.utility.MySymbol;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;

@@ -1,15 +1,13 @@
 package com.example.bakalar.logic;
 
-import com.example.bakalar.canvas.arrow.Arrow;
-import com.example.bakalar.canvas.arrow.LineArrow;
 import com.example.bakalar.canvas.node.MyNode;
-import com.example.bakalar.logic.button.ButtonState;
 import com.example.bakalar.logic.conversion.ConversionLogic;
-import com.example.bakalar.logic.history.BoardHistory;
+import com.example.bakalar.logic.history.HistoryLogic;
 import com.example.bakalar.logic.history.MyHistory;
-import com.example.bakalar.logic.transitions.BoardLogic;
+import com.example.bakalar.logic.transitions.runPDALogic;
+import com.example.bakalar.logic.utility.ButtonState;
+import com.example.bakalar.logic.utility.DescribePDA;
 import javafx.fxml.FXML;
-import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
@@ -87,7 +85,7 @@ public class MainController {
     private Board currentBoard;
     private Stack<MyHistory> undoStack;
     private Stack<MyHistory> redoStack;
-    private BoardLogic boardLogic;
+    private runPDALogic runPDALogic;
     private ConversionLogic conversionLogic;
 
 
@@ -102,8 +100,11 @@ public class MainController {
         redoStack = new Stack<>();
         this.begSymbol.setText(STARTING_Z);
         List<TextField> describeFields = List.of(describeStates, describeAlphabet, describeStackAlphabet, describeEndStates);
-        currentBoard = new Board(mainPane, inputFieldAlphabet, describeFields, transFunctions, rulesContainer, currentState, undoStack, redoStack);
-        this.boardLogic = new BoardLogic(currentBoard, this.stateContainer);
+        DescribePDA describePDA = new DescribePDA(describeFields, transFunctions, inputFieldAlphabet);
+        HistoryLogic historyLogic = new HistoryLogic(undoStack, redoStack);
+        currentBoard = new Board(mainPane, describePDA, historyLogic, rulesContainer, currentState);
+        historyLogic.setBoard(currentBoard);
+        this.runPDALogic = new runPDALogic(currentBoard, this.stateContainer);
         this.conversionLogic = new ConversionLogic(currentBoard);
         inputFieldAlphabet.textProperty().addListener((observable, oldValue, newValue) -> {
             currentBoard.updateAllDescribePDA();
@@ -173,11 +174,11 @@ public class MainController {
 
     public void start() {
         String inputAlphabet = this.inputFieldAlphabet.getText();
-        boardLogic.start(STARTING_Z, inputAlphabet);
+        runPDALogic.start(STARTING_Z, inputAlphabet);
     }
 
     public void step() {
-        boardLogic.step();
+        runPDALogic.step();
     }
 
     public void buttonRedo() {
@@ -199,7 +200,7 @@ public class MainController {
         currentBoard.setStarting(firstNode, true);
         MyNode secondNode = currentBoard.createMyNode(320, 150);
         currentBoard.setEnding(firstNode, true);
-        currentBoard.getInputFieldAlphabet().setText("111000");
+        inputFieldAlphabet.setText("111000");
         currentBoard.createMyArrow(firstNode, firstNode, "1", "Z", "XZ");
         currentBoard.createMyArrow(firstNode, firstNode, "1", "X", "XX");
         currentBoard.createMyArrow(firstNode, firstNode, EPSILON, "X", EPSILON);

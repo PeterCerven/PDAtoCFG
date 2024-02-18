@@ -1,7 +1,6 @@
 package com.example.bakalar.canvas.arrow;
 
 import com.example.bakalar.canvas.node.MyNode;
-import com.example.bakalar.canvas.node.NodeTransition;
 import com.example.bakalar.logic.Board;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
@@ -31,7 +30,7 @@ public abstract class Arrow extends Group implements Serializable {
     protected static final Logger log = LogManager.getLogger(Arrow.class.getName());
     protected MyNode from;
     protected MyNode to;
-    protected List<NodeTransition> transitions;
+    protected List<TransitionInputs> transitions;
     protected VBox symbolContainers;
     protected Polygon arrowHead;
     protected Board board;
@@ -40,7 +39,7 @@ public abstract class Arrow extends Group implements Serializable {
 
 
 
-    public Arrow(MyNode from, MyNode to, Board board, List<NodeTransition> nodeTransition) {
+    public Arrow(MyNode from, MyNode to, Board board, List<TransitionInputs> transitionInputs) {
         super();
         this.transitions = new ArrayList<>();
         this.from = from;
@@ -52,7 +51,7 @@ public abstract class Arrow extends Group implements Serializable {
         this.symbolContainers = new VBox();
         setViewOrder(1);
         this.arrowHead = createArrowHead();
-        for (NodeTransition transition : nodeTransition) {
+        for (TransitionInputs transition : transitionInputs) {
             addSymbolContainer(transition);
         }
         this.getChildren().addAll(arrowHead, symbolContainers);
@@ -68,22 +67,22 @@ public abstract class Arrow extends Group implements Serializable {
         return arrowHead;
     }
 
-    public void addSymbolContainer(NodeTransition nodeTransition) {
+    public void addSymbolContainer(TransitionInputs transitionInputs) {
         HBox container = new HBox(NODE_RADIUS / 5.0);
-        Text readSymbol = new Text(nodeTransition.getRead());
-        Text popSymbol = new Text(nodeTransition.getPop());
-        Text pushSymbol = new Text(nodeTransition.getPush());
+        Text readSymbol = new Text(transitionInputs.getRead());
+        Text popSymbol = new Text(transitionInputs.getPop());
+        Text pushSymbol = new Text(transitionInputs.getPush());
         container.getChildren().addAll(readSymbol, popSymbol, pushSymbol);
         container.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
             if (event.getButton() == MouseButton.SECONDARY) {
-                NodeTransition newNodeTransition = board.createArrowTransition(nodeTransition.getRead(), nodeTransition.getPop(), nodeTransition.getPush());
-                nodeTransition.setRead(newNodeTransition.getRead());
-                nodeTransition.setPop(newNodeTransition.getPop());
-                nodeTransition.setPush(newNodeTransition.getPush());
+                TransitionInputs newTransitionInputs = board.createArrowTransition(transitionInputs.getRead(), transitionInputs.getPop(), transitionInputs.getPush());
+                transitionInputs.setRead(newTransitionInputs.getRead());
+                transitionInputs.setPop(newTransitionInputs.getPop());
+                transitionInputs.setPush(newTransitionInputs.getPush());
                 container.getChildren().clear();
-                readSymbol.setText(newNodeTransition.getRead());
-                popSymbol.setText(newNodeTransition.getPop());
-                pushSymbol.setText(newNodeTransition.getPush());
+                readSymbol.setText(newTransitionInputs.getRead());
+                popSymbol.setText(newTransitionInputs.getPop());
+                pushSymbol.setText(newTransitionInputs.getPush());
                 container.getChildren().addAll(readSymbol, popSymbol, pushSymbol);
                 this.board.updateAllDescribePDA();
             }
@@ -93,7 +92,7 @@ public abstract class Arrow extends Group implements Serializable {
             container.setLayoutX(newValue.getHeight());
             this.symbolContainers = updateSymbolContainerPosition(this.symbolContainers);
         });
-        this.transitions.add(nodeTransition);
+        this.transitions.add(transitionInputs);
         this.symbolContainers.getChildren().add(container);
         this.board.updateAllDescribePDA();
     }

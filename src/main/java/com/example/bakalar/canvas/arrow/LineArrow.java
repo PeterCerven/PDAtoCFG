@@ -2,7 +2,6 @@ package com.example.bakalar.canvas.arrow;
 
 import com.example.bakalar.logic.Board;
 import com.example.bakalar.canvas.node.MyNode;
-import com.example.bakalar.canvas.node.NodeTransition;
 import javafx.geometry.Point2D;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -12,7 +11,6 @@ import javafx.scene.shape.StrokeType;
 import javafx.scene.transform.Rotate;
 import lombok.Getter;
 
-import java.util.HashMap;
 import java.util.List;
 
 import static com.example.bakalar.logic.MainController.NODE_RADIUS;
@@ -31,8 +29,8 @@ public class LineArrow extends Arrow {
     private double endX;
     private double endY;
 
-    public LineArrow(MyNode from, MyNode to, Board board, List<NodeTransition> nodeTransition) {
-        super(from, to, board, nodeTransition);
+    public LineArrow(MyNode from, MyNode to, Board board, List<TransitionInputs> transitionInputs) {
+        super(from, to, board, transitionInputs);
 
         this.line = createLine();
         resetLine();
@@ -45,17 +43,17 @@ public class LineArrow extends Arrow {
 
 
 
-    public LineArrow(MyNode from, MyNode to, double change, Board board, List<NodeTransition> nodeTransition) {
-        this(from, to, board,nodeTransition);
+    public LineArrow(MyNode from, MyNode to, double change, Board board, List<TransitionInputs> transitionInputs) {
+        this(from, to, board, transitionInputs);
         Point2D thirdPoint = getThirdPoint(change);
         this.controlPointChangeX = thirdPoint.getX() - (startX + endX) / 2.0;
         this.controlPointChangeY = thirdPoint.getY() - (startY + endY) / 2.0;
         this.updateObjects(true);
     }
 
-    public LineArrow(MyNode from, MyNode to, Board board, List<NodeTransition> nodeTransition, double startX, double startY,
+    public LineArrow(MyNode from, MyNode to, Board board, List<TransitionInputs> transitionInputs, double startX, double startY,
                      double endX, double endY, double controlPointChangeX, double controlPointChangeY) {
-        super(from, to, board, nodeTransition);
+        super(from, to, board, transitionInputs);
         this.line = createLine();
         line.setControlX(controlX);
         line.setControlY(controlY);

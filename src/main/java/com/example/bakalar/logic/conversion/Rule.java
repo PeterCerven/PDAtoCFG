@@ -1,6 +1,6 @@
 package com.example.bakalar.logic.conversion;
 
-import com.example.bakalar.logic.character.MySymbol;
+import com.example.bakalar.logic.utility.MySymbol;
 import lombok.Getter;
 import lombok.Setter;
 

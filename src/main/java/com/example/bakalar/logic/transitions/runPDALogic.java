@@ -3,8 +3,8 @@ package com.example.bakalar.logic.transitions;
 import com.example.bakalar.logic.Board;
 import com.example.bakalar.canvas.arrow.Arrow;
 import com.example.bakalar.canvas.node.MyNode;
-import com.example.bakalar.canvas.node.NodeTransition;
-import com.example.bakalar.logic.character.MySymbol;
+import com.example.bakalar.canvas.arrow.TransitionInputs;
+import com.example.bakalar.logic.utility.MySymbol;
 import javafx.scene.layout.HBox;
 
 import java.util.ArrayList;
@@ -14,7 +14,7 @@ import java.util.Stack;
 
 import static com.example.bakalar.canvas.arrow.Arrow.EPSILON;
 
-public class BoardLogic {
+public class runPDALogic {
     private List<MySymbol> inputAlphabet;
     private List<StepState> stepStates;
     private List<StepState> tmpStepStates;
@@ -23,7 +23,7 @@ public class BoardLogic {
     private final HBox stateContainer;
 
 
-    public BoardLogic(Board board, HBox stateContainer) {
+    public runPDALogic(Board board, HBox stateContainer) {
         this.board = board;
         this.stateContainer = stateContainer;
         this.inputAlphabet = new ArrayList<>();
@@ -55,12 +55,12 @@ public class BoardLogic {
             MySymbol stackTop = stepState.getSymbolStack().peek();
             boolean foundWay = false;
             for (Arrow arrow : stepState.getCurrentNode().getArrowsFrom()) {
-                for (NodeTransition nodeTransition : arrow.getTransitions()) {
+                for (TransitionInputs transitionInputs : arrow.getTransitions()) {
                     Stack<MySymbol> symbolStack = new Stack<>();
                     symbolStack.addAll(stepState.getSymbolStack());
-                    MySymbol read = new MySymbol(nodeTransition.getRead());
-                    MySymbol pop = new MySymbol(nodeTransition.getPop());
-                    List<MySymbol> pushSymbols = convertStringToListOfSymbols(nodeTransition.getPush());
+                    MySymbol read = new MySymbol(transitionInputs.getRead());
+                    MySymbol pop = new MySymbol(transitionInputs.getPop());
+                    List<MySymbol> pushSymbols = convertStringToListOfSymbols(transitionInputs.getPush());
                     if (read.equals(inputLetterToRead) && (pop.equals(stackTop) || Objects.equals(pop.getName(), EPSILON))) {
                         if (!Objects.equals(pop.getName(), EPSILON)) {
                             symbolStack.pop();

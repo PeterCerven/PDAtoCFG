@@ -3,16 +3,14 @@ package com.example.bakalar.logic;
 import com.example.bakalar.canvas.arrow.Arrow;
 import com.example.bakalar.canvas.arrow.LineArrow;
 import com.example.bakalar.canvas.arrow.SelfLoopArrow;
-import com.example.bakalar.logic.button.ButtonState;
+import com.example.bakalar.logic.history.*;
+import com.example.bakalar.logic.utility.ButtonState;
 import com.example.bakalar.logic.conversion.Rule;
 import com.example.bakalar.canvas.node.MyNode;
-import com.example.bakalar.canvas.node.NodeTransition;
+import com.example.bakalar.canvas.arrow.TransitionInputs;
 import com.example.bakalar.canvas.node.StartNodeArrow;
-import com.example.bakalar.logic.history.ArrowHistory;
-import com.example.bakalar.logic.history.BoardHistory;
-import com.example.bakalar.logic.history.MyHistory;
-import com.example.bakalar.logic.history.NodeHistory;
 import com.example.bakalar.logic.transitions.Transition;
+import com.example.bakalar.logic.utility.DescribePDA;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.*;
@@ -43,40 +41,29 @@ public class Board implements Serializable {
     private List<MyNode> nodes;
     private List<Arrow> arrows;
     private MyNode startNode;
-    private  AnchorPane mainPane;
+    private AnchorPane mainPane;
     private StartNodeArrow startNodeArrow;
     private int nodeCounter;
-    private  CheckBox startingCheckBox;
-    private  CheckBox endingCheckBox;
-    private  TextField inputFieldAlphabet;
-    private  Button conversionBtn;
-    private  TextField describeStates;
-    private  TextField describeAlphabet;
-    private  TextField describeStackAlphabet;
-    private  TextField describeStartingState;
-    private  TextField describeStartingStackSymbol;
-    private  TextField describeEndStates;
-    private  VBox transFunctions;
-    private  VBox rulesContainer;
+    private CheckBox startingCheckBox;
+    private CheckBox endingCheckBox;
+    private Button conversionBtn;
+    private VBox rulesContainer;
     private List<Rule> rules;
     private int idNodeCounter;
     private ButtonState currentState;
-    private Stack<MyHistory> undoStack;
-    private Stack<MyHistory> redoStack;
     private double startX, startY;
     private MyNode selectedNode;
-    
+    private DescribePDA describePDA;
+    private HistoryLogic historyLogic;
 
 
-    public Board(AnchorPane mainPane, TextField inputFieldAlphabet, List<TextField> describeFields, VBox transFunctions,
-                 VBox rulesContainer, ButtonState currentState, Stack<MyHistory> undoStack, Stack<MyHistory> redoStack) {
+    public Board(AnchorPane mainPane, DescribePDA describePDA, HistoryLogic historyLogic,
+                 VBox rulesContainer, ButtonState currentState) {
         this.nodes = new ArrayList<>();
         this.rules = new ArrayList<>();
-        this.transFunctions = transFunctions;
         this.rulesContainer = rulesContainer;
-        initDescribeFields(describeFields);
+        this.describePDA = describePDA;
         this.arrows = new ArrayList<>();
-        this.inputFieldAlphabet = inputFieldAlphabet;
         this.mainPane = mainPane;
         this.startNodeArrow = new StartNodeArrow(0, 0, 0);
         this.addObject(startNodeArrow);
@@ -86,114 +73,12 @@ public class Board implements Serializable {
         this.endingCheckBox = new CheckBox("End Node");
         this.idNodeCounter = 0;
         this.currentState = currentState;
-        this.undoStack = undoStack;
-        this.redoStack = redoStack;
+        this.historyLogic = historyLogic;
     }
 
-    // init functions
-
-    private void initDescribeFields(List<TextField> describeFields) {
-        this.describeStates = describeFields.get(0);
-        this.describeAlphabet = describeFields.get(1);
-        this.describeStackAlphabet = describeFields.get(2);
-        this.describeEndStates = describeFields.get(3);
-    }
-
-    // describe functions
 
     public void updateAllDescribePDA() {
-        updateDescribeStates();
-        updateDescribeAlphabet();
-        updateDescribeStackAlphabet();
-        updateDescribeEndStates();
-        updateDescribeTransFunctions();
-    }
-
-    private void updateDescribeStates() {
-        StringBuilder text = new StringBuilder("K = {");
-        for (MyNode node : nodes) {
-            text.append(node.getName()).append(", ");
-        }
-        if (!nodes.isEmpty()) {
-            text.delete(text.length() - 2, text.length());
-        }
-        text.append("}");
-        this.describeStates.setText(text.toString());
-    }
-
-    private void updateDescribeAlphabet() {
-        StringBuilder text = new StringBuilder(SIGMA + " = {");
-        Set<Character> alphabet = new HashSet<>();
-        for (Character character : inputFieldAlphabet.getText().toCharArray()) {
-            alphabet.add(character);
-        }
-        for (Character character : alphabet) {
-            text.append(character).append(", ");
-        }
-        if (!inputFieldAlphabet.getText().isEmpty()) {
-            text.delete(text.length() - 2, text.length());
-        }
-        text.append("}");
-        this.describeAlphabet.setText(text.toString());
-    }
-
-    private void updateDescribeStackAlphabet() {
-        StringBuilder text = new StringBuilder(GAMMA_CAPITAL + " = {");
-        Set<String> stackAlphabet = getStrings();
-        for (String symbol : stackAlphabet) {
-            text.append(symbol).append(", ");
-        }
-        if (!stackAlphabet.isEmpty()) {
-            text.delete(text.length() - 2, text.length());
-        }
-        text.append("}");
-        this.describeStackAlphabet.setText(text.toString());
-    }
-
-    private Set<String> getStrings() {
-        Set<String> stackAlphabet = new HashSet<>();
-        stackAlphabet.add(STARTING_Z);
-        for (Arrow arrow : arrows) {
-            for (NodeTransition nodeTransition : arrow.getTransitions()) {
-                String pushString = nodeTransition.getPush();
-                String popString = nodeTransition.getPop();
-                if (!popString.equals(EPSILON))
-                    stackAlphabet.add(popString);
-                for (int i = 0; i < nodeTransition.getPush().length(); i++) {
-                    String substring = pushString.substring(i, i + 1);
-                    if (!substring.equals(EPSILON))
-                        stackAlphabet.add(substring);
-                }
-            }
-        }
-        return stackAlphabet;
-    }
-
-
-    private void updateDescribeEndStates() {
-        StringBuilder text = new StringBuilder("F = {");
-        boolean hasEndStates = false;
-        for (MyNode node : nodes) {
-            if (node.isEnding()) {
-                text.append(node.getName()).append(", ");
-                hasEndStates = true;
-            }
-        }
-        if (hasEndStates) {
-            text.delete(text.length() - 2, text.length());
-        }
-        text.append("}");
-        this.describeEndStates.setText(text.toString());
-    }
-
-    public void updateDescribeTransFunctions() {
-        this.transFunctions.getChildren().clear();
-        List<Transition> transitions = getNodesTransitions();
-        for (Transition transition : transitions) {
-            TextField textField = new TextField(transition.toString());
-            textField.setEditable(false);
-            this.transFunctions.getChildren().add(textField);
-        }
+        this.describePDA.updateAllDescribePDA(this.nodes, this.arrows, this.getNodesTransitions());
     }
 
 
@@ -201,9 +86,9 @@ public class Board implements Serializable {
         List<Transition> transitions = new ArrayList<>();
         for (MyNode node : nodes) {
             for (Arrow arrow : node.getArrowsFrom()) {
-                for (NodeTransition nodeTransition : arrow.getTransitions()) {
-                    transitions.add(new Transition(arrow.getFrom().getName(), nodeTransition.getRead(),
-                            nodeTransition.getPop(), arrow.getTo().getName(), nodeTransition.getPush()));
+                for (TransitionInputs transitionInputs : arrow.getTransitions()) {
+                    transitions.add(new Transition(arrow.getFrom().getName(), transitionInputs.getRead(),
+                            transitionInputs.getPop(), arrow.getTo().getName(), transitionInputs.getPush()));
                 }
             }
         }
@@ -238,22 +123,22 @@ public class Board implements Serializable {
     }
 
     public Arrow createArrow(MyNode from, MyNode to, String read, String pop, String push) {
-        NodeTransition nodeTransition;
+        TransitionInputs transitionInputs;
         if (read != null) {
-            nodeTransition = new NodeTransition(read, pop, push);
+            transitionInputs = new TransitionInputs(read, pop, push);
             this.updateAllDescribePDA();
         } else {
-            nodeTransition = createArrowTransition("", "", "");
+            transitionInputs = createArrowTransition("", "", "");
         }
-        if (nodeTransition == null) {
+        if (transitionInputs == null) {
             return null;
         }
         Arrow arrow = sameArrowExists(from, to);
         if (arrow != null) {
-            arrow.addSymbolContainer(nodeTransition);
+            arrow.addSymbolContainer(transitionInputs);
             return arrow;
         }
-        List<NodeTransition> transitions = List.of(nodeTransition);
+        List<TransitionInputs> transitions = List.of(transitionInputs);
         if (from == to) {
             arrow = new SelfLoopArrow(from, to, this, transitions);
         } else {
@@ -286,6 +171,37 @@ public class Board implements Serializable {
         updateAllDescribePDA();
     }
 
+    public MyNode createMyNode(double x, double y) {
+        MyNode myNode = new MyNode(x, y, NODE_RADIUS);
+        this.makeDraggable(myNode);
+        this.enableArrowCreation(myNode);
+        this.addObject(myNode);
+        return myNode;
+    }
+
+    private void createArrow(MyNode node) {
+        if (selectedNode != null) {
+            saveCurrentState();
+            createMyArrow(selectedNode, node, null, null, null);
+            this.selectNode(selectedNode, false);
+            selectedNode = null;
+
+        } else {
+            selectedNode = node;
+            this.selectNode(node, true);
+        }
+    }
+
+    public void createMyArrow(MyNode from, MyNode to, String input, String stackTop, String stackPush) {
+        Arrow arrow = this.createArrow(from, to, input, stackTop, stackPush);
+        if (arrow != null) {
+            this.makeErasable(arrow);
+            if (arrow instanceof LineArrow lineArrow) {
+                this.makeCurveDraggable(lineArrow);
+            }
+        }
+    }
+
     // utility functions
 
     private Arrow sameArrowExists(MyNode from, MyNode to) {
@@ -306,6 +222,10 @@ public class Board implements Serializable {
         return false;
     }
 
+    public void testBoard() {
+        clearBoard();
+    }
+
     public void clearBoard() {
         mainPane.getChildren().clear();
         nodes.clear();
@@ -314,6 +234,8 @@ public class Board implements Serializable {
         startNode = null;
         updateAllDescribePDA();
     }
+
+    // starting and ending nodes
 
 
     public void removeStartingFromOtherNodes() {
@@ -338,7 +260,7 @@ public class Board implements Serializable {
 
     // event handlers
 
-    public NodeTransition createArrowTransition(String read, String pop, String push) {
+    public TransitionInputs createArrowTransition(String read, String pop, String push) {
         Dialog<ButtonType> dialog = new Dialog<>();
         dialog.setTitle("Create transition");
         dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
@@ -373,7 +295,7 @@ public class Board implements Serializable {
             String newPush = input3.getText().isBlank() ? EPSILON : input3.getText();
 
             this.updateAllDescribePDA();
-            return new NodeTransition(newRead, newPop, newPush);
+            return new TransitionInputs(newRead, newPop, newPush);
         }
         return null;
     }
@@ -414,135 +336,6 @@ public class Board implements Serializable {
         });
     }
 
-    // rules
-
-    public void testBoard() {
-        clearBoard();
-    }
-
-    // history
-
-    public MyHistory createHistory() {
-        BoardHistory boardHistory = new BoardHistory(startNode == null ? null : startNode.getNodeId(), nodeCounter, idNodeCounter);
-        List<ArrowHistory> arrowHistories = createArrowHistory();
-        List<NodeHistory> nodeHistories = createNodeHistory();
-
-        return new MyHistory(boardHistory, nodeHistories, arrowHistories);
-    }
-
-    private List<ArrowHistory> createArrowHistory() {
-        List<ArrowHistory> arrowHistories = new ArrayList<>();
-        for (Arrow arrow : arrows) {
-            if (arrow instanceof LineArrow lineArrow) {
-                arrowHistories.add(new ArrowHistory(lineArrow.getStartX(), lineArrow.getStartY(), lineArrow.getEndX(), lineArrow.getEndY(),
-                        lineArrow.getFromId(), lineArrow.getToId(), lineArrow.getTransitions(), lineArrow.getControlX(), lineArrow.getControlY(), true));
-            } else if (arrow instanceof SelfLoopArrow selfLoopArrow) {
-                arrowHistories.add(new ArrowHistory(selfLoopArrow.getFromId(), selfLoopArrow.getToId(), selfLoopArrow.getTransitions(), false));
-            }
-        }
-        return arrowHistories;
-    }
-
-    private List<NodeHistory> createNodeHistory() {
-        List<NodeHistory> nodeHistories = new ArrayList<>();
-        for (MyNode node : nodes) {
-            nodeHistories.add(new NodeHistory(node.getName(), node.getAbsoluteCentrePosX(), node.getAbsoluteCentrePosY(), node.isStarting(), node.isEnding(), node.getNodeId()));
-        }
-        return nodeHistories;
-
-    }
-
-    public void restoreBoardFromHistory(MyHistory myHistory) {
-        clearBoard();
-        BoardHistory boardHistory = myHistory.getBoardHistory();
-        this.nodeCounter = boardHistory.getNodeCounter();
-        this.idNodeCounter = boardHistory.getIdNodeCounter();
-        Integer startNodeId = boardHistory.getStartNodeId();
-        List<NodeHistory> nodeHistories = myHistory.getNodeHistory();
-        List<ArrowHistory> arrowHistories = myHistory.getArrowHistory();
-        List<Node> newNodes = new ArrayList<>();
-        for (NodeHistory nodeHistory : nodeHistories) {
-            MyNode myNode = new MyNode(nodeHistory.getName(), nodeHistory.getX(), nodeHistory.getY(), nodeHistory.getNodeId(), nodeHistory.isStarting(), nodeHistory.isEnding());
-            this.makeDraggable(myNode);
-            this.enableArrowCreation(myNode);
-            newNodes.add(addObjectFromHistory(myNode));
-        }
-        for (ArrowHistory arrowHistory : arrowHistories) {
-            Arrow arrow;
-            MyNode from = findNodeById(arrowHistory.getFromId());
-            MyNode to = findNodeById(arrowHistory.getToId());
-            if (arrowHistory.isLineArrow()) {
-                arrow = new LineArrow(from, to, this, arrowHistory.getTransitions());
-                makeCurveDraggable((LineArrow) arrow);
-            } else {
-                arrow = new SelfLoopArrow(from, to, this, arrowHistory.getTransitions());
-            }
-            newNodes.add(addObjectFromHistory(arrow));
-        }
-        if (startNodeId != null) {
-            for (Node node : newNodes) {
-                if (node instanceof MyNode myNode) {
-                    if (myNode.getNodeId() == startNodeId) {
-                        this.setStarting(myNode, true);
-                    }
-                }
-            }
-        }
-        mainPane.getChildren().addAll(newNodes);
-        updateAllDescribePDA();
-    }
-
-    private MyNode findNodeById(int toId) {
-        for (MyNode node : nodes) {
-            if (node.getNodeId() == toId) {
-                return node;
-            }
-        }
-        return null;
-    }
-
-    private Node addObjectFromHistory(Node node) {
-        if (node instanceof Arrow arrow) {
-            arrows.add(arrow);
-        } else if (node instanceof MyNode myNode) {
-            nodes.add(myNode);
-        }
-        return node;
-    }
-
-    public void saveCurrentState() {
-        MyHistory myHistory = this.createHistory();
-        undoStack.push(myHistory);
-        redoStack.clear();
-    }
-
-    public void undo() {
-        if (!undoStack.isEmpty()) {
-            redoStack.push(this.createHistory());
-            MyHistory boardHistory = undoStack.pop();
-            this.restoreBoardFromHistory(boardHistory);
-        }
-    }
-
-    public void redo() {
-        if (!redoStack.isEmpty()) {
-            undoStack.push(this.createHistory());
-            MyHistory nextState = redoStack.pop();
-            this.restoreBoardFromHistory(nextState);
-        }
-    }
-
-    public MyNode createMyNode(double x, double y) {
-        MyNode myNode = new MyNode(x, y, NODE_RADIUS);
-        this.makeDraggable(myNode);
-        this.enableArrowCreation(myNode);
-        this.addObject(myNode);
-        return myNode;
-    }
-
-    // Event handlers
-
-
     public void makeCurveDraggable(LineArrow arrow) {
         arrow.getControlIndicator().setOnMousePressed(event -> {
             if (currentState.equals(ButtonState.SELECT)) {
@@ -560,10 +353,7 @@ public class Board implements Serializable {
                 arrow.moveControlPoint(e.getSceneX() - startX, e.getSceneY() - startY);
             }
         });
-
-
     }
-
 
     public void makeDraggable(MyNode node) {
         node.setOnMousePressed(event -> {
@@ -603,29 +393,6 @@ public class Board implements Serializable {
         });
     }
 
-    private void createArrow(MyNode node) {
-        if (selectedNode != null) {
-            saveCurrentState();
-            createMyArrow(selectedNode, node, null, null, null);
-            this.selectNode(selectedNode, false);
-            selectedNode = null;
-
-        } else {
-            selectedNode = node;
-            this.selectNode(node, true);
-        }
-    }
-
-    public void createMyArrow(MyNode from, MyNode to, String input, String stackTop, String stackPush) {
-        Arrow arrow = this.createArrow(from, to, input, stackTop, stackPush);
-        if (arrow != null) {
-            this.makeErasable(arrow);
-            if (arrow instanceof LineArrow lineArrow) {
-                this.makeCurveDraggable(lineArrow);
-            }
-        }
-    }
-
     public void makeErasable(Node node) {
         node.setOnMouseClicked(event -> {
             if (currentState.equals(ButtonState.ERASE) && event.getButton() == MouseButton.PRIMARY) {
@@ -633,5 +400,59 @@ public class Board implements Serializable {
                 this.removeObject(node);
             }
         });
+    }
+
+    // history
+
+    public void saveCurrentState() {
+        historyLogic.saveCurrentState();
+    }
+
+    public void redo() {
+        historyLogic.redo();
+    }
+
+    public void undo() {
+        historyLogic.undo();
+    }
+
+    public void restoreBoardFromHistory(MyHistory myHistory) {
+        clearBoard();
+        BoardHistory boardHistory = myHistory.getBoardHistory();
+        this.nodeCounter = boardHistory.getNodeCounter();
+        this.idNodeCounter = boardHistory.getIdNodeCounter();
+        Integer startNodeId = boardHistory.getStartNodeId();
+        List<NodeHistory> nodeHistories = myHistory.getNodeHistory();
+        List<ArrowHistory> arrowHistories = myHistory.getArrowHistory();
+        List<Node> newNodes = new ArrayList<>();
+        for (NodeHistory nodeHistory : nodeHistories) {
+            MyNode myNode = new MyNode(nodeHistory.getName(), nodeHistory.getX(), nodeHistory.getY(), nodeHistory.getNodeId(), nodeHistory.isStarting(), nodeHistory.isEnding());
+            this.makeDraggable(myNode);
+            this.enableArrowCreation(myNode);
+            newNodes.add(historyLogic.addObjectFromHistory(myNode, nodes, arrows));
+        }
+        for (ArrowHistory arrowHistory : arrowHistories) {
+            Arrow arrow;
+            MyNode from = historyLogic.findNodeById(arrowHistory.getFromId());
+            MyNode to = historyLogic.findNodeById(arrowHistory.getToId());
+            if (arrowHistory.isLineArrow()) {
+                arrow = new LineArrow(from, to, this, arrowHistory.getTransitions());
+                makeCurveDraggable((LineArrow) arrow);
+            } else {
+                arrow = new SelfLoopArrow(from, to, this, arrowHistory.getTransitions());
+            }
+            newNodes.add(historyLogic.addObjectFromHistory(arrow, nodes, arrows));
+        }
+        if (startNodeId != null) {
+            for (Node node : newNodes) {
+                if (node instanceof MyNode myNode) {
+                    if (myNode.getNodeId() == startNodeId) {
+                        this.setStarting(myNode, true);
+                    }
+                }
+            }
+        }
+        mainPane.getChildren().addAll(newNodes);
+        updateAllDescribePDA();
     }
 }

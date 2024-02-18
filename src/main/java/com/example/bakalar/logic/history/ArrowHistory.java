@@ -1,7 +1,6 @@
 package com.example.bakalar.logic.history;
 
-import com.example.bakalar.canvas.node.NodeTransition;
-import com.example.bakalar.logic.transitions.Transition;
+import com.example.bakalar.canvas.arrow.TransitionInputs;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -16,13 +15,13 @@ public class ArrowHistory {
     private double endY;
     private int fromId;
     private int toId;
-    private List<NodeTransition> transitions;
+    private List<TransitionInputs> transitions;
     private double controlPointChangeX;
     private double controlPointChangeY;
     private boolean isLineArrow;
 
     public ArrowHistory(double startX, double startY, double endX, double endY, int fromId, int toId,
-                        List<NodeTransition> transitions, double controlPointChangeX, double controlPointChangeY, boolean isLineArrow) {
+                        List<TransitionInputs> transitions, double controlPointChangeX, double controlPointChangeY, boolean isLineArrow) {
         this.startX = startX;
         this.startY = startY;
         this.endX = endX;
@@ -35,7 +34,7 @@ public class ArrowHistory {
         this.isLineArrow = isLineArrow;
     }
 
-    public ArrowHistory(int fromId, int toId, List<NodeTransition> transitions, boolean isLineArrow) {
+    public ArrowHistory(int fromId, int toId, List<TransitionInputs> transitions, boolean isLineArrow) {
         this.fromId = fromId;
         this.toId = toId;
         this.transitions = transitions;
