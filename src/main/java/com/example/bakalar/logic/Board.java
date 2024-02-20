@@ -3,9 +3,9 @@ package com.example.bakalar.logic;
 import com.example.bakalar.canvas.arrow.Arrow;
 import com.example.bakalar.canvas.arrow.LineArrow;
 import com.example.bakalar.canvas.arrow.SelfLoopArrow;
+import com.example.bakalar.logic.conversion.CFGRule;
 import com.example.bakalar.logic.history.*;
 import com.example.bakalar.logic.utility.ButtonState;
-import com.example.bakalar.logic.conversion.Rule;
 import com.example.bakalar.canvas.node.MyNode;
 import com.example.bakalar.canvas.arrow.TransitionInputs;
 import com.example.bakalar.canvas.node.StartNodeArrow;
@@ -48,7 +48,7 @@ public class Board implements Serializable {
     private CheckBox endingCheckBox;
     private Button conversionBtn;
     private VBox rulesContainer;
-    private List<Rule> rules;
+    private List<CFGRule> rules;
     private int idNodeCounter;
     private ButtonState currentState;
     private double startX, startY;
@@ -426,7 +426,8 @@ public class Board implements Serializable {
         List<ArrowHistory> arrowHistories = myHistory.getArrowHistory();
         List<Node> newNodes = new ArrayList<>();
         for (NodeHistory nodeHistory : nodeHistories) {
-            MyNode myNode = new MyNode(nodeHistory.getName(), nodeHistory.getX(), nodeHistory.getY(), nodeHistory.getNodeId(), nodeHistory.isStarting(), nodeHistory.isEnding());
+            MyNode myNode = new MyNode(nodeHistory.getName(), nodeHistory.getX(), nodeHistory.getY(), nodeHistory.getNodeId(),
+                    nodeHistory.isStarting(), nodeHistory.isEnding());
             this.makeDraggable(myNode);
             this.enableArrowCreation(myNode);
             newNodes.add(historyLogic.addObjectFromHistory(myNode, nodes, arrows));
