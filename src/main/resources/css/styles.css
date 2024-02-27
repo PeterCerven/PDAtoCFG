@@ -11,3 +11,7 @@
 /*    -fx-border-style: solid;*/
 /*}*/
 
+.red-text {
+    -fx-color: red;
+}
+

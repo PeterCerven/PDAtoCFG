@@ -9,6 +9,7 @@ module com.example.bakalar {
     requires org.apache.commons.lang3;
     requires lombok;
     requires modelmapper;
+    requires javafx.web;
 
     opens com.example.bakalar to javafx.fxml;
     exports com.example.bakalar;
@@ -27,4 +28,5 @@ module com.example.bakalar {
     exports com.example.bakalar.logic.history;
     opens com.example.bakalar.logic.history to javafx.fxml, lombok;
     exports com.example.bakalar.logic.utility;
+    opens com.example.bakalar.logic.utility to javafx.fxml, lombok;
 }

@@ -1,15 +1,36 @@
 package com.example.bakalar.logic.utility;
 
+import javafx.scene.paint.Color;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
 public class MySymbol {
-    String name;
+    public static final Color DEFAULT_COLOR = Color.BLACK;
+    private String name;
+    private Color color;
+    private int index;
 
     public MySymbol(String name) {
         this.name = name;
+        this.color = Color.BLACK;
+    }
+
+    public MySymbol(MySymbol mySymbol, Color color) {
+        this.name = mySymbol.getName();
+        this.color = color;
+    }
+
+    public MySymbol(String name, Color color) {
+        this.name = name;
+        this.color = color;
+    }
+
+    public MySymbol(String name, Color color, int index) {
+        this.name = name;
+        this.color = color;
+        this.index = index;
     }
 
     @Override

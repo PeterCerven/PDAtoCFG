@@ -9,7 +9,9 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -26,7 +28,7 @@ import static com.example.bakalar.logic.Board.STARTING_Z;
 public class ConversionLogic {
     private final Board board;
     private Stage transitionStage;
-    private Label transitionLabel;
+    private TextFlow transitionLabel;
     private Label transitionIndexLabel;
     private List<Transition> transitions;
     private VBox ruleBox;
@@ -49,7 +51,7 @@ public class ConversionLogic {
     private void setupTransitionStage(List<Transition> transitions) {
         this.transitions = transitions;
         this.transitionStage = new Stage();
-        this.transitionLabel = new Label();
+        this.transitionLabel = new TextFlow();
         this.transitionIndexLabel = new Label();
         this.ruleBox = new VBox();
         this.cfgRules = new HashMap<>();
@@ -75,9 +77,8 @@ public class ConversionLogic {
         HBox stepsLayout = new HBox(10, showStepsButton, prevSteps, nextSteps);
         stepsLayout.setAlignment(Pos.BOTTOM_RIGHT);
 
-        transitionLabel.setFont(new Font("Arial", 16));
 
-        transitionIndexLabel.setFont(new Font("Arial", 16));
+        transitionIndexLabel.setFont(new Font("Arial", 22));
         transitionIndexLabel.setAlignment(Pos.TOP_LEFT);
 
         for (Transition transition : transitions) {
@@ -111,19 +112,32 @@ public class ConversionLogic {
         currentStep = 0;
 
         Transition currentTransition = transitions.get(currentIndex);
+        transitionLabel.getChildren().clear();
+        Text labelText = new Text();
+        labelText.setFont(new Font("Courier New", 25));
         switch (currentTransition.getTransitionType()) {
-            case START -> transitionLabel.setText("Start transition");
-            case END -> transitionLabel.setText("End transition");
-            default -> transitionLabel.setText(currentTransition.toString());
+            case START -> {
+                labelText.setText("Start transition");
+                transitionLabel.getChildren().add(labelText);
+            }
+            case END -> {
+                labelText.setText("End transition");
+                transitionLabel.getChildren().add(labelText);
+            }
+            default -> {
+                labelText.setText(currentTransition.toString());
+                transitionLabel.getChildren().add(labelText);
+            }
         }
         transitionIndexLabel.setText("Transition " + (currentIndex + 1) + "/" + transitions.size());
         List<CFGRule> cfgRules = this.cfgRules.get(currentIndex);
         ruleBox.getChildren().clear();
         for (CFGRule cfgRule : cfgRules) {
-            TextField textField = new TextField(cfgRule.toString());
-            textField.setEditable(false);
-            textField.setFont(new Font("Arial", 16));
-            ruleBox.getChildren().add(textField);
+            TextFlow textFlow = new TextFlow();
+            Text text = new Text(cfgRule.toString());
+            text.setFont(new Font("Courier New", 22));
+            textFlow.getChildren().add(text);
+            ruleBox.getChildren().add(textFlow);
         }
     }
 
@@ -154,51 +168,68 @@ public class ConversionLogic {
 
     private CFGRule createRule(String[] statesPos, Transition transition) {
         int posCounter = 0;
-        CFGRuleStep cfgRuleStep = new CFGRuleStep(transition);
+        CFGRuleStep cfgRuleStep = new CFGRuleStep(transition, transitionLabel);
 
 
         // left side
-        SpecialNonTerminal leftSide = new SpecialNonTerminal(transition.getCurrentState(),
-                transition.getSymbolToPop(), statesPos[posCounter]);
+        SpecialNonTerminal leftSide = new SpecialNonTerminal(transition.getCurrentState(), transition.getSymbolToPop(),
+                statesPos[posCounter]);
 
-        SpecialNonTerminal leftSideStep1 = new SpecialNonTerminal(transition.getCurrentState().getName(), "_", "_");
-        SpecialNonTerminal leftSideStep2 = new SpecialNonTerminal(transition.getCurrentState().getName(), transition.getSymbolToPop().getName(), "_");
-        SpecialNonTerminal leftSideStep3 = new SpecialNonTerminal(transition.getCurrentState().getName(), transition.getSymbolToPop().getName(), statesPos[posCounter]);
-
-        posCounter++;
+        // steps for left side
+        SpecialNonTerminal leftSideStep1 = new SpecialNonTerminal(new MySymbol(transition.getCurrentState(), Color.RED),
+                new MySymbol("_"), new MySymbol("_"));
+        SpecialNonTerminal leftSideStep2 = new SpecialNonTerminal(new MySymbol(transition.getCurrentState().getName()),
+                new MySymbol(transition.getSymbolToPop(), Color.RED), new MySymbol("_"));
+        SpecialNonTerminal leftSideStep3 = new SpecialNonTerminal(new MySymbol(transition.getCurrentState().getName()),
+                new MySymbol(transition.getSymbolToPop().getName()), new MySymbol(statesPos[posCounter], Color.RED));
 
         cfgRuleStep.addLeftSideStep(leftSideStep1);
         cfgRuleStep.addLeftSideStep(leftSideStep2);
-        cfgRuleStep.addLeftSideStep(leftSideStep3);
+
+        posCounter++;
 
         // terminal
         List<SpecialNonTerminal> rightSide = new ArrayList<>();
-        String terminal = "";
+        MySymbol terminal = new MySymbol("");
         if (!transition.getInputSymbolToRead().getName().equals("ε")) {
-            terminal = transition.getInputSymbolToRead().getName();
+            terminal = new MySymbol(transition.getInputSymbolToRead().getName());
         }
 
-        cfgRuleStep.addTerminal(terminal);
+        // steps for terminal
+        cfgRuleStep.addTerminal(new MySymbol(terminal, Color.RED));
 
 
         // right side
-        cfgRuleStep.addRightSideStackSymbols(transition.getSymbolsToPush());
         MySymbol nextStateSymbol = new MySymbol(transition.getNextState().getName());
 
-        cfgRuleStep.addFirstAndLastRightSideStep(nextStateSymbol.getName());
+        // steps for right side stack symbols
+        cfgRuleStep.addRightSideStackSymbols(transition.getSymbolsToPush(), Color.RED);
+        cfgRuleStep.addFirstRightSideStep(new MySymbol(nextStateSymbol.getName(), Color.RED));
+        List<MySymbol> tableOptions = new ArrayList<>();
+
         for (int i = 0; i < transition.getSymbolsToPush().size(); i++) {
             if (i == transition.getSymbolsToPush().size() - 1) {
                 rightSide.add(new SpecialNonTerminal(nextStateSymbol, transition.getSymbolsToPush().get(i), statesPos[0]));
                 break;
             }
-            cfgRuleStep.addRightSideStepForTableOption(statesPos[posCounter], i);
+            // steps for right side
+            tableOptions.add(new MySymbol(statesPos[posCounter], Color.RED, i));
 
             rightSide.add(new SpecialNonTerminal(nextStateSymbol, transition.getSymbolsToPush().get(i), statesPos[posCounter]));
             nextStateSymbol = new MySymbol(statesPos[posCounter]);
             posCounter++;
         }
 
-        CFGRule cfgRule = new CFGRule(leftSide, terminal, rightSide);
+        // All possibilities
+        cfgRuleStep.addAllPossibilities(leftSideStep3, tableOptions);
+        cfgRuleStep.addPossibilitiesAnotherSide(tableOptions);
+
+        // Add lastRight step
+
+
+        cfgRuleStep.addLastRightStep(leftSideStep3);
+
+        CFGRule cfgRule = new CFGRule(leftSide, terminal, rightSide, transition);
         cfgRule.setSteps(cfgRuleStep.getCfgRulesSteps());
 
         return cfgRule;
@@ -209,9 +240,9 @@ public class ConversionLogic {
 
     private List<CFGRule> terminalMove(Transition transition) {
         SpecialNonTerminal leftSide = new SpecialNonTerminal(transition.getCurrentState(), transition.getSymbolToPop(), transition.getNextState());
-        String terminal = transition.getInputSymbolToRead().getName();
+        MySymbol terminal = new MySymbol(transition.getInputSymbolToRead().getName());
         List<SpecialNonTerminal> rightSide = new ArrayList<>();
-        CFGRule cfgRule = new CFGRule(leftSide, terminal, rightSide);
+        CFGRule cfgRule = new CFGRule(leftSide, terminal, rightSide, transition);
         return List.of(cfgRule);
     }
 
@@ -236,7 +267,7 @@ public class ConversionLogic {
         for (MySymbol stateSymbol : allStateSymbols) {
             List<SpecialNonTerminal> rightSide = new ArrayList<>();
             rightSide.add(new SpecialNonTerminal(transition.getCurrentState(), startStackSymbol, stateSymbol));
-            CFGRule cfgRule = new CFGRule(startSymbol, null, rightSide);
+            CFGRule cfgRule = new CFGRule(startSymbol, null, rightSide, transition);
             cfgRules.add(cfgRule);
         }
         return cfgRules;
@@ -255,11 +286,17 @@ public class ConversionLogic {
         ruleBox.getChildren().clear();
         for (CFGRule cfgRule : cfgRules) {
             CFGRule cfgStep = cfgRule.getSteps().get(currentStep);
-            TextField textField = new TextField(cfgStep.toString());
-            textField.setEditable(false);
-            textField.setFont(new Font("Arial", 16));
-            ruleBox.getChildren().add(textField);
+            TextFlow textFlow = new TextFlow();
+            List<Text> texts = cfgStep.createTextFromStep();
+            List<Text> transitionTexts = cfgStep.getTransition().createTextFromStep();
+
+
+            transitionLabel.getChildren().clear();
+            transitionLabel.getChildren().addAll(transitionTexts);
+            textFlow.getChildren().addAll(texts);
+            ruleBox.getChildren().add(textFlow);
         }
+
     }
 
 

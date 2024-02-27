@@ -1,10 +1,14 @@
 package com.example.bakalar.logic.transitions;
 
+import com.example.bakalar.logic.conversion.CustomText;
 import com.example.bakalar.logic.conversion.TransitionType;
 import com.example.bakalar.logic.utility.MySymbol;
+import com.example.bakalar.logic.utility.SpecialNonTerminal;
+import javafx.scene.text.Text;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -47,9 +51,27 @@ public class Transition {
         return symbolsToPush.stream().map(MySymbol::getName).collect(Collectors.joining());
     }
 
+    public List<Text> createTextFromStep() {
+        List<Text> texts = new ArrayList<>();
+        texts.add(new CustomText("δ("));
+        texts.add(new CustomText(currentState));
+        texts.add(new CustomText(", "));
+        texts.add(new CustomText(inputSymbolToRead));
+        texts.add(new CustomText(", "));
+        texts.add(new CustomText(symbolToPop));
+        texts.add(new CustomText(") -> ("));
+        texts.add(new CustomText(nextState));
+        texts.add(new CustomText(", "));
+        for (MySymbol symbol : symbolsToPush) {
+            texts.add(new CustomText(symbol));
+        }
+        texts.add(new CustomText(")"));
+        return texts;
+    }
+
     @Override
     public String toString() {
         return "δ(" + currentState + ", " + inputSymbolToRead + ", " + symbolToPop + ") -> " +
-                "(" + nextState + ", " + (symbolsToPush == null ? "" :symbolsToPush.stream().map(MySymbol::getName).collect(Collectors.joining())) + ")";
+                "(" + nextState + ", " + (symbolsToPush == null ? "" : symbolsToPush.stream().map(MySymbol::getName).collect(Collectors.joining())) + ")";
     }
 }
