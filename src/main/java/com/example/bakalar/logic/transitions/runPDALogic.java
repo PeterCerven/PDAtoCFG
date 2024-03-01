@@ -12,7 +12,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Stack;
 
-import static com.example.bakalar.canvas.arrow.Arrow.EPSILON;
+import static com.example.bakalar.logic.Board.EPSILON;
+
 
 public class runPDALogic {
     private List<MySymbol> inputAlphabet;

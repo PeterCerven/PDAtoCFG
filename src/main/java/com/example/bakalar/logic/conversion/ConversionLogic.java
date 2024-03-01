@@ -23,12 +23,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.example.bakalar.logic.Board.STARTING_Z;
+import static com.example.bakalar.logic.Board.*;
 
 public class ConversionLogic {
     private final Board board;
     private Stage transitionStage;
     private TextFlow transitionLabel;
+    private HBox transitionLabelBox;
     private Label transitionIndexLabel;
     private List<Transition> transitions;
     private VBox ruleBox;
@@ -43,7 +44,6 @@ public class ConversionLogic {
     public void convertPDA() {
         List<Transition> transitions = board.getNodesTransitions();
         transitions.add(0, new Transition(board.getStartNode().getName(), TransitionType.START));
-        transitions.add(new Transition("qf", TransitionType.END));
         setupTransitionStage(transitions);
         showTransitionStage();
     }
@@ -55,6 +55,7 @@ public class ConversionLogic {
         this.transitionIndexLabel = new Label();
         this.ruleBox = new VBox();
         this.cfgRules = new HashMap<>();
+        this.transitionLabelBox = new HBox(10, transitionLabel);
 
         Button nextButton = new Button("Next");
         nextButton.setOnAction(e -> updateTransition(1));
@@ -77,21 +78,31 @@ public class ConversionLogic {
         HBox stepsLayout = new HBox(10, showStepsButton, prevSteps, nextSteps);
         stepsLayout.setAlignment(Pos.BOTTOM_RIGHT);
 
+        VBox helpingComments = new VBox();
+        helpingComments.setAlignment(Pos.CENTER_LEFT);
+        helpingComments.getChildren().add(new Label("Red color means the symbol is being processed"));
+
 
         transitionIndexLabel.setFont(new Font("Arial", 22));
-        transitionIndexLabel.setAlignment(Pos.TOP_LEFT);
+        transitionLabelBox.setAlignment(Pos.CENTER);
+
 
         for (Transition transition : transitions) {
             this.cfgRules.put(transitions.indexOf(transition), convertTransitions(transition));
         }
 
-        VBox layout = new VBox(10, transitionLabel, buttonLayout, transitionIndexLabel, ruleBox);
+        VBox topMenu = new VBox(10, transitionLabelBox, buttonLayout, transitionIndexLabel);
+        topMenu.setAlignment(Pos.TOP_CENTER);
+
+        VBox layout = new VBox(ruleBox);
         layout.setAlignment(Pos.TOP_CENTER);
         layout.setPadding(new Insets(10));
 
         BorderPane root = new BorderPane();
         root.setPadding(new Insets(10));
+        root.setLeft(helpingComments);
         root.setCenter(layout);
+        root.setTop(topMenu);
         root.setBottom(stepsLayout);
 
         Scene scene = new Scene(root, 800, 600);
@@ -120,12 +131,10 @@ public class ConversionLogic {
                 labelText.setText("Start transition");
                 transitionLabel.getChildren().add(labelText);
             }
-            case END -> {
-                labelText.setText("End transition");
-                transitionLabel.getChildren().add(labelText);
-            }
             default -> {
-                labelText.setText(currentTransition.toString());
+                List<Text> transitionTexts = currentTransition.createTextFromStep();
+                String transitionText = transitionTexts.stream().map(Text::getText).reduce("", String::concat);
+                labelText.setText(transitionText);
                 transitionLabel.getChildren().add(labelText);
             }
         }
@@ -146,7 +155,6 @@ public class ConversionLogic {
         List<CFGRule> cfgRules = new ArrayList<>();
         switch (transition.getTransitionType()) {
             case START -> cfgRules.addAll(startMove(transition));
-            case END -> cfgRules.addAll(endMove(transition));
             case NORMAL -> cfgRules.addAll(pushMove(transition));
             case TERMINAL -> cfgRules.addAll(terminalMove(transition));
         }
@@ -168,7 +176,7 @@ public class ConversionLogic {
 
     private CFGRule createRule(String[] statesPos, Transition transition) {
         int posCounter = 0;
-        CFGRuleStep cfgRuleStep = new CFGRuleStep(transition, transitionLabel);
+        CFGRuleStep cfgRuleStep = new CFGRuleStep(transition);
 
 
         // left side
@@ -183,15 +191,15 @@ public class ConversionLogic {
         SpecialNonTerminal leftSideStep3 = new SpecialNonTerminal(new MySymbol(transition.getCurrentState().getName()),
                 new MySymbol(transition.getSymbolToPop().getName()), new MySymbol(statesPos[posCounter], Color.RED));
 
-        cfgRuleStep.addLeftSideStep(leftSideStep1);
-        cfgRuleStep.addLeftSideStep(leftSideStep2);
+        cfgRuleStep.addLeftSideStep(leftSideStep1, "current");
+        cfgRuleStep.addLeftSideStep(leftSideStep2, "pop");
 
         posCounter++;
 
         // terminal
         List<SpecialNonTerminal> rightSide = new ArrayList<>();
         MySymbol terminal = new MySymbol("");
-        if (!transition.getInputSymbolToRead().getName().equals("ε")) {
+        if (!transition.getInputSymbolToRead().getName().equals(EPSILON)) {
             terminal = new MySymbol(transition.getInputSymbolToRead().getName());
         }
 
@@ -231,6 +239,7 @@ public class ConversionLogic {
 
         CFGRule cfgRule = new CFGRule(leftSide, terminal, rightSide, transition);
         cfgRule.setSteps(cfgRuleStep.getCfgRulesSteps());
+        cfgRule.setStepsTransitions(cfgRuleStep.getStepsTransitions());
 
         return cfgRule;
     }
@@ -239,6 +248,8 @@ public class ConversionLogic {
 
 
     private List<CFGRule> terminalMove(Transition transition) {
+        CFGRuleStep cfgRuleStep = new CFGRuleStep(transition);
+        // TODO: add steps for terminal move
         SpecialNonTerminal leftSide = new SpecialNonTerminal(transition.getCurrentState(), transition.getSymbolToPop(), transition.getNextState());
         MySymbol terminal = new MySymbol(transition.getInputSymbolToRead().getName());
         List<SpecialNonTerminal> rightSide = new ArrayList<>();
@@ -246,13 +257,9 @@ public class ConversionLogic {
         return List.of(cfgRule);
     }
 
-    private List<CFGRule> endMove(Transition transition) {
-        return new ArrayList<>();
-    }
-
     private List<CFGRule> pushMove(Transition transition) {
         List<CFGRule> convertedTransitions = new ArrayList<>();
-        recursiveLoop(transition.getSymbolsToPush().size(), board.getNodes().size(), new String[board.getNodes().size()],
+        recursiveLoop(transition.getSymbolsToPush().size(), board.getNodes().size(), new String[transition.getSymbolsToPush().size()],
                 0, transition, convertedTransitions);
 
         return convertedTransitions;
@@ -260,9 +267,11 @@ public class ConversionLogic {
 
 
     private List<CFGRule> startMove(Transition transition) {
+        CFGRuleStep cfgRuleStep = new CFGRuleStep(transition);
+        // TODO: add steps for start move
         List<MySymbol> allStateSymbols = board.getNodes().stream().map(node -> new MySymbol(node.getName())).toList();
         List<CFGRule> cfgRules = new ArrayList<>();
-        MySymbol startSymbol = new MySymbol("S");
+        MySymbol startSymbol = new MySymbol(STARTING_S);
         MySymbol startStackSymbol = new MySymbol(STARTING_Z);
         for (MySymbol stateSymbol : allStateSymbols) {
             List<SpecialNonTerminal> rightSide = new ArrayList<>();
@@ -286,9 +295,10 @@ public class ConversionLogic {
         ruleBox.getChildren().clear();
         for (CFGRule cfgRule : cfgRules) {
             CFGRule cfgStep = cfgRule.getSteps().get(currentStep);
+            Transition transition = cfgRule.getStepsTransitions().get(currentStep);
             TextFlow textFlow = new TextFlow();
             List<Text> texts = cfgStep.createTextFromStep();
-            List<Text> transitionTexts = cfgStep.getTransition().createTextFromStep();
+            List<Text> transitionTexts = transition.createTextFromStep();
 
 
             transitionLabel.getChildren().clear();

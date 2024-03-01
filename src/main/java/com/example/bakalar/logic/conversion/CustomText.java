@@ -6,14 +6,14 @@ import javafx.scene.text.Text;
 
 public class CustomText extends Text {
 
-    public CustomText(MySymbol mySymbol) {
+    public CustomText(MySymbol mySymbol, int size) {
         super(mySymbol.toString());
         this.setFill(mySymbol.getColor());
-        this.setFont(new Font("Courier New", 22));
+        this.setFont(new Font("Courier New", size));
     }
 
-    public CustomText(String text) {
+    public CustomText(String text, int size) {
         super(text);
-        this.setFont(new Font("Courier New", 22));
+        this.setFont(new Font("Courier New", size));
     }
 }

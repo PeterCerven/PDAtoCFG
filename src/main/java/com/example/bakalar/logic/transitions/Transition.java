@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.example.bakalar.logic.Board.EPSILON;
+
 @Getter
 @Setter
 public class Transition {
@@ -29,7 +31,7 @@ public class Transition {
         this.nextState = new MySymbol(nextState);
         this.symbolsToPush = convertStringToList(symbolsToPush);
         this.transitionType = TransitionType.NORMAL;
-        if (this.symbolsToPush.size() == 1 && this.symbolsToPush.get(0).getName().equals("ε")) {
+        if (this.symbolsToPush.size() == 1 && this.symbolsToPush.get(0).getName().equals(EPSILON)) {
             this.transitionType = TransitionType.TERMINAL;
         }
     }
@@ -37,6 +39,8 @@ public class Transition {
     public Transition(String currentState, TransitionType transitionType) {
         this.currentState = new MySymbol(currentState);
         this.transitionType = transitionType;
+        this.symbolsToPush = new ArrayList<>();
+
     }
 
     private List<MySymbol> convertStringToList(String symbolsToPush) {
@@ -52,20 +56,21 @@ public class Transition {
     }
 
     public List<Text> createTextFromStep() {
+        int size = 25;
         List<Text> texts = new ArrayList<>();
-        texts.add(new CustomText("δ("));
-        texts.add(new CustomText(currentState));
-        texts.add(new CustomText(", "));
-        texts.add(new CustomText(inputSymbolToRead));
-        texts.add(new CustomText(", "));
-        texts.add(new CustomText(symbolToPop));
-        texts.add(new CustomText(") -> ("));
-        texts.add(new CustomText(nextState));
-        texts.add(new CustomText(", "));
+        texts.add(new CustomText("δ(", size));
+        texts.add(new CustomText(currentState, size));
+        texts.add(new CustomText(", ", size));
+        texts.add(new CustomText(inputSymbolToRead, size));
+        texts.add(new CustomText(", ", size));
+        texts.add(new CustomText(symbolToPop, size));
+        texts.add(new CustomText(") -> (", size));
+        texts.add(new CustomText(nextState, size));
+        texts.add(new CustomText(", ", size));
         for (MySymbol symbol : symbolsToPush) {
-            texts.add(new CustomText(symbol));
+            texts.add(new CustomText(symbol, size));
         }
-        texts.add(new CustomText(")"));
+        texts.add(new CustomText(")", size));
         return texts;
     }
 

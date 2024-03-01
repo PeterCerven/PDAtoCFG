@@ -2,6 +2,7 @@ package com.example.bakalar.canvas.arrow;
 
 import com.example.bakalar.canvas.node.MyNode;
 import com.example.bakalar.logic.Board;
+import com.example.bakalar.logic.transitions.Transition;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
 import javafx.scene.input.MouseButton;
@@ -26,7 +27,6 @@ import static com.example.bakalar.logic.MainController.NODE_RADIUS;
 @Setter
 public abstract class Arrow extends Group implements Serializable {
     public static final int ARROW_HEAD_SZIE = NODE_RADIUS / 2;
-    public static final String EPSILON = "ε";
     protected static final Logger log = LogManager.getLogger(Arrow.class.getName());
     protected MyNode from;
     protected MyNode to;
@@ -76,14 +76,10 @@ public abstract class Arrow extends Group implements Serializable {
         container.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
             if (event.getButton() == MouseButton.SECONDARY) {
                 TransitionInputs newTransitionInputs = board.createArrowTransition(transitionInputs.getRead(), transitionInputs.getPop(), transitionInputs.getPush());
-                transitionInputs.setRead(newTransitionInputs.getRead());
-                transitionInputs.setPop(newTransitionInputs.getPop());
-                transitionInputs.setPush(newTransitionInputs.getPush());
-                container.getChildren().clear();
+                changeTransition(transitionInputs, newTransitionInputs);
                 readSymbol.setText(newTransitionInputs.getRead());
                 popSymbol.setText(newTransitionInputs.getPop());
                 pushSymbol.setText(newTransitionInputs.getPush());
-                container.getChildren().addAll(readSymbol, popSymbol, pushSymbol);
                 this.board.updateAllDescribePDA();
             }
         });
@@ -95,6 +91,16 @@ public abstract class Arrow extends Group implements Serializable {
         this.transitions.add(transitionInputs);
         this.symbolContainers.getChildren().add(container);
         this.board.updateAllDescribePDA();
+    }
+
+    private void changeTransition(TransitionInputs oldTransition, TransitionInputs newTransition) {
+        for (int i = 0; i < transitions.size(); i++) {
+            if (transitions.get(i).equals(oldTransition)) {
+                transitions.set(i, newTransition);
+                break;
+            }
+        }
+
     }
 
     public abstract void updateObjects(boolean toEdge);

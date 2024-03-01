@@ -16,13 +16,11 @@ import java.util.List;
 public class CFGRuleStep {
     private CFGRule templateRule;
     private List<CFGRule> cfgRulesSteps;
-    private TextFlow transitionLabel;
+    private List<Transition> stepsTransitions;
     private Transition transition;
-    private Transition templateTransition;
 
 
-    public CFGRuleStep(Transition transition, TextFlow transitionLabel) {
-        this.transitionLabel = transitionLabel;
+    public CFGRuleStep(Transition transition) {
         this.transition = transition;
         templateRule = new CFGRule();
         templateRule.setLeftSide(new SpecialNonTerminal("_", "_", "_"));
@@ -32,28 +30,60 @@ public class CFGRuleStep {
         }
         cfgRulesSteps = new ArrayList<>();
         cfgRulesSteps.add(new CFGRule(templateRule.copyLeftSide(), templateRule.copyTerminal(), templateRule.copyRightSide(), transition));
+        stepsTransitions = new ArrayList<>();
+        stepsTransitions.add(new Transition(transition.getCurrentState().getName(), transition.getInputSymbolToRead().getName(), transition.getSymbolToPop().getName(),
+                transition.getNextState().getName(), transition.getSymbolsToPushAsString()));
     }
 
-    public void addLeftSideStep(SpecialNonTerminal leftSide) {
+    public CFGRuleStep(MySymbol startingSymbol, MySymbol startingStackSymbol, MySymbol startingStateSymbol, List<MySymbol> allStateSymbols) {
+
+    }
+
+    public void addLeftSideStep(SpecialNonTerminal leftSide, String symbol) {
+        // transition step
+        Transition newTransition = new Transition(transition.getCurrentState().getName(), transition.getInputSymbolToRead().getName(), transition.getSymbolToPop().getName(),
+                transition.getNextState().getName(), transition.getSymbolsToPushAsString());
+        if (symbol.equals("current")) {
+            newTransition.setCurrentState(new MySymbol(leftSide.getStateSymbolFrom().getName(), Color.RED));
+        } else if (symbol.equals("pop")) {
+            newTransition.setSymbolToPop(new MySymbol(leftSide.getStackSymbol().getName(), Color.RED));
+        }
+        stepsTransitions.add(newTransition);
+
+        // rule step
         templateRule.resetFontColor();
         templateRule.setLeftSide(leftSide);
         cfgRulesSteps.add(new CFGRule(templateRule.copyLeftSide(), templateRule.copyTerminal(), templateRule.copyRightSide(), transition));
     }
 
     public void addTerminal(MySymbol terminal) {
+        // transition step
+        MySymbol myTerminal = new MySymbol(terminal.getName(), Color.RED);
+        Transition newTransition = new Transition(transition.getCurrentState().getName(), transition.getInputSymbolToRead().getName(), transition.getSymbolToPop().getName(),
+                transition.getNextState().getName(), transition.getSymbolsToPushAsString());
+        newTransition.setInputSymbolToRead(terminal);
+        stepsTransitions.add(newTransition);
+
+        // rule step
         templateRule.resetFontColor();
-        templateRule.setTerminal(new MySymbol(terminal.getName(), Color.RED));
+        templateRule.setTerminal(myTerminal);
         cfgRulesSteps.add(new CFGRule(templateRule.copyLeftSide(), templateRule.copyTerminal(), templateRule.copyRightSide(), transition));
     }
 
-    public void addRightSideStepForTableOption(MySymbol tableOption, int index) {
-        templateRule.resetFontColor();
-        templateRule.getRightSide().get(index).setStateSymbolTo(tableOption);
-        templateRule.getRightSide().get(index + 1).setStateSymbolFrom(tableOption);
-        cfgRulesSteps.add(new CFGRule(templateRule.copyLeftSide(), templateRule.copyTerminal(), templateRule.copyRightSide(), transition));
-    }
 
     public void addRightSideStackSymbols(List<MySymbol> stackSymbols, Color color) {
+        // transition step
+        Transition newTransition = new Transition(transition.getCurrentState().getName(), transition.getInputSymbolToRead().getName(), transition.getSymbolToPop().getName(),
+                transition.getNextState().getName(), transition.getSymbolsToPushAsString());
+        List<MySymbol> newStackSymbols = new ArrayList<>();
+        for (MySymbol stackSymbol : stackSymbols) {
+            MySymbol newStackSymbol = new MySymbol(stackSymbol.getName(), color);
+            newStackSymbols.add(newStackSymbol);
+        }
+        newTransition.setSymbolsToPush(newStackSymbols);
+        stepsTransitions.add(newTransition);
+
+        // rule step
         templateRule.resetFontColor();
         for (int i = 0; i < stackSymbols.size(); i++) {
             MySymbol stackSymbol = stackSymbols.get(i);
@@ -64,6 +94,13 @@ public class CFGRuleStep {
     }
 
     public void addFirstRightSideStep(MySymbol name) {
+        // transition step
+        Transition newTransition = new Transition(transition.getCurrentState().getName(), transition.getInputSymbolToRead().getName(), transition.getSymbolToPop().getName(),
+                transition.getNextState().getName(), transition.getSymbolsToPushAsString());
+        newTransition.setNextState(new MySymbol(name.getName(), Color.RED));
+        stepsTransitions.add(newTransition);
+
+        // rule step
         templateRule.resetFontColor();
         templateRule.getRightSide().get(0).setStateSymbolFrom(name);
         templateRule.getRightSide().get(templateRule.getRightSide().size() - 1).setStateSymbolTo(templateRule.getLeftSide().getStateSymbolTo());
@@ -71,6 +108,12 @@ public class CFGRuleStep {
     }
 
     public void addAllPossibilities(SpecialNonTerminal leftSide, List<MySymbol> tableOptions) {
+        // transition step
+        Transition newTransition = new Transition(transition.getCurrentState().getName(), transition.getInputSymbolToRead().getName(), transition.getSymbolToPop().getName(),
+                transition.getNextState().getName(), transition.getSymbolsToPushAsString());
+        stepsTransitions.add(newTransition);
+
+        // rule step
         templateRule.resetFontColor();
         templateRule.setLeftSide(leftSide);
         for (MySymbol tableOption : tableOptions) {
@@ -80,6 +123,12 @@ public class CFGRuleStep {
     }
 
     public void addPossibilitiesAnotherSide(List<MySymbol> tableOptions) {
+        // transition step
+        Transition newTransition = new Transition(transition.getCurrentState().getName(), transition.getInputSymbolToRead().getName(), transition.getSymbolToPop().getName(),
+                transition.getNextState().getName(), transition.getSymbolsToPushAsString());
+        stepsTransitions.add(newTransition);
+
+        // rule step
         templateRule.resetFontColor();
         for (MySymbol tableOption : tableOptions) {
             tableOption.setColor(Color.RED);
@@ -89,6 +138,12 @@ public class CFGRuleStep {
     }
 
     public void addLastRightStep(SpecialNonTerminal leftSide) {
+        // transition step
+        Transition newTransition = new Transition(transition.getCurrentState().getName(), transition.getInputSymbolToRead().getName(), transition.getSymbolToPop().getName(),
+                transition.getNextState().getName(), transition.getSymbolsToPushAsString());
+        stepsTransitions.add(newTransition);
+
+        // rule step
         templateRule.resetFontColor();
         leftSide.getStateSymbolTo().setColor(Color.RED);
         templateRule.setLeftSide(leftSide);
