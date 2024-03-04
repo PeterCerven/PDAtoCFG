@@ -10,6 +10,7 @@ import com.example.bakalar.canvas.node.MyNode;
 import com.example.bakalar.canvas.arrow.TransitionInputs;
 import com.example.bakalar.canvas.node.StartNodeArrow;
 import com.example.bakalar.logic.transitions.Transition;
+import com.example.bakalar.logic.utility.DescribeCFG;
 import com.example.bakalar.logic.utility.DescribePDA;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
@@ -17,7 +18,6 @@ import javafx.scene.control.*;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.VBox;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.logging.log4j.LogManager;
@@ -47,7 +47,6 @@ public class Board implements Serializable {
     private CheckBox startingCheckBox;
     private CheckBox endingCheckBox;
     private Button conversionBtn;
-    private VBox rulesContainer;
     private List<CFGRule> rules;
     private int idNodeCounter;
     private ButtonState currentState;
@@ -55,13 +54,13 @@ public class Board implements Serializable {
     private MyNode selectedNode;
     private DescribePDA describePDA;
     private HistoryLogic historyLogic;
+    private DescribeCFG describeCFG;
 
 
-    public Board(AnchorPane mainPane, DescribePDA describePDA, HistoryLogic historyLogic,
-                 VBox rulesContainer, ButtonState currentState) {
+    public Board(AnchorPane mainPane, DescribePDA describePDA, HistoryLogic historyLogic, DescribeCFG describeCFG, ButtonState currentState) {
+        this.describeCFG = describeCFG;
         this.nodes = new ArrayList<>();
         this.rules = new ArrayList<>();
-        this.rulesContainer = rulesContainer;
         this.describePDA = describePDA;
         this.arrows = new ArrayList<>();
         this.mainPane = mainPane;

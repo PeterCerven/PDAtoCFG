@@ -21,11 +21,13 @@ public class CFGRule {
     private List<CFGRule> steps;
     private List<Transition> stepsTransitions;
     private Transition transition;
+    private List<String> helpingComments;
 
     public CFGRule() {
         this.steps = new ArrayList<>();
         this.rightSide = new ArrayList<>();
         this.stepsTransitions = new ArrayList<>();
+        this.helpingComments = new ArrayList<>();
     }
 
     public CFGRule(SpecialNonTerminal leftSide, MySymbol terminal, List<SpecialNonTerminal> rightSide, Transition transition) {
@@ -35,6 +37,7 @@ public class CFGRule {
         this.steps = new ArrayList<>();
         this.transition = transition;
         this.stepsTransitions = new ArrayList<>();
+        this.helpingComments = new ArrayList<>();
     }
 
     public CFGRule(MySymbol mySymbolLeftSide, MySymbol terminal, List<SpecialNonTerminal> rightSide, Transition transition) {
@@ -43,6 +46,7 @@ public class CFGRule {
         this.rightSide = rightSide;
         this.steps = new ArrayList<>();
         this.transition = transition;
+        this.stepsTransitions = new ArrayList<>();
     }
 
     public SpecialNonTerminal copyLeftSide() {

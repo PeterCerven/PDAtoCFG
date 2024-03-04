@@ -6,6 +6,7 @@ import com.example.bakalar.logic.history.HistoryLogic;
 import com.example.bakalar.logic.history.MyHistory;
 import com.example.bakalar.logic.transitions.runPDALogic;
 import com.example.bakalar.logic.utility.ButtonState;
+import com.example.bakalar.logic.utility.DescribeCFG;
 import com.example.bakalar.logic.utility.DescribePDA;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -81,10 +82,15 @@ public class MainController {
     private VBox transFunctions;
     @FXML
     private VBox rulesContainer;
+    @FXML
+    private TextField nonTerminalField;
+    @FXML
+    private TextField terminalField;
+    @FXML
+    private TextField startingSymbolField;
+
     private ButtonState currentState = ButtonState.SELECT;
     private Board currentBoard;
-    private Stack<MyHistory> undoStack;
-    private Stack<MyHistory> redoStack;
     private runPDALogic runPDALogic;
     private ConversionLogic conversionLogic;
 
@@ -96,13 +102,19 @@ public class MainController {
     }
 
     private void setupBoard() {
-        undoStack = new Stack<>();
-        redoStack = new Stack<>();
+
         this.begSymbol.setText(STARTING_Z);
-        List<TextField> describeFields = List.of(describeStates, describeAlphabet, describeStackAlphabet, describeEndStates);
-        DescribePDA describePDA = new DescribePDA(describeFields, transFunctions, inputFieldAlphabet);
-        HistoryLogic historyLogic = new HistoryLogic(undoStack, redoStack);
-        currentBoard = new Board(mainPane, describePDA, historyLogic, rulesContainer, currentState);
+
+
+        List<TextField> describePDAFields = List.of(describeStates, describeAlphabet, describeStackAlphabet, describeEndStates);
+        DescribePDA describePDA = new DescribePDA(describePDAFields, transFunctions, inputFieldAlphabet);
+
+        List<TextField> describeCFGFields = List.of(nonTerminalField, terminalField, startingSymbolField);
+        DescribeCFG describeCFG = new DescribeCFG(describeCFGFields, rulesContainer);
+
+        HistoryLogic historyLogic = new HistoryLogic();
+
+        currentBoard = new Board(mainPane, describePDA, historyLogic, describeCFG, currentState);
         historyLogic.setBoard(currentBoard);
         this.runPDALogic = new runPDALogic(currentBoard, this.stateContainer);
         this.conversionLogic = new ConversionLogic(currentBoard);
@@ -110,6 +122,8 @@ public class MainController {
             currentBoard.updateAllDescribePDA();
         });
     }
+
+
 
     public void setPrimaryStage(Stage stage) {
         this.primaryStage = stage;

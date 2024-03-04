@@ -20,9 +20,9 @@ public class HistoryLogic {
     private Stack<MyHistory> redoStack;
     private Board board;
 
-    public HistoryLogic(Stack<MyHistory> undoStack, Stack<MyHistory> redoStack) {
-        this.undoStack = undoStack;
-        this.redoStack = redoStack;
+    public HistoryLogic() {
+        this.undoStack = new Stack<>();
+        this.redoStack = new Stack<>();
     }
 
     public MyHistory createHistory() {

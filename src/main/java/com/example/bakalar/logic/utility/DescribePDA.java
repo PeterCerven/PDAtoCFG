@@ -16,12 +16,10 @@ import static com.example.bakalar.logic.Board.*;
 public class DescribePDA {
     private final TextField describeStates;
     private final TextField describeAlphabet;
-    private TextField describeStackAlphabet;
-    private TextField describeStartingState;
-    private TextField describeStartingStackSymbol;
-    private TextField describeEndStates;
-    private VBox transFunctions;
-    private TextField inputFieldAlphabet;
+    private final TextField describeStackAlphabet;
+    private final TextField describeEndStates;
+    private final VBox transFunctions;
+    private final TextField inputFieldAlphabet;
 
     public DescribePDA(List<TextField> describeFields, VBox transFunctions, TextField inputFieldAlphabet) {
         this.describeStates = describeFields.get(0);
