@@ -19,10 +19,7 @@ import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.example.bakalar.logic.Board.*;
 
@@ -48,7 +45,40 @@ public class ConversionLogic {
         transitions.add(0, new Transition(board.getStartNode().getName(), TransitionType.START));
         setupTransitionStage(transitions);
         showTransitionStage();
+        board.showCFG(getAllNonTerminals(), getAllTerminals(), getAllRules(), STARTING_S);
     }
+
+    private Set<SpecialNonTerminal> getAllNonTerminals() {
+        Set<SpecialNonTerminal> nonTerminals = new HashSet<>();
+        for (List<CFGRule> lists : cfgRules.values()) {
+            for (CFGRule rule : lists) {
+                if (rule.getLeftSide() != null)
+                    nonTerminals.add(rule.getLeftSide());
+                nonTerminals.addAll(rule.getRightSide());
+            }
+        }
+        return nonTerminals;
+    }
+
+    private List<CFGRule> getAllRules() {
+        List<CFGRule> allRules = new ArrayList<>();
+        for (List<CFGRule> lists : cfgRules.values()) {
+            allRules.addAll(lists);
+        }
+        return allRules;
+    }
+
+    private Set<MySymbol> getAllTerminals() {
+        Set<MySymbol> terminals = new HashSet<>();
+        for (CFGRule rule : getAllRules()) {
+            if (rule.getTerminal() != null) {
+                terminals.add(rule.getTerminal());
+            }
+        }
+        return terminals;
+    }
+
+
 
     private void setupTransitionStage(List<Transition> transitions) {
         this.transitions = transitions;

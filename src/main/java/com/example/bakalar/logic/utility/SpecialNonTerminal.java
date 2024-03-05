@@ -47,4 +47,24 @@ public class SpecialNonTerminal {
     public String toString() {
         return "[" + stateSymbolFrom + ", " + stackSymbol + ", " + stateSymbolTo + "]";
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof SpecialNonTerminal that)) return false;
+
+        if (getStateSymbolFrom() != null ? !getStateSymbolFrom().equals(that.getStateSymbolFrom()) : that.getStateSymbolFrom() != null)
+            return false;
+        if (getStackSymbol() != null ? !getStackSymbol().equals(that.getStackSymbol()) : that.getStackSymbol() != null)
+            return false;
+        return getStateSymbolTo() != null ? getStateSymbolTo().equals(that.getStateSymbolTo()) : that.getStateSymbolTo() == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = getStateSymbolFrom() != null ? getStateSymbolFrom().hashCode() : 0;
+        result = 31 * result + (getStackSymbol() != null ? getStackSymbol().hashCode() : 0);
+        result = 31 * result + (getStateSymbolTo() != null ? getStateSymbolTo().hashCode() : 0);
+        return result;
+    }
 }

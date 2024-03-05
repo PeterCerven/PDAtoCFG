@@ -5,13 +5,11 @@ import com.example.bakalar.canvas.arrow.LineArrow;
 import com.example.bakalar.canvas.arrow.SelfLoopArrow;
 import com.example.bakalar.logic.conversion.CFGRule;
 import com.example.bakalar.logic.history.*;
-import com.example.bakalar.logic.utility.ButtonState;
+import com.example.bakalar.logic.utility.*;
 import com.example.bakalar.canvas.node.MyNode;
 import com.example.bakalar.canvas.arrow.TransitionInputs;
 import com.example.bakalar.canvas.node.StartNodeArrow;
 import com.example.bakalar.logic.transitions.Transition;
-import com.example.bakalar.logic.utility.DescribeCFG;
-import com.example.bakalar.logic.utility.DescribePDA;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.*;
@@ -78,6 +76,10 @@ public class Board implements Serializable {
 
     public void updateAllDescribePDA() {
         this.describePDA.updateAllDescribePDA(this.nodes, this.arrows, this.getNodesTransitions());
+    }
+
+    public void showCFG(Set<SpecialNonTerminal> allNonTerminals, Set<MySymbol> allTerminals, List<CFGRule> allRules, String startingS) {
+        this.describeCFG.updateAllDescribeCFG(allNonTerminals, allTerminals, allRules, startingS);
     }
 
 
@@ -455,4 +457,6 @@ public class Board implements Serializable {
         mainPane.getChildren().addAll(newNodes);
         updateAllDescribePDA();
     }
+
+
 }
