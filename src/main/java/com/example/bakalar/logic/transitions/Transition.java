@@ -43,6 +43,18 @@ public class Transition {
 
     }
 
+    public Transition(MySymbol mySymbol, MySymbol inputSymbolToRead, MySymbol symbolToPop, MySymbol nextState, String symbolsToPushAsString) {
+        this.currentState = new MySymbol(mySymbol.getName());
+        this.inputSymbolToRead = new MySymbol(inputSymbolToRead.getName());
+        this.symbolToPop = new MySymbol(symbolToPop.getName());
+        this.nextState = new MySymbol(nextState.getName());
+        this.symbolsToPush = convertStringToList(symbolsToPushAsString);
+        this.transitionType = TransitionType.NORMAL;
+        if (this.symbolsToPush.size() == 1 && this.symbolsToPush.get(0).getName().equals(EPSILON)) {
+            this.transitionType = TransitionType.TERMINAL;
+        }
+    }
+
     private List<MySymbol> convertStringToList(String symbolsToPush) {
         return symbolsToPush.chars()
                 .mapToObj(c -> (char) c)

@@ -214,7 +214,8 @@ public class ConversionLogic {
 
     private CFGRule createRule(String[] statesPos, Transition transition) {
         int posCounter = 0;
-        CFGRuleStep cfgRuleStep = new CFGRuleStep(transition);
+        RuleStepLogic ruleStepLogic = new RuleStepLogic(transition);
+        ruleStepLogic.prepareSteps();
 
 
         // left side
@@ -229,8 +230,8 @@ public class ConversionLogic {
         SpecialNonTerminal leftSideStep3 = new SpecialNonTerminal(new MySymbol(transition.getCurrentState().getName()),
                 new MySymbol(transition.getSymbolToPop().getName()), new MySymbol(statesPos[posCounter], Color.RED));
 
-        cfgRuleStep.addLeftSideStep(leftSideStep1, "current");
-        cfgRuleStep.addLeftSideStep(leftSideStep2, "pop");
+        ruleStepLogic.addLeftSideStep(leftSideStep1, "current");
+        ruleStepLogic.addLeftSideStep(leftSideStep2, "pop");
 
         posCounter++;
 
@@ -242,15 +243,15 @@ public class ConversionLogic {
         }
 
         // steps for terminal
-        cfgRuleStep.addTerminal(new MySymbol(terminal, Color.RED));
+        ruleStepLogic.addTerminal(new MySymbol(terminal, Color.RED));
 
 
         // right side
         MySymbol nextStateSymbol = new MySymbol(transition.getNextState().getName());
 
         // steps for right side stack symbols
-        cfgRuleStep.addRightSideStackSymbols(transition.getSymbolsToPush(), Color.RED);
-        cfgRuleStep.addFirstRightSideStep(new MySymbol(nextStateSymbol.getName(), Color.RED));
+        ruleStepLogic.addRightSideStackSymbols(transition.getSymbolsToPush(), Color.RED);
+        ruleStepLogic.addFirstRightSideStep(new MySymbol(nextStateSymbol.getName(), Color.RED));
         List<MySymbol> tableOptions = new ArrayList<>();
 
         for (int i = 0; i < transition.getSymbolsToPush().size(); i++) {
@@ -267,20 +268,18 @@ public class ConversionLogic {
         }
 
         // All possibilities
-        cfgRuleStep.addAllPossibilities(leftSideStep3, tableOptions);
+        ruleStepLogic.addAllPossibilities(leftSideStep3, tableOptions);
         if (transition.getSymbolsToPush().size() > 1) {
-            cfgRuleStep.addPossibilitiesAnotherSide(tableOptions);
+            ruleStepLogic.addPossibilitiesAnotherSide(tableOptions);
         }
 
         // Add lastRight step
 
 
-        cfgRuleStep.addLastRightStep(leftSideStep3);
+        ruleStepLogic.addLastRightStep(leftSideStep3);
 
         CFGRule cfgRule = new CFGRule(leftSide, terminal, rightSide, transition);
-        cfgRule.setSteps(cfgRuleStep.getCfgRulesSteps());
-        cfgRule.setStepsTransitions(cfgRuleStep.getStepsTransitions());
-        cfgRule.setHelpingComments(cfgRuleStep.getHelpingComments());
+        cfgRule.setSteps(ruleStepLogic.getStepRules());
 
         return cfgRule;
     }
@@ -289,15 +288,13 @@ public class ConversionLogic {
 
 
     private List<CFGRule> terminalMove(Transition transition) {
-        CFGRuleStep cfgRuleStep = new CFGRuleStep();
+        RuleStepLogic ruleStepLogic = new RuleStepLogic(transition);
         SpecialNonTerminal leftSide = new SpecialNonTerminal(transition.getCurrentState(), transition.getSymbolToPop(), transition.getNextState());
         MySymbol terminal = new MySymbol(transition.getInputSymbolToRead().getName());
         List<SpecialNonTerminal> rightSide = new ArrayList<>();
-        cfgRuleStep.createTerminalSteps(transition);
+        ruleStepLogic.createTerminalSteps();
         CFGRule cfgRule = new CFGRule(leftSide, terminal, rightSide, transition);
-        cfgRule.setSteps(cfgRuleStep.getCfgRulesSteps());
-        cfgRule.setStepsTransitions(cfgRuleStep.getStepsTransitions());
-        cfgRule.setHelpingComments(cfgRuleStep.getHelpingComments());
+        cfgRule.setSteps(ruleStepLogic.getStepRules());
         return List.of(cfgRule);
     }
 
@@ -316,13 +313,12 @@ public class ConversionLogic {
         MySymbol startSymbol = new MySymbol(STARTING_S);
         MySymbol startStackSymbol = new MySymbol(STARTING_Z);
         for (MySymbol stateSymbol : allStateSymbols) {
-            CFGRuleStep cfgRuleStep = new CFGRuleStep();
+            RuleStepLogic ruleStepLogic = new RuleStepLogic(transition);
             List<SpecialNonTerminal> rightSide = new ArrayList<>();
             rightSide.add(new SpecialNonTerminal(transition.getCurrentState(), startStackSymbol, stateSymbol));
-            cfgRuleStep.createStartingSteps(STARTING_S, STARTING_Z, board.getStartNode().getName(), stateSymbol.getName(), transition);
+            ruleStepLogic.createStartingSteps(STARTING_S, STARTING_Z, board.getStartNode().getName(), stateSymbol.getName());
             CFGRule cfgRule = new CFGRule(startSymbol, null, rightSide, transition);
-            cfgRule.setSteps(cfgRuleStep.getCfgRulesSteps());
-            cfgRule.setHelpingComments(cfgRuleStep.getHelpingComments());
+            cfgRule.setSteps(ruleStepLogic.getStepRules());
             cfgRules.add(cfgRule);
         }
         return cfgRules;
@@ -341,19 +337,19 @@ public class ConversionLogic {
         ruleBox.getChildren().clear();
         for (CFGRule cfgRule : cfgRules) {
 
-            CFGRule cfgStep = cfgRule.getSteps().get(currentStep);
+            StepRule cfgStep = cfgRule.getSteps().get(currentStep);
             TextFlow textFlow = new TextFlow();
             List<Text> texts = cfgStep.createTextFromStep();
             textFlow.getChildren().addAll(texts);
             textFlow.setTextAlignment(TextAlignment.CENTER);
             ruleBox.getChildren().add(textFlow);
 
-            String helpingComment = cfgRule.getHelpingComments().get(currentStep);
+            String helpingComment = cfgStep.getHelpingComment();
             helpingLabelComment.setText(helpingComment);
 
 
-            if (cfgRule.getStepsTransitions() != null && !cfgRule.getStepsTransitions().isEmpty()) {
-                Transition transition = cfgRule.getStepsTransitions().get(currentStep);
+            if (cfgStep.getTransition().getTransitionType() != TransitionType.START) {
+                Transition transition = cfgStep.getTransition();
                 List<Text> transitionTexts = transition.createTextFromStep();
                 transitionLabel.getChildren().clear();
                 transitionLabel.getChildren().addAll(transitionTexts);

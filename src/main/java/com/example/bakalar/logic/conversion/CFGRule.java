@@ -18,16 +18,12 @@ public class CFGRule {
     private MySymbol mySymbolLeftSide;
     private MySymbol terminal;
     private List<SpecialNonTerminal> rightSide;
-    private List<CFGRule> steps;
-    private List<Transition> stepsTransitions;
+    private List<StepRule> steps;
     private Transition transition;
-    private List<String> helpingComments;
 
     public CFGRule() {
         this.steps = new ArrayList<>();
         this.rightSide = new ArrayList<>();
-        this.stepsTransitions = new ArrayList<>();
-        this.helpingComments = new ArrayList<>();
     }
 
     public CFGRule(SpecialNonTerminal leftSide, MySymbol terminal, List<SpecialNonTerminal> rightSide, Transition transition) {
@@ -36,8 +32,6 @@ public class CFGRule {
         this.rightSide = rightSide;
         this.steps = new ArrayList<>();
         this.transition = transition;
-        this.stepsTransitions = new ArrayList<>();
-        this.helpingComments = new ArrayList<>();
     }
 
     public CFGRule(MySymbol mySymbolLeftSide, MySymbol terminal, List<SpecialNonTerminal> rightSide, Transition transition) {
@@ -46,7 +40,6 @@ public class CFGRule {
         this.rightSide = rightSide;
         this.steps = new ArrayList<>();
         this.transition = transition;
-        this.stepsTransitions = new ArrayList<>();
     }
 
     public SpecialNonTerminal copyLeftSide() {
@@ -82,34 +75,6 @@ public class CFGRule {
             specialNonTerminal.getStackSymbol().setColor(MySymbol.DEFAULT_COLOR);
             specialNonTerminal.getStateSymbolTo().setColor(MySymbol.DEFAULT_COLOR);
         }
-    }
-
-    public List<Text> createTextFromStep() {
-        int fontSize = 22;
-        List<Text> texts = new ArrayList<>();
-        if (mySymbolLeftSide == null) {
-            createSpecialSymbol(texts, leftSide, fontSize);
-        } else {
-            texts.add(new CustomText(mySymbolLeftSide, fontSize));
-        }
-        texts.add(new CustomText(" -> ", fontSize));
-        if (terminal != null) {
-            texts.add(new CustomText(terminal, fontSize));
-        }
-        for (SpecialNonTerminal specialNonTerminal : rightSide) {
-            createSpecialSymbol(texts, specialNonTerminal, fontSize);
-        }
-        return texts;
-    }
-
-    private void createSpecialSymbol(List<Text> texts, SpecialNonTerminal specialNonTerminal, int fontSize) {
-        texts.add(new CustomText("[", fontSize));
-        texts.add(new CustomText(specialNonTerminal.getStateSymbolFrom(), fontSize));
-        texts.add(new CustomText(", ", fontSize));
-        texts.add(new CustomText(specialNonTerminal.getStackSymbol(), fontSize));
-        texts.add(new CustomText(", ", fontSize));
-        texts.add(new CustomText(specialNonTerminal.getStateSymbolTo(), fontSize));
-        texts.add(new CustomText("]", fontSize));
     }
 
 
