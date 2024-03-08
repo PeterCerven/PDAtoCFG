@@ -354,6 +354,12 @@ public class Board implements Serializable {
                 arrow.moveControlPoint(e.getSceneX() - startX, e.getSceneY() - startY);
             }
         });
+
+        arrow.getControlIndicator().setOnMouseEntered(e -> {
+            if (currentState.equals(ButtonState.SELECT)) {
+                arrow.getControlIndicator().setStyle("-fx-cursor: hand");
+            }
+        });
     }
 
     public void makeDraggable(MyNode node) {

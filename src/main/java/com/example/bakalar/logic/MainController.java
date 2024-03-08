@@ -3,12 +3,12 @@ package com.example.bakalar.logic;
 import com.example.bakalar.canvas.node.MyNode;
 import com.example.bakalar.logic.conversion.ConversionLogic;
 import com.example.bakalar.logic.history.HistoryLogic;
-import com.example.bakalar.logic.history.MyHistory;
 import com.example.bakalar.logic.transitions.runPDALogic;
 import com.example.bakalar.logic.utility.ButtonState;
 import com.example.bakalar.logic.utility.DescribeCFG;
 import com.example.bakalar.logic.utility.DescribePDA;
 import javafx.fxml.FXML;
+import javafx.scene.Cursor;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
@@ -23,7 +23,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.List;
-import java.util.Stack;
 
 import static com.example.bakalar.logic.Board.EPSILON;
 import static com.example.bakalar.logic.Board.STARTING_Z;
@@ -98,7 +97,7 @@ public class MainController {
     @FXML
     private void initialize() {
         setupBoard();
-        setButtonImages();
+        setUpButtons();
     }
 
     private void setupBoard() {
@@ -132,38 +131,59 @@ public class MainController {
     // set images
 
 
-    private void setButtonImages() {
+    private void setUpButtons() {
         Image image = new Image(ARROW_ICON_PATH);
         ImageView imageView = new ImageView(image);
         this.arrowBtn.setGraphic(imageView);
+        arrowBtn.setOnMouseEntered(e -> arrowBtn.setCursor(Cursor.HAND));
+        arrowBtn.setOnMouseExited(e -> arrowBtn.setCursor(Cursor.DEFAULT));
 
         image = new Image(ERASER_ICON_PATH);
         imageView = new ImageView(image);
         this.eraseBtn.setGraphic(imageView);
+        eraseBtn.setOnMouseEntered(e -> eraseBtn.setCursor(Cursor.HAND));
+        eraseBtn.setOnMouseExited(e -> eraseBtn.setCursor(Cursor.DEFAULT));
 
         image = new Image(NODE_ICON_PATH);
         imageView = new ImageView(image);
         this.nodeBtn.setGraphic(imageView);
+        nodeBtn.setOnMouseEntered(e -> nodeBtn.setCursor(Cursor.HAND));
+        nodeBtn.setOnMouseExited(e -> nodeBtn.setCursor(Cursor.DEFAULT));
 
         image = new Image(START_ICON_PATH);
         imageView = new ImageView(image);
         this.startButton.setGraphic(imageView);
+        startButton.setOnMouseEntered(e -> startButton.setCursor(Cursor.HAND));
+        startButton.setOnMouseExited(e -> startButton.setCursor(Cursor.DEFAULT));
+
 
         image = new Image(STEP_ICON_PATH);
         imageView = new ImageView(image);
         this.stepButton.setGraphic(imageView);
+        stepButton.setOnMouseEntered(e -> stepButton.setCursor(Cursor.HAND));
+        stepButton.setOnMouseExited(e -> stepButton.setCursor(Cursor.DEFAULT));
 
         image = new Image(ERASE_ALL_ICON_PATH);
         imageView = new ImageView(image);
         this.resetBtn.setGraphic(imageView);
+        resetBtn.setOnMouseEntered(e -> resetBtn.setCursor(Cursor.HAND));
+        resetBtn.setOnMouseExited(e -> resetBtn.setCursor(Cursor.DEFAULT));
+
 
         image = new Image(UNDO_ICON_PATH);
         imageView = new ImageView(image);
         this.undoBtn.setGraphic(imageView);
+        undoBtn.setOnMouseEntered(e -> undoBtn.setCursor(Cursor.HAND));
+        undoBtn.setOnMouseExited(e -> undoBtn.setCursor(Cursor.DEFAULT));
 
         image = new Image(REDO_ICON_PATH);
         imageView = new ImageView(image);
         this.reUndoBtn.setGraphic(imageView);
+        reUndoBtn.setOnMouseEntered(e -> reUndoBtn.setCursor(Cursor.HAND));
+        reUndoBtn.setOnMouseExited(e -> reUndoBtn.setCursor(Cursor.DEFAULT));
+
+        conversionBtn.setOnMouseEntered(e -> conversionBtn.setCursor(Cursor.HAND));
+        conversionBtn.setOnMouseExited(e -> conversionBtn.setCursor(Cursor.DEFAULT));
     }
 
 
@@ -172,7 +192,16 @@ public class MainController {
     public void createNode(MouseEvent event) {
         if (currentState.equals(ButtonState.NODE) && event.getButton() == MouseButton.PRIMARY) {
             currentBoard.saveCurrentState();
-            currentBoard.createMyNode(event.getX(), event.getY());
+            MyNode myNode = currentBoard.createMyNode(event.getX(), event.getY());
+            myNode.setOnMouseEntered(e -> {
+                if (currentState.equals(ButtonState.SELECT) ||
+                        currentState.equals(ButtonState.ERASE) ||
+                        currentState.equals(ButtonState.ARROW)) {
+                    myNode.setCursor(Cursor.HAND);
+                }
+
+            });
+            myNode.setOnMouseExited(e -> myNode.setCursor(Cursor.DEFAULT));
         }
     }
 

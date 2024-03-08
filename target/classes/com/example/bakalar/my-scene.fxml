@@ -26,7 +26,7 @@
             </Button>
          </children>
       </HBox>
-      <ScrollPane fx:id="myScrollPane" layoutX="6.0" layoutY="52.0" prefHeight="475.0" prefWidth="665.0">
+      <ScrollPane fx:id="myScrollPane" layoutX="9.0" layoutY="61.0" prefHeight="445.0" prefWidth="665.0" AnchorPane.bottomAnchor="238.0" AnchorPane.leftAnchor="9.0" AnchorPane.rightAnchor="621.0" AnchorPane.topAnchor="61.0">
         <content>
           <AnchorPane fx:id="mainPane" minHeight="0.0" minWidth="0.0" onMouseClicked="#createNode" prefHeight="473.0" prefWidth="664.0" />
         </content>
@@ -53,17 +53,15 @@
       <Text layoutX="684.0" layoutY="27.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Popis Zásobníkového automatu" />
       <Text layoutX="699.0" layoutY="182.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Prechodové funkcie" />
       <VBox fx:id="transFunctions" layoutX="700.0" layoutY="214.0" prefHeight="242.0" prefWidth="148.0" style="-fx-border-color: black;" />
-      <VBox fx:id="rulesContainer" layoutX="1091.0" layoutY="49.0" prefHeight="378.0" prefWidth="190.0" style="-fx-border-color: black;" />
-      <Text layoutX="1091.0" layoutY="35.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Pravidlá bezkontextovej gramatiky" />
+      <VBox fx:id="rulesContainer" layoutX="912.0" layoutY="225.0" prefHeight="378.0" prefWidth="190.0" style="-fx-border-color: black;" />
+      <Text layoutX="916.0" layoutY="210.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Pravidlá bezkontextovej gramatiky" />
       <Text layoutX="902.0" layoutY="57.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Popis bezkontextovej gramatiky" />
       <VBox layoutX="919.0" layoutY="71.0" prefHeight="77.0" prefWidth="135.0" style="-fx-border-color: black;">
          <children>
-            <TextField />
-            <TextField />
-            <TextField />
+            <TextField fx:id="nonTerminalField" />
+            <TextField fx:id="terminalField" />
+            <TextField fx:id="startingSymbolField" />
          </children>
       </VBox>
-      <VBox fx:id="transFunctions1" layoutX="913.0" layoutY="198.0" prefHeight="266.0" prefWidth="133.0" style="-fx-border-color: black;" />
-      <Text layoutX="928.0" layoutY="181.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Prechodové funkcie" />
    </children>
 </AnchorPane>
