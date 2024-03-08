@@ -29,10 +29,12 @@ public class StepRule {
     }
 
     public StepRule() {
+        this.rightSide = new ArrayList<>();
     }
 
     public StepRule(Transition transition) {
         this.transition = transition;
+        this.rightSide = new ArrayList<>();
     }
 
     public List<Text> createTextFromStep() {

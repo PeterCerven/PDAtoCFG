@@ -8,7 +8,9 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -30,11 +32,14 @@ public class ConversionLogic {
     private HBox transitionLabelBox;
     private Label transitionIndexLabel;
     private List<Transition> transitions;
+    private VBox contentBox;
     private VBox ruleBox;
+    private VBox stepsBox;
+    private boolean showSteps = false;
     private Map<Integer, List<CFGRule>> cfgRules;
     private int currentIndex = 0;
-    private int currentStep = 0;
     private Label helpingLabelComment;
+    private BorderPane root;
 
     public ConversionLogic(Board board) {
         this.board = board;
@@ -79,40 +84,30 @@ public class ConversionLogic {
     }
 
 
-
     private void setupTransitionStage(List<Transition> transitions) {
         this.transitions = transitions;
         this.transitionStage = new Stage();
         this.transitionLabel = new TextFlow();
         this.transitionIndexLabel = new Label();
         this.ruleBox = new VBox();
+        this.contentBox = new VBox();
+        contentBox.setAlignment(Pos.TOP_CENTER);
+        this.stepsBox = new VBox();
         this.helpingLabelComment = new Label();
         this.cfgRules = new HashMap<>();
         this.transitionLabelBox = new HBox(10, transitionLabel);
 
 
-        Button nextSteps = new Button("Ďalší krok");
-        nextSteps.setOnAction(e -> updateStep(1));
+        Button showStepsButton = new Button("Ukáž kroky");
+        showStepsButton.setAlignment(Pos.BOTTOM_CENTER);
+        showStepsButton.setOnAction(e -> steps());
 
-        Button prevSteps = new Button("Predošlý krok");
-        prevSteps.setOnAction(e -> updateStep(-1));
-
-        Button showStepsButton = showButton(nextSteps, prevSteps);
-
-        HBox stepsLayout = nextPrevButtons(nextSteps, prevSteps, showStepsButton);
 
         Button nextButton = new Button("Ďalší");
-        nextButton.setOnAction(e -> {
-            updateTransition(1);
-            turnOffStepButtons(nextSteps, prevSteps, showStepsButton);
-        });
+        nextButton.setOnAction(e -> updateTransition(1));
 
         Button prevButton = new Button("Predošlý");
-        prevButton.setOnAction(e -> {
-                    updateTransition(-1);
-                    turnOffStepButtons(nextSteps, prevSteps, showStepsButton);
-                }
-        );
+        prevButton.setOnAction(e -> updateTransition(-1));
 
         HBox buttonLayout = new HBox(10, prevButton, nextButton);
         buttonLayout.setAlignment(Pos.TOP_RIGHT);
@@ -136,14 +131,16 @@ public class ConversionLogic {
 
         BorderPane ruleBoxPane = new BorderPane();
         ruleBoxPane.setPadding(new Insets(10));
-        ruleBoxPane.setCenter(ruleBox);
+        contentBox.getChildren().add(ruleBox);
+        contentBox.getChildren().add(showStepsButton);
+        contentBox.getChildren().add(stepsBox);
+        ruleBoxPane.setCenter(contentBox);
 
 
-        BorderPane root = new BorderPane();
+        root = new BorderPane();
         root.setPadding(new Insets(10));
         root.setCenter(ruleBoxPane);
         root.setTop(topMenu);
-        root.setBottom(stepsLayout);
 
         Scene scene = new Scene(root, 800, 600);
         transitionStage.setScene(scene);
@@ -174,7 +171,7 @@ public class ConversionLogic {
             showStepsButton.setVisible(false);
             showStepsButton.setManaged(false);
 
-            showSteps();
+            steps();
         });
         return showStepsButton;
     }
@@ -325,37 +322,60 @@ public class ConversionLogic {
     }
 
     // steps
-    private void showSteps() {
-        updateStep(currentStep);
+    private void steps() {
+        this.showSteps = !showSteps;
+        if (showSteps) {
+            showSteps();
+        } else {
+            hideSteps();
+        }
     }
 
-    private void updateStep(int step) {
-        currentStep += step;
+    private void hideSteps() {
+        stepsBox.getChildren().clear();
+    }
+
+    private void showSteps() {
+        stepsBox.getChildren().clear();
+        VBox stepsLayout = new VBox(10);
+        ScrollPane scrollPane = new ScrollPane();
+        scrollPane.setContent(stepsLayout);
+        scrollPane.setFitToWidth(true);
         List<CFGRule> cfgRules = this.cfgRules.get(currentIndex);
-        if (currentStep < 0) currentStep = 0;
-        if (currentStep >= cfgRules.get(0).getSteps().size()) currentStep = cfgRules.get(0).getSteps().size() - 1;
-        ruleBox.getChildren().clear();
-        for (CFGRule cfgRule : cfgRules) {
+        for (int i = 0; i < cfgRules.get(0).getSteps().size(); i++) {
 
-            StepRule cfgStep = cfgRule.getSteps().get(currentStep);
-            TextFlow textFlow = new TextFlow();
-            List<Text> texts = cfgStep.createTextFromStep();
-            textFlow.getChildren().addAll(texts);
-            textFlow.setTextAlignment(TextAlignment.CENTER);
-            ruleBox.getChildren().add(textFlow);
+            VBox stepLayout = new VBox();
+            stepLayout.setAlignment(Pos.CENTER);
+            String helpingComment = "";
+            TextFlow transitionTextFlow = new TextFlow();
+            for (CFGRule cfgRule : cfgRules) {
+                StepRule stepRule = cfgRule.getSteps().get(i);
+                helpingComment = stepRule.getHelpingComment();
 
-            String helpingComment = cfgStep.getHelpingComment();
-            helpingLabelComment.setText(helpingComment);
+                TextFlow textFlow = new TextFlow();
+                List<Text> texts = stepRule.createTextFromStep();
+                textFlow.getChildren().addAll(texts);
+                textFlow.setTextAlignment(TextAlignment.CENTER);
 
+                stepLayout.getChildren().addAll(textFlow);
 
-            if (cfgStep.getTransition().getTransitionType() != TransitionType.START) {
-                Transition transition = cfgStep.getTransition();
-                List<Text> transitionTexts = transition.createTextFromStep();
-                transitionLabel.getChildren().clear();
-                transitionLabel.getChildren().addAll(transitionTexts);
+                if (stepRule.getTransition().getTransitionType() != TransitionType.START) {
+                    Transition transition = stepRule.getTransition();
+                    List<Text> transitionTexts = transition.createTextFromStep();
+                    transitionTextFlow = new TextFlow();
+                    transitionTextFlow.setTextAlignment(TextAlignment.CENTER);
+                    transitionTextFlow.getChildren().addAll(transitionTexts);
+                }
             }
+            Label helpingLabelComment = new Label(helpingComment, transitionTextFlow);
+            helpingLabelComment.setTextAlignment(TextAlignment.CENTER);
+            helpingLabelComment.setContentDisplay(ContentDisplay.TEXT_ONLY);
+            helpingLabelComment.setWrapText(true);
+            stepLayout.getChildren().add(0, helpingLabelComment);
+            stepLayout.getChildren().add(0, transitionTextFlow);
+            stepsLayout.getChildren().add(stepLayout);
         }
-
+        stepsBox.getChildren().add(scrollPane);
     }
 
     private void showTransitionStage() {
@@ -363,14 +383,19 @@ public class ConversionLogic {
         transitionStage.show();
     }
 
+    private void resetStates() {
+        transitionLabel.getChildren().clear();
+        stepsBox.getChildren().clear();
+        this.showSteps = false;
+    }
+
     private void updateTransition(int step) {
         currentIndex += step;
         if (currentIndex < 0) currentIndex = 0;
         if (currentIndex >= transitions.size()) currentIndex = transitions.size() - 1;
-        currentStep = 0;
 
         Transition currentTransition = transitions.get(currentIndex);
-        transitionLabel.getChildren().clear();
+        resetStates();
         Text labelText = new Text();
         labelText.setFont(new Font("Courier New", 25));
         switch (currentTransition.getTransitionType()) {
