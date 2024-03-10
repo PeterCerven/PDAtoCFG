@@ -16,6 +16,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -30,7 +31,7 @@ import static com.example.bakalar.logic.Board.STARTING_Z;
 
 public class MainController {
 
-    public static final int NODE_RADIUS = 30;
+    public static final int NODE_RADIUS = 34;
     private static final Logger log = LogManager.getLogger(MainController.class.getName());
     private static final String ARROW_ICON_PATH = "file:src/main/resources/icons/Arrow.png";
     private static final String ERASER_ICON_PATH = "file:src/main/resources/icons/Eraser.png";
@@ -40,7 +41,6 @@ public class MainController {
     private static final String ERASE_ALL_ICON_PATH = "file:src/main/resources/icons/EraseAll.png";
     private static final String UNDO_ICON_PATH = "file:src/main/resources/icons/Undo.png";
     private static final String REDO_ICON_PATH = "file:src/main/resources/icons/Redo.png";
-    private Stage primaryStage;
     @FXML
     private AnchorPane mainPane;
     @FXML
@@ -56,19 +56,9 @@ public class MainController {
     @FXML
     private Button reUndoBtn;
     @FXML
-    private Button startButton;
-    @FXML
-    private Button stepButton;
-    @FXML
     private Button conversionBtn;
     @FXML
     private Button testBtn;
-    @FXML
-    private TextField inputFieldAlphabet;
-    @FXML
-    private TextField begSymbol;
-    @FXML
-    private HBox stateContainer;
     @FXML
     private TextField describeStates;
     @FXML
@@ -80,14 +70,7 @@ public class MainController {
     @FXML
     private VBox transFunctions;
     @FXML
-    private VBox rulesContainer;
-    @FXML
-    private TextField nonTerminalField;
-    @FXML
-    private TextField terminalField;
-    @FXML
-    private TextField startingSymbolField;
-
+    private BorderPane mainContainer;
     private ButtonState currentState = ButtonState.SELECT;
     private Board currentBoard;
     private runPDALogic runPDALogic;
@@ -102,31 +85,24 @@ public class MainController {
 
     private void setupBoard() {
 
-        this.begSymbol.setText(STARTING_Z);
 
 
         List<TextField> describePDAFields = List.of(describeStates, describeAlphabet, describeStackAlphabet, describeEndStates);
-        DescribePDA describePDA = new DescribePDA(describePDAFields, transFunctions, inputFieldAlphabet);
+        DescribePDA describePDA = new DescribePDA(describePDAFields, transFunctions);
 
-        List<TextField> describeCFGFields = List.of(nonTerminalField, terminalField, startingSymbolField);
-        DescribeCFG describeCFG = new DescribeCFG(describeCFGFields, rulesContainer);
+
 
         HistoryLogic historyLogic = new HistoryLogic();
 
-        currentBoard = new Board(mainPane, describePDA, historyLogic, describeCFG, currentState);
+        currentBoard = new Board(mainPane, describePDA, historyLogic, currentState);
         historyLogic.setBoard(currentBoard);
-        this.runPDALogic = new runPDALogic(currentBoard, this.stateContainer);
+//        this.runPDALogic = new runPDALogic(currentBoard, this.stateContainer);
         this.conversionLogic = new ConversionLogic(currentBoard);
-        inputFieldAlphabet.textProperty().addListener((observable, oldValue, newValue) -> {
-            currentBoard.updateAllDescribePDA();
-        });
+//        inputFieldAlphabet.textProperty().addListener((observable, oldValue, newValue) -> {
+//            currentBoard.updateAllDescribePDA();
+//        });
     }
 
-
-
-    public void setPrimaryStage(Stage stage) {
-        this.primaryStage = stage;
-    }
 
     // set images
 
@@ -149,19 +125,6 @@ public class MainController {
         this.nodeBtn.setGraphic(imageView);
         nodeBtn.setOnMouseEntered(e -> nodeBtn.setCursor(Cursor.HAND));
         nodeBtn.setOnMouseExited(e -> nodeBtn.setCursor(Cursor.DEFAULT));
-
-        image = new Image(START_ICON_PATH);
-        imageView = new ImageView(image);
-        this.startButton.setGraphic(imageView);
-        startButton.setOnMouseEntered(e -> startButton.setCursor(Cursor.HAND));
-        startButton.setOnMouseExited(e -> startButton.setCursor(Cursor.DEFAULT));
-
-
-        image = new Image(STEP_ICON_PATH);
-        imageView = new ImageView(image);
-        this.stepButton.setGraphic(imageView);
-        stepButton.setOnMouseEntered(e -> stepButton.setCursor(Cursor.HAND));
-        stepButton.setOnMouseExited(e -> stepButton.setCursor(Cursor.DEFAULT));
 
         image = new Image(ERASE_ALL_ICON_PATH);
         imageView = new ImageView(image);
@@ -192,16 +155,7 @@ public class MainController {
     public void createNode(MouseEvent event) {
         if (currentState.equals(ButtonState.NODE) && event.getButton() == MouseButton.PRIMARY) {
             currentBoard.saveCurrentState();
-            MyNode myNode = currentBoard.createMyNode(event.getX(), event.getY());
-            myNode.setOnMouseEntered(e -> {
-                if (currentState.equals(ButtonState.SELECT) ||
-                        currentState.equals(ButtonState.ERASE) ||
-                        currentState.equals(ButtonState.ARROW)) {
-                    myNode.setCursor(Cursor.HAND);
-                }
-
-            });
-            myNode.setOnMouseExited(e -> myNode.setCursor(Cursor.DEFAULT));
+            currentBoard.createMyNode(event.getX(), event.getY());
         }
     }
 
@@ -213,11 +167,6 @@ public class MainController {
         currentState = ButtonState.SELECT;
         currentBoard.setSelectedNode(null);
         updateButtonStates();
-    }
-
-    public void start() {
-        String inputAlphabet = this.inputFieldAlphabet.getText();
-        runPDALogic.start(STARTING_Z, inputAlphabet);
     }
 
     public void step() {
@@ -243,7 +192,6 @@ public class MainController {
         currentBoard.setStarting(firstNode, true);
         MyNode secondNode = currentBoard.createMyNode(320, 150);
         currentBoard.setEnding(firstNode, true);
-        inputFieldAlphabet.setText("111000");
         currentBoard.createMyArrow(firstNode, firstNode, "1", "Z", "XZ");
         currentBoard.createMyArrow(firstNode, firstNode, "1", "X", "XX");
         currentBoard.createMyArrow(firstNode, firstNode, EPSILON, "X", EPSILON);
@@ -255,9 +203,9 @@ public class MainController {
     // Buttons toggle
 
     private void updateButtonStates() {
-        nodeBtn.setStyle(currentState == ButtonState.NODE ? "-fx-background-color: #00ff00" : "");
-        arrowBtn.setStyle(currentState == ButtonState.ARROW ? "-fx-background-color: #00ff00" : "");
-        eraseBtn.setStyle(currentState == ButtonState.ERASE ? "-fx-background-color: #00ff00" : "");
+        nodeBtn.setStyle(currentState == ButtonState.NODE ? "-fx-background-color: #113a11; -fx-border-color: #0b270c" : "");
+        arrowBtn.setStyle(currentState == ButtonState.ARROW ? "-fx-background-color: #113a11; -fx-border-color: #0b270c" : "");
+        eraseBtn.setStyle(currentState == ButtonState.ERASE ? "-fx-background-color: #113a11; -fx-border-color: #0b270c" : "");
     }
 
 

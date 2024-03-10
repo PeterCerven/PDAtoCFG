@@ -99,7 +99,7 @@ public class MyNode extends Group implements Serializable {
     public void setSelected(boolean selected) {
         this.selected = selected;
         if (selected) {
-            this.circle.setFill(Color.BLUE);
+            this.circle.setFill(new Color(0.4, 0.6, 0.4, 1));
         } else {
             this.circle.setFill(Color.WHITE);
         }

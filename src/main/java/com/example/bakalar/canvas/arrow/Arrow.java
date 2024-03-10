@@ -11,6 +11,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
+import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import lombok.Getter;
 import lombok.Setter;
@@ -60,9 +61,9 @@ public abstract class Arrow extends Group implements Serializable {
 
     private Polygon createArrowHead() {
         Polygon arrowHead = new Polygon();
-        arrowHead.setStroke(Color.BLUE);
+        arrowHead.setStroke(Color.BLACK);
         arrowHead.setStrokeWidth(3);
-        arrowHead.setFill(Color.BLUE);
+        arrowHead.setFill(Color.BLACK);
         arrowHead.setViewOrder(-1);
         return arrowHead;
     }
@@ -70,8 +71,11 @@ public abstract class Arrow extends Group implements Serializable {
     public void addSymbolContainer(TransitionInputs transitionInputs) {
         HBox container = new HBox(NODE_RADIUS / 5.0);
         Text readSymbol = new Text(transitionInputs.getRead());
+        readSymbol.setFont(new Font(15));
         Text popSymbol = new Text(transitionInputs.getPop());
+        popSymbol.setFont(new Font(15));
         Text pushSymbol = new Text(transitionInputs.getPush());
+        pushSymbol.setFont(new Font(15));
         container.getChildren().addAll(readSymbol, popSymbol, pushSymbol);
         container.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
             if (event.getButton() == MouseButton.SECONDARY) {

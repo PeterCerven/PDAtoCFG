@@ -6,10 +6,12 @@ import com.example.bakalar.canvas.node.MyNode;
 import com.example.bakalar.logic.transitions.Transition;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.example.bakalar.logic.Board.*;
 
@@ -19,22 +21,22 @@ public class DescribePDA {
     private final TextField describeStackAlphabet;
     private final TextField describeEndStates;
     private final VBox transFunctions;
-    private final TextField inputFieldAlphabet;
 
-    public DescribePDA(List<TextField> describeFields, VBox transFunctions, TextField inputFieldAlphabet) {
+
+    public DescribePDA(List<TextField> describeFields, VBox transFunctions) {
         this.describeStates = describeFields.get(0);
         this.describeAlphabet = describeFields.get(1);
         this.describeStackAlphabet = describeFields.get(2);
         this.describeEndStates = describeFields.get(3);
         this.transFunctions = transFunctions;
-        this.inputFieldAlphabet = inputFieldAlphabet;
+
     }
 
     public void updateAllDescribePDA(List<MyNode> nodes, List<Arrow> arrows, List<Transition> transitions) {
         updateDescribeStates(nodes);
-        updateDescribeAlphabet();
         updateDescribeStackAlphabet(arrows);
         updateDescribeEndStates(nodes);
+        updateDescribeAlphabet(transitions);
         updateDescribeTransFunctions(transitions);
     }
 
@@ -50,22 +52,6 @@ public class DescribePDA {
         this.describeStates.setText(text.toString());
     }
 
-    public void updateDescribeAlphabet() {
-        StringBuilder text = new StringBuilder(SIGMA + " = {");
-        Set<Character> alphabet = new HashSet<>();
-        for (Character character : inputFieldAlphabet.getText().toCharArray()) {
-            alphabet.add(character);
-        }
-        for (Character character : alphabet) {
-            text.append(character).append(", ");
-        }
-        if (!inputFieldAlphabet.getText().isEmpty()) {
-            text.delete(text.length() - 2, text.length());
-        }
-        text.append("}");
-        this.describeAlphabet.setText(text.toString());
-    }
-
     public void updateDescribeStackAlphabet(List<Arrow> arrows) {
         StringBuilder text = new StringBuilder(GAMMA_CAPITAL + " = {");
         Set<String> stackAlphabet = getStrings(arrows);
@@ -78,6 +64,18 @@ public class DescribePDA {
         text.append("}");
         this.describeStackAlphabet.setText(text.toString());
     }
+
+    private void updateDescribeAlphabet(List<Transition> transitions) {
+        StringBuilder text = new StringBuilder("Σ = {");
+        String symbols = transitions.stream()
+                .map(t -> t.getInputSymbolToRead().getName())
+                .filter(s -> !s.equals(EPSILON))
+                .distinct()
+                .collect(Collectors.joining(", "));
+        text.append(symbols).append("}");
+        this.describeAlphabet.setText(text.toString());
+    }
+
 
     private Set<String> getStrings(List<Arrow> arrows) {
         Set<String> stackAlphabet = new HashSet<>();
@@ -119,6 +117,7 @@ public class DescribePDA {
         this.transFunctions.getChildren().clear();
         for (Transition transition : transitions) {
             TextField textField = new TextField(transition.toString());
+            textField.setFont(new Font(18));
             textField.setEditable(false);
             this.transFunctions.getChildren().add(textField);
         }

@@ -11,6 +11,7 @@ import com.example.bakalar.canvas.arrow.TransitionInputs;
 import com.example.bakalar.canvas.node.StartNodeArrow;
 import com.example.bakalar.logic.transitions.Transition;
 import javafx.geometry.Insets;
+import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseButton;
@@ -55,8 +56,7 @@ public class Board implements Serializable {
     private DescribeCFG describeCFG;
 
 
-    public Board(AnchorPane mainPane, DescribePDA describePDA, HistoryLogic historyLogic, DescribeCFG describeCFG, ButtonState currentState) {
-        this.describeCFG = describeCFG;
+    public Board(AnchorPane mainPane, DescribePDA describePDA, HistoryLogic historyLogic, ButtonState currentState) {
         this.nodes = new ArrayList<>();
         this.rules = new ArrayList<>();
         this.describePDA = describePDA;
@@ -79,7 +79,7 @@ public class Board implements Serializable {
     }
 
     public void showCFG(Set<SpecialNonTerminal> allNonTerminals, Set<MySymbol> allTerminals, List<CFGRule> allRules, String startingS) {
-        this.describeCFG.updateAllDescribeCFG(allNonTerminals, allTerminals, allRules, startingS);
+//        this.describeCFG.updateAllDescribeCFG(allNonTerminals, allTerminals, allRules, startingS);
     }
 
 
@@ -176,6 +176,7 @@ public class Board implements Serializable {
         MyNode myNode = new MyNode(x, y, NODE_RADIUS);
         this.makeDraggable(myNode);
         this.enableArrowCreation(myNode);
+        this.cursorChange(myNode);
         this.addObject(myNode);
         return myNode;
     }
@@ -199,6 +200,7 @@ public class Board implements Serializable {
             this.makeErasable(arrow);
             if (arrow instanceof LineArrow lineArrow) {
                 this.makeCurveDraggable(lineArrow);
+
             }
         }
     }
@@ -398,6 +400,18 @@ public class Board implements Serializable {
                 this.removeObject(node);
             }
         });
+    }
+
+    public void cursorChange(MyNode myNode) {
+        myNode.setOnMouseEntered(e -> {
+            if (currentState.equals(ButtonState.SELECT) ||
+                    currentState.equals(ButtonState.ERASE) ||
+                    currentState.equals(ButtonState.ARROW)) {
+                myNode.setCursor(Cursor.HAND);
+            }
+
+        });
+        myNode.setOnMouseExited(e -> myNode.setCursor(Cursor.DEFAULT));
     }
 
     public void makeErasable(Node node) {
