@@ -36,8 +36,6 @@ public class MainController {
     private static final String ARROW_ICON_PATH = "file:src/main/resources/icons/Arrow.png";
     private static final String ERASER_ICON_PATH = "file:src/main/resources/icons/Eraser.png";
     private static final String NODE_ICON_PATH = "file:src/main/resources/icons/Node.png";
-    private static final String START_ICON_PATH = "file:src/main/resources/icons/Start.png";
-    private static final String STEP_ICON_PATH = "file:src/main/resources/icons/Step.png";
     private static final String ERASE_ALL_ICON_PATH = "file:src/main/resources/icons/EraseAll.png";
     private static final String UNDO_ICON_PATH = "file:src/main/resources/icons/Undo.png";
     private static final String REDO_ICON_PATH = "file:src/main/resources/icons/Redo.png";

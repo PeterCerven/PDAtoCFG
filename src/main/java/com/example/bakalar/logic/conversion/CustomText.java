@@ -9,11 +9,11 @@ public class CustomText extends Text {
     public CustomText(MySymbol mySymbol, int size) {
         super(mySymbol.toString());
         this.setFill(mySymbol.getColor());
-        this.setFont(new Font("Courier New", size));
+        this.setFont(new Font(size));
     }
 
     public CustomText(String text, int size) {
         super(text);
-        this.setFont(new Font("Courier New", size));
+        this.setFont(new Font(size));
     }
 }
