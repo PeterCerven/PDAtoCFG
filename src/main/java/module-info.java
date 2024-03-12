@@ -14,6 +14,8 @@ module com.example.bakalar {
     requires com.fasterxml.jackson.core;
 
 
+    exports com.example.bakalar.files;
+    exports com.example.bakalar.exceptions;
     opens com.example.bakalar.files to com.fasterxml.jackson.databind, lombok, javafx.fxml, com.fasterxml.jackson.core;
     opens com.example.bakalar to javafx.fxml;
     exports com.example.bakalar;

@@ -161,6 +161,15 @@ public abstract class Arrow extends Group implements Serializable {
     public int hashCode() {
         return 31 * getTransitions().hashCode();
     }
+
+    public boolean sameTransitionExists(TransitionInputs transitionInputs) {
+        for (TransitionInputs transition : transitions) {
+            if (transition.equals(transitionInputs)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
 
 

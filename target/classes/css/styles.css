@@ -49,6 +49,7 @@
 
 .label {
     -fx-text-fill: #333; /* Dark grey text for labels for better readability */
+    -fx-font-size: 16px; /* Slightly larger font size for labels */
 }
 
 .button:pressed {

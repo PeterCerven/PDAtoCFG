@@ -1,19 +1,16 @@
 package com.example.bakalar.logic;
 
-import com.example.bakalar.canvas.arrow.Arrow;
-import com.example.bakalar.canvas.arrow.LineArrow;
-import com.example.bakalar.canvas.arrow.SelfLoopArrow;
-import com.example.bakalar.files.AppState;
-import com.example.bakalar.canvas.arrow.ArrowModel;
-import com.example.bakalar.files.FileLogic;
+import com.example.bakalar.canvas.arrow.*;
+import com.example.bakalar.canvas.node.MyNode;
 import com.example.bakalar.canvas.node.MyNodeModel;
+import com.example.bakalar.canvas.node.StartNodeArrow;
+import com.example.bakalar.exceptions.MyCustomException;
+import com.example.bakalar.files.AppState;
+import com.example.bakalar.files.FileLogic;
 import com.example.bakalar.logic.conversion.CFGRule;
 import com.example.bakalar.logic.history.*;
-import com.example.bakalar.logic.utility.*;
-import com.example.bakalar.canvas.node.MyNode;
-import com.example.bakalar.canvas.arrow.TransitionInputs;
-import com.example.bakalar.canvas.node.StartNodeArrow;
 import com.example.bakalar.logic.transitions.Transition;
+import com.example.bakalar.logic.utility.*;
 import javafx.geometry.Insets;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
@@ -73,8 +70,8 @@ public class Board implements Serializable {
         this.addObject(startNodeArrow);
         this.startNodeArrow.setVisible(false);
         this.nodeCounter = 0;
-        this.startingCheckBox = new CheckBox("Starting Node");
-        this.endingCheckBox = new CheckBox("End Node");
+        this.startingCheckBox = new CheckBox("Začiatočný stav");
+        this.endingCheckBox = new CheckBox("Koncový stav");
         this.idNodeCounter = 0;
         this.currentState = currentState;
         this.historyLogic = historyLogic;
@@ -92,16 +89,20 @@ public class Board implements Serializable {
     }
 
     private void createBoardFromAppState(AppState appState) {
-        clearBoard();
-        for (MyNodeModel myNodeModel : appState.getNodes()) {
-            createMyNodeFromHistory(myNodeModel.getName(), myNodeModel.getX(), myNodeModel.getY(), myNodeModel.getNodeId(),
-                    myNodeModel.isStarting(), myNodeModel.isEnding());
-        }
-        for (ArrowModel arrowModel : appState.getArrows()) {
-            MyNode from = findNodeById(arrowModel.getFromNodeId());
-            MyNode to = findNodeById(arrowModel.getToNodeId());
-            Arrow arrow = createArrow(from, to, arrowModel.getInput(), arrowModel.getStackTop(), arrowModel.getStackPush());
-            arrows.add(arrow);
+        try {
+            clearBoard();
+            for (MyNodeModel myNodeModel : appState.getNodes()) {
+                createMyNodeFromHistory(myNodeModel.getName(), myNodeModel.getX(), myNodeModel.getY(), myNodeModel.getNodeId(),
+                        myNodeModel.isStarting(), myNodeModel.isEnding());
+            }
+            for (ArrowModel arrowModel : appState.getArrows()) {
+                MyNode from = findNodeById(arrowModel.getFromNodeId());
+                MyNode to = findNodeById(arrowModel.getToNodeId());
+                Arrow arrow = createArrow(from, to, arrowModel.getInput(), arrowModel.getStackTop(), arrowModel.getStackPush());
+                arrows.add(arrow);
+            }
+        } catch (MyCustomException e) {
+            showErrorDialog(e.getMessage());
         }
     }
 
@@ -155,7 +156,7 @@ public class Board implements Serializable {
         updateAllDescribePDA();
     }
 
-    public Arrow createArrow(MyNode from, MyNode to, String read, String pop, String push) {
+    public Arrow createArrow(MyNode from, MyNode to, String read, String pop, String push) throws MyCustomException {
         TransitionInputs transitionInputs;
         if (read != null) {
             transitionInputs = new TransitionInputs(read, pop, push);
@@ -168,6 +169,10 @@ public class Board implements Serializable {
         }
         Arrow arrow = sameArrowExists(from, to);
         if (arrow != null) {
+            boolean sameTransition = arrow.sameTransitionExists(transitionInputs);
+            if (sameTransition) {
+                throw new MyCustomException("Prechodová funkcia už existuje");
+            }
             arrow.addSymbolContainer(transitionInputs);
             return arrow;
         }
@@ -186,6 +191,7 @@ public class Board implements Serializable {
         this.addObject(arrow);
         return arrow;
     }
+
 
     public void addObject(Node node) {
         if (node instanceof Arrow arrow) {
@@ -234,15 +240,18 @@ public class Board implements Serializable {
     }
 
     public void createMyArrow(UUID fromId, UUID toId, String input, String stackTop, String stackPush) {
-        MyNode fromNode = findNodeById(fromId);
-        MyNode toNode = findNodeById(toId);
-        Arrow arrow = this.createArrow(fromNode, toNode, input, stackTop, stackPush);
-        if (arrow != null) {
-            this.makeErasable(arrow);
-            if (arrow instanceof LineArrow lineArrow) {
-                this.makeCurveDraggable(lineArrow);
-
+        try {
+            MyNode fromNode = findNodeById(fromId);
+            MyNode toNode = findNodeById(toId);
+            Arrow arrow = this.createArrow(fromNode, toNode, input, stackTop, stackPush);
+            if (arrow != null) {
+                this.makeErasable(arrow);
+                if (arrow instanceof LineArrow lineArrow) {
+                    this.makeCurveDraggable(lineArrow);
+                }
             }
+        } catch (MyCustomException e) {
+            showErrorDialog(e.getMessage());
         }
     }
 
@@ -289,13 +298,13 @@ public class Board implements Serializable {
         this.setStartNode(node);
     }
 
-    private MyNode findNodeById(UUID nodeId) {
+    private MyNode findNodeById(UUID nodeId) throws MyCustomException {
         for (MyNode node : nodes) {
             if (node.getNodeId().equals(nodeId)) {
                 return node;
             }
         }
-        return null;
+        throw new MyCustomException("Node not found");
     }
 
     public void setEnding(MyNode node, boolean ending) {
@@ -311,18 +320,18 @@ public class Board implements Serializable {
 
     public TransitionInputs createArrowTransition(String read, String pop, String push) {
         Dialog<ButtonType> dialog = new Dialog<>();
-        dialog.setTitle("Create transition");
+        dialog.setTitle("Vytvorte prechodovú funkciu");
         dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 
         TextField input1 = new TextField(read == null || read.isBlank() ? EPSILON : read);
-        input1.setPromptText("Read");
-        Label label1 = new Label("Read");
+        input1.setPromptText("Čítaj");
+        Label label1 = new Label("Čítaj");
         TextField input2 = new TextField(pop == null || pop.isBlank() ? EPSILON : pop);
-        input2.setPromptText("Pop");
-        Label label2 = new Label("Pop");
+        input2.setPromptText("Vyber zo zásobníka");
+        Label label2 = new Label("Vyber zo zásobníka");
         TextField input3 = new TextField(push == null || push.isBlank() ? EPSILON : push);
-        input3.setPromptText("Push");
-        Label label3 = new Label("Push");
+        input3.setPromptText("Daj na zásobník");
+        Label label3 = new Label("Daj na zásobník");
 
         GridPane grid = new GridPane();
         grid.setHgap(5);
@@ -351,7 +360,7 @@ public class Board implements Serializable {
 
     public void showDialog(MyNode node) {
         Dialog<ButtonType> dialog = new Dialog<>();
-        dialog.setTitle("Edit Node");
+        dialog.setTitle("Zmeň stav");
 
         GridPane gridPane = new GridPane();
         gridPane.setHgap(10);
@@ -522,6 +531,16 @@ public class Board implements Serializable {
         }
         mainPane.getChildren().addAll(newNodes);
         updateAllDescribePDA();
+    }
+
+    // error handling
+
+    public void showErrorDialog(String errorMessage) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Error");
+        alert.setHeaderText(null);
+        alert.setContentText(errorMessage);
+        alert.showAndWait();
     }
 
 

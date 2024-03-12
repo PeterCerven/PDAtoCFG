@@ -53,6 +53,14 @@ public class ConversionLogic {
 
     public void convertPDA() {
         List<Transition> transitions = board.getNodesTransitions();
+        if (transitions.isEmpty()) {
+            board.showErrorDialog("Nemožno previesť Nemáte žiadne prechodové funkcie.");
+            return;
+        }
+        if (board.getStartNode() == null) {
+            board.showErrorDialog("Nemožno previesť Nemáte žiadny začiatočný stav.");
+            return;
+        }
         transitions.add(0, new Transition(board.getStartNode().getName(), TransitionType.START));
         setupTransitionStage(transitions);
         showTransitionStage();
