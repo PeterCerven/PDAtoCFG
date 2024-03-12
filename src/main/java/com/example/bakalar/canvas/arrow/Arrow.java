@@ -21,6 +21,7 @@ import org.apache.logging.log4j.Logger;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import static com.example.bakalar.logic.MainController.NODE_RADIUS;
 
@@ -35,8 +36,8 @@ public abstract class Arrow extends Group implements Serializable {
     protected VBox symbolContainers;
     protected Polygon arrowHead;
     protected Board board;
-    protected int fromId;
-    protected int toId;
+    protected UUID fromId;
+    protected UUID toId;
 
 
 

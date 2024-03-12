@@ -16,6 +16,8 @@ public class MyApp extends Application {
     public void start(Stage stage) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(MyApp.class.getResource("my-scene.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
+        MainController controller = fxmlLoader.getController();
+        controller.setStage(stage);
 
         String styles = Objects.requireNonNull(getClass().getResource("/css/styles.css")).toExternalForm();
         scene.getStylesheets().add(styles);

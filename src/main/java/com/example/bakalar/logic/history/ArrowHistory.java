@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.List;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -13,14 +14,14 @@ public class ArrowHistory {
     private double startY;
     private double endX;
     private double endY;
-    private int fromId;
-    private int toId;
+    private UUID fromId;
+    private UUID toId;
     private List<TransitionInputs> transitions;
     private double controlPointChangeX;
     private double controlPointChangeY;
     private boolean isLineArrow;
 
-    public ArrowHistory(double startX, double startY, double endX, double endY, int fromId, int toId,
+    public ArrowHistory(double startX, double startY, double endX, double endY, UUID fromId, UUID toId,
                         List<TransitionInputs> transitions, double controlPointChangeX, double controlPointChangeY, boolean isLineArrow) {
         this.startX = startX;
         this.startY = startY;
@@ -34,7 +35,7 @@ public class ArrowHistory {
         this.isLineArrow = isLineArrow;
     }
 
-    public ArrowHistory(int fromId, int toId, List<TransitionInputs> transitions, boolean isLineArrow) {
+    public ArrowHistory(UUID fromId, UUID toId, List<TransitionInputs> transitions, boolean isLineArrow) {
         this.fromId = fromId;
         this.toId = toId;
         this.transitions = transitions;

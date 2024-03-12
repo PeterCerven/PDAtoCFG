@@ -73,6 +73,7 @@ public class MainController {
     private Board currentBoard;
     private runPDALogic runPDALogic;
     private ConversionLogic conversionLogic;
+    private Stage stage;
 
 
     @FXML
@@ -92,13 +93,17 @@ public class MainController {
 
         HistoryLogic historyLogic = new HistoryLogic();
 
-        currentBoard = new Board(mainPane, describePDA, historyLogic, currentState);
+        currentBoard = new Board(mainPane, describePDA, historyLogic, currentState, stage);
         historyLogic.setBoard(currentBoard);
 //        this.runPDALogic = new runPDALogic(currentBoard, this.stateContainer);
         this.conversionLogic = new ConversionLogic(currentBoard);
 //        inputFieldAlphabet.textProperty().addListener((observable, oldValue, newValue) -> {
 //            currentBoard.updateAllDescribePDA();
 //        });
+    }
+
+    public void setStage(Stage stage) {
+        this.stage = stage;
     }
 
 
@@ -185,17 +190,18 @@ public class MainController {
 
     public void testBoard() {
         currentBoard.saveCurrentState();
-        currentBoard.testBoard();
+        currentBoard.clearBoard();
         MyNode firstNode = currentBoard.createMyNode(120, 150);
         currentBoard.setStarting(firstNode, true);
         MyNode secondNode = currentBoard.createMyNode(320, 150);
         currentBoard.setEnding(firstNode, true);
-        currentBoard.createMyArrow(firstNode, firstNode, "1", "Z", "XZ");
-        currentBoard.createMyArrow(firstNode, firstNode, "1", "X", "XX");
-        currentBoard.createMyArrow(firstNode, firstNode, EPSILON, "X", EPSILON);
-        currentBoard.createMyArrow(firstNode, secondNode, "0", "X", "X");
-        currentBoard.createMyArrow(secondNode, secondNode, "1", "X", EPSILON);
-        currentBoard.createMyArrow(secondNode, firstNode, "0", "Z", "Z");
+
+        currentBoard.createMyArrow(firstNode.getNodeId(), firstNode.getNodeId(), "1", "Z", "XZ");
+        currentBoard.createMyArrow(firstNode.getNodeId(), firstNode.getNodeId(), "1", "X", "XX");
+        currentBoard.createMyArrow(firstNode.getNodeId(), firstNode.getNodeId(), EPSILON, "X", EPSILON);
+        currentBoard.createMyArrow(firstNode.getNodeId(), secondNode.getNodeId(), "0", "X", "X");
+        currentBoard.createMyArrow(secondNode.getNodeId(), secondNode.getNodeId(), "1", "X", EPSILON);
+        currentBoard.createMyArrow(secondNode.getNodeId(), firstNode.getNodeId(), "0", "Z", "Z");
     }
 
     // Buttons toggle
@@ -227,6 +233,19 @@ public class MainController {
         }
         updateButtonStates();
         currentBoard.setCurrentState(currentState);
+    }
+
+    // menu action
+    public void closeApp() {
+        stage.close();
+    }
+
+    public void saveToFile() {
+        currentBoard.saveCurrentStateToFile();
+    }
+
+    public void loadFromFile() {
+        currentBoard.loadStateFromFile();
     }
 
 }

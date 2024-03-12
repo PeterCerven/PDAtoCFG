@@ -15,10 +15,10 @@
 
 .scroll-bar:vertical .thumb {
     -fx-background-color: #125c1d; /* Lighter green for the thumb (the part you drag) */
-    -fx-pref-height: 3;
+    -fx-pref-height: 10px;
     -fx-background-radius: 10px;
     -fx-min-height: 3px; /* Minimum height of the thumb */
-    -fx-max-height: 5px; /* Maximum height you want to allow for the thumb */
+    -fx-max-height: 50px; /* Maximum height you want to allow for the thumb */
 }
 
 .scroll-bar:vertical .track {

@@ -3,6 +3,10 @@ package com.example.bakalar.logic;
 import com.example.bakalar.canvas.arrow.Arrow;
 import com.example.bakalar.canvas.arrow.LineArrow;
 import com.example.bakalar.canvas.arrow.SelfLoopArrow;
+import com.example.bakalar.files.AppState;
+import com.example.bakalar.canvas.arrow.ArrowModel;
+import com.example.bakalar.files.FileLogic;
+import com.example.bakalar.canvas.node.MyNodeModel;
 import com.example.bakalar.logic.conversion.CFGRule;
 import com.example.bakalar.logic.history.*;
 import com.example.bakalar.logic.utility.*;
@@ -17,6 +21,7 @@ import javafx.scene.control.*;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
+import javafx.stage.Stage;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.logging.log4j.LogManager;
@@ -54,9 +59,11 @@ public class Board implements Serializable {
     private DescribePDA describePDA;
     private HistoryLogic historyLogic;
     private DescribeCFG describeCFG;
+    private FileLogic fileLogic;
+    private Stage stage;
 
 
-    public Board(AnchorPane mainPane, DescribePDA describePDA, HistoryLogic historyLogic, ButtonState currentState) {
+    public Board(AnchorPane mainPane, DescribePDA describePDA, HistoryLogic historyLogic, ButtonState currentState, Stage stage) {
         this.nodes = new ArrayList<>();
         this.rules = new ArrayList<>();
         this.describePDA = describePDA;
@@ -71,6 +78,31 @@ public class Board implements Serializable {
         this.idNodeCounter = 0;
         this.currentState = currentState;
         this.historyLogic = historyLogic;
+        this.fileLogic = new FileLogic();
+        this.stage = stage;
+    }
+
+    public void saveCurrentStateToFile() {
+        fileLogic.saveToJson(nodes, arrows, this.stage);
+    }
+
+    public void loadStateFromFile() {
+        AppState appState = fileLogic.loadFromJson(this.stage);
+        createBoardFromAppState(appState);
+    }
+
+    private void createBoardFromAppState(AppState appState) {
+        clearBoard();
+        for (MyNodeModel myNodeModel : appState.getNodes()) {
+            createMyNodeFromHistory(myNodeModel.getName(), myNodeModel.getX(), myNodeModel.getY(), myNodeModel.getNodeId(),
+                    myNodeModel.isStarting(), myNodeModel.isEnding());
+        }
+        for (ArrowModel arrowModel : appState.getArrows()) {
+            MyNode from = findNodeById(arrowModel.getFromNodeId());
+            MyNode to = findNodeById(arrowModel.getToNodeId());
+            Arrow arrow = createArrow(from, to, arrowModel.getInput(), arrowModel.getStackTop(), arrowModel.getStackPush());
+            arrows.add(arrow);
+        }
     }
 
 
@@ -161,7 +193,6 @@ public class Board implements Serializable {
         } else if (node instanceof MyNode myNode) {
             char character = (char) (nodeCounter + '₀');
             String name = "q" + character;
-            myNode.setNodeId(idNodeCounter++);
 
             myNode.setName(name);
             nodeCounter++;
@@ -181,10 +212,18 @@ public class Board implements Serializable {
         return myNode;
     }
 
+    public void createMyNodeFromHistory(String name, double x, double y, UUID nodeId, boolean starting, boolean ending) {
+        MyNode myNode = new MyNode(name, x, y, nodeId, starting, ending);
+        this.makeDraggable(myNode);
+        this.enableArrowCreation(myNode);
+        this.cursorChange(myNode);
+        this.addObject(myNode);
+    }
+
     private void createArrow(MyNode node) {
         if (selectedNode != null) {
             saveCurrentState();
-            createMyArrow(selectedNode, node, null, null, null);
+            createMyArrow(selectedNode.getNodeId(), node.getNodeId(), null, null, null);
             this.selectNode(selectedNode, false);
             selectedNode = null;
 
@@ -194,8 +233,10 @@ public class Board implements Serializable {
         }
     }
 
-    public void createMyArrow(MyNode from, MyNode to, String input, String stackTop, String stackPush) {
-        Arrow arrow = this.createArrow(from, to, input, stackTop, stackPush);
+    public void createMyArrow(UUID fromId, UUID toId, String input, String stackTop, String stackPush) {
+        MyNode fromNode = findNodeById(fromId);
+        MyNode toNode = findNodeById(toId);
+        Arrow arrow = this.createArrow(fromNode, toNode, input, stackTop, stackPush);
         if (arrow != null) {
             this.makeErasable(arrow);
             if (arrow instanceof LineArrow lineArrow) {
@@ -225,10 +266,6 @@ public class Board implements Serializable {
         return false;
     }
 
-    public void testBoard() {
-        clearBoard();
-    }
-
     public void clearBoard() {
         mainPane.getChildren().clear();
         nodes.clear();
@@ -250,6 +287,15 @@ public class Board implements Serializable {
     public void setStarting(MyNode node, boolean starting) {
         node.setStarting(starting);
         this.setStartNode(node);
+    }
+
+    private MyNode findNodeById(UUID nodeId) {
+        for (MyNode node : nodes) {
+            if (node.getNodeId().equals(nodeId)) {
+                return node;
+            }
+        }
+        return null;
     }
 
     public void setEnding(MyNode node, boolean ending) {
@@ -442,7 +488,7 @@ public class Board implements Serializable {
         BoardHistory boardHistory = myHistory.getBoardHistory();
         this.nodeCounter = boardHistory.getNodeCounter();
         this.idNodeCounter = boardHistory.getIdNodeCounter();
-        Integer startNodeId = boardHistory.getStartNodeId();
+        UUID startNodeId = boardHistory.getStartNodeId();
         List<NodeHistory> nodeHistories = myHistory.getNodeHistory();
         List<ArrowHistory> arrowHistories = myHistory.getArrowHistory();
         List<Node> newNodes = new ArrayList<>();
@@ -468,7 +514,7 @@ public class Board implements Serializable {
         if (startNodeId != null) {
             for (Node node : newNodes) {
                 if (node instanceof MyNode myNode) {
-                    if (myNode.getNodeId() == startNodeId) {
+                    if (myNode.getNodeId().equals(startNodeId)) {
                         this.setStarting(myNode, true);
                     }
                 }

@@ -13,6 +13,7 @@ import org.apache.logging.log4j.Logger;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import static com.example.bakalar.logic.MainController.NODE_RADIUS;
 
@@ -30,11 +31,11 @@ public class MyNode extends Group implements Serializable {
     private EndNode endNode;
     private StartNodeArrow startNodeArrow;
     private boolean selected;
-    private int nodeId;
+    private UUID nodeId;
 
     public MyNode(double x, double y, double radius) {
         super();
-
+        this.nodeId = UUID.randomUUID();
         circle = createCircle(x, y, radius);
         nameText = createNameText();
 
@@ -49,17 +50,17 @@ public class MyNode extends Group implements Serializable {
         this.arrowsTo = new ArrayList<>();
     }
 
-    public MyNode(String name, double x, double y, int nodeId, boolean isStarting, boolean isEnding) {
+    public MyNode(String name, double x, double y, UUID nodeId, boolean starting, boolean ending) {
         this(x, y, NODE_RADIUS);
         this.name = name;
         this.nodeId = nodeId;
-        this.starting = isStarting;
-        this.ending = isEnding;
+        this.starting = starting;
+        this.ending = ending;
         this.setName(name);
-        if (isStarting) {
+        if (starting) {
             startNodeArrow.setVisible(true);
         }
-        if (isEnding) {
+        if (ending) {
             endNode.setVisible(true);
         }
     }
@@ -149,21 +150,13 @@ public class MyNode extends Group implements Serializable {
         return allArrows;
     }
 
-    public void updatePosition() {
-        this.setTranslateX(this.getTranslateX());
-        this.setTranslateY(this.getTranslateY());
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof MyNode myNode)) return false;
 
-        return getNodeId() == myNode.getNodeId();
+        return getNodeId().equals(myNode.getNodeId());
     }
 
-    @Override
-    public int hashCode() {
-        return getNodeId();
-    }
+
 }

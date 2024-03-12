@@ -12,6 +12,7 @@ import lombok.Setter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -57,9 +58,9 @@ public class HistoryLogic {
     }
 
 
-    public MyNode findNodeById(int toId) {
+    public MyNode findNodeById(UUID toId) {
         for (MyNode node : board.getNodes()) {
-            if (node.getNodeId() == toId) {
+            if (node.getNodeId().equals(toId)) {
                 return node;
             }
         }
