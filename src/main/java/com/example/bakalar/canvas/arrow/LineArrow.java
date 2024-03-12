@@ -51,27 +51,10 @@ public class LineArrow extends Arrow {
         this.updateObjects(true);
     }
 
-    public LineArrow(MyNode from, MyNode to, Board board, List<TransitionInputs> transitionInputs, double startX, double startY,
-                     double endX, double endY, double controlPointChangeX, double controlPointChangeY) {
-        super(from, to, board, transitionInputs);
-        this.line = createLine();
-        line.setControlX(controlX);
-        line.setControlY(controlY);
-        line.setStartX(startX);
-        line.setStartY(startY);
-        line.setEndX(endX);
-        line.setEndY(endY);
-
-        this.controlIndicator = createControlIndicator();
-        this.controlX = (startX + endX) / 2.0 + controlPointChangeX;
-        this.controlY = (startY + endY) / 2.0 + controlPointChangeY;
-
-        this.startX = startX;
-        this.startY = startY;
+    public LineArrow(MyNode from, MyNode to, double controlPointChangeX, double controlPointChangeY, Board board, List<TransitionInputs> transitionInputs) {
+        this(from, to, board, transitionInputs);
         this.controlPointChangeX = controlPointChangeX;
         this.controlPointChangeY = controlPointChangeY;
-        this.endX = endX;
-        this.endY = endY;
         this.updateObjects(true);
     }
 

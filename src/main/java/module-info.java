@@ -28,9 +28,9 @@ module com.example.bakalar {
     exports com.example.bakalar.logic.conversion;
     opens com.example.bakalar.logic.conversion to javafx.fxml, lombok;
     exports com.example.bakalar.logic.history;
-    opens com.example.bakalar.logic.history to javafx.fxml, lombok;
     exports com.example.bakalar.logic.utility;
     opens com.example.bakalar.logic.utility to javafx.fxml, lombok;
     opens com.example.bakalar.canvas.arrow to com.fasterxml.jackson.core, com.fasterxml.jackson.databind, javafx.fxml, lombok;
     opens com.example.bakalar.canvas.node to com.fasterxml.jackson.core, com.fasterxml.jackson.databind, javafx.fxml, lombok;
+    opens com.example.bakalar.logic.history to com.fasterxml.jackson.core, com.fasterxml.jackson.databind, javafx.fxml, lombok;
 }

@@ -1,7 +1,5 @@
-package com.example.bakalar.files;
+package com.example.bakalar.logic.history;
 
-import com.example.bakalar.canvas.arrow.ArrowModel;
-import com.example.bakalar.canvas.node.MyNodeModel;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,12 +9,14 @@ import java.util.List;
 @Getter
 @Setter
 public class AppState implements Serializable {
-    private List<MyNodeModel> nodes;
+    private List<NodeModel> nodes;
     private List<ArrowModel> arrows;
+    private int nodeCounter;
 
-    public AppState(List<MyNodeModel> nodes, List<ArrowModel> arrows) {
+    public AppState(List<NodeModel> nodes, List<ArrowModel> arrows, int nodeCounter) {
         this.nodes = nodes;
         this.arrows = arrows;
+        this.nodeCounter = nodeCounter;
     }
 
     public AppState() {

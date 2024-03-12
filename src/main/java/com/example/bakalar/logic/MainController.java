@@ -1,5 +1,6 @@
 package com.example.bakalar.logic;
 
+import com.example.bakalar.canvas.arrow.TransitionInputs;
 import com.example.bakalar.canvas.node.MyNode;
 import com.example.bakalar.logic.conversion.ConversionLogic;
 import com.example.bakalar.logic.history.HistoryLogic;
@@ -196,12 +197,12 @@ public class MainController {
         MyNode secondNode = currentBoard.createMyNode(320, 150);
         currentBoard.setEnding(firstNode, true);
 
-        currentBoard.createMyArrow(firstNode.getNodeId(), firstNode.getNodeId(), "1", "Z", "XZ");
-        currentBoard.createMyArrow(firstNode.getNodeId(), firstNode.getNodeId(), "1", "X", "XX");
-        currentBoard.createMyArrow(firstNode.getNodeId(), firstNode.getNodeId(), EPSILON, "X", EPSILON);
-        currentBoard.createMyArrow(firstNode.getNodeId(), secondNode.getNodeId(), "0", "X", "X");
-        currentBoard.createMyArrow(secondNode.getNodeId(), secondNode.getNodeId(), "1", "X", EPSILON);
-        currentBoard.createMyArrow(secondNode.getNodeId(), firstNode.getNodeId(), "0", "Z", "Z");
+        currentBoard.createMyArrow(firstNode.getNodeId(), firstNode.getNodeId(), new TransitionInputs("1", "Z", "XZ"));
+        currentBoard.createMyArrow(firstNode.getNodeId(), firstNode.getNodeId(), new TransitionInputs("1", "X", "XX"));
+        currentBoard.createMyArrow(firstNode.getNodeId(), firstNode.getNodeId(), new TransitionInputs(EPSILON, "X", EPSILON));
+        currentBoard.createMyArrow(firstNode.getNodeId(), secondNode.getNodeId(), new TransitionInputs("0", "X", "X"));
+        currentBoard.createMyArrow(secondNode.getNodeId(), secondNode.getNodeId(), new TransitionInputs("1", "X", EPSILON));
+        currentBoard.createMyArrow(secondNode.getNodeId(), firstNode.getNodeId(), new TransitionInputs("0", "Z", "Z"));
     }
 
     // Buttons toggle

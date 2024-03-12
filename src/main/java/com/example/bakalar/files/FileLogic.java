@@ -1,11 +1,11 @@
 package com.example.bakalar.files;
 
 import com.example.bakalar.canvas.arrow.Arrow;
-import com.example.bakalar.canvas.arrow.ArrowModel;
+import com.example.bakalar.logic.history.AppState;
+import com.example.bakalar.logic.history.ArrowModel;
 import com.example.bakalar.canvas.arrow.TransitionInputs;
 import com.example.bakalar.canvas.node.MyNode;
-import com.example.bakalar.canvas.node.MyNodeModel;
-import com.example.bakalar.logic.transitions.Transition;
+import com.example.bakalar.logic.history.NodeModel;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -16,17 +16,16 @@ import java.util.List;
 
 public class FileLogic {
 
-//    saveToJson(nodes, arrows, "myDiagramState.pda");
 
 
     public FileLogic() {
     }
 
-    public void saveToJson(List<MyNode> nodes, List<Arrow> arrows, Stage primaryStage) {
+    public void saveToJson(List<MyNode> nodes, List<Arrow> arrows, int nodeCounter, Stage primaryStage) {
         File file = showSaveFileDialog(primaryStage);
         if (file != null) {
-            List<MyNodeModel> myNodeModels = nodes.stream().map(node -> {
-                MyNodeModel myNodeModel = new MyNodeModel();
+            List<NodeModel> myNodeModels = nodes.stream().map(node -> {
+                NodeModel myNodeModel = new NodeModel();
                 myNodeModel.setNodeId(node.getNodeId());
                 myNodeModel.setX(node.getAbsoluteCentrePosX());
                 myNodeModel.setY(node.getAbsoluteCentrePosY());
@@ -42,22 +41,20 @@ public class FileLogic {
                     ArrowModel arrowModel = new ArrowModel();
                     arrowModel.setFromNodeId(arrow.getFrom().getNodeId());
                     arrowModel.setToNodeId(arrow.getTo().getNodeId());
-                    arrowModel.setInput(inputs.getRead());
-                    arrowModel.setStackTop(inputs.getPop());
-                    arrowModel.setStackPush(inputs.getPush());
+                    arrowModel.setTransition(inputs);
                     arrowModels.add(arrowModel);
                 }
             }
 
-            saveToJson(myNodeModels, arrowModels, file.getAbsolutePath());
+            saveToJson(myNodeModels, arrowModels, nodeCounter, file.getAbsolutePath());
         }
     }
 
-    private void saveToJson(List<MyNodeModel> nodes, List<ArrowModel> arrows, String filePath) {
+    private void saveToJson(List<NodeModel> nodes, List<ArrowModel> arrows, int nodeCounter, String filePath) {
         try {
             ObjectMapper mapper = new ObjectMapper();
             // Create a wrapper object that holds both lists
-            AppState state = new AppState(nodes, arrows);
+            AppState state = new AppState(nodes, arrows, nodeCounter);
             // Write JSON to the file
             mapper.writeValue(new File(filePath), state);
         } catch (Exception e) {

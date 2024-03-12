@@ -3,6 +3,7 @@ package com.example.bakalar.logic.history;
 import com.example.bakalar.canvas.arrow.Arrow;
 import com.example.bakalar.canvas.arrow.LineArrow;
 import com.example.bakalar.canvas.arrow.SelfLoopArrow;
+import com.example.bakalar.canvas.arrow.TransitionInputs;
 import com.example.bakalar.canvas.node.MyNode;
 import com.example.bakalar.logic.Board;
 import javafx.scene.Node;
@@ -17,8 +18,8 @@ import java.util.UUID;
 @Getter
 @Setter
 public class HistoryLogic {
-    private Stack<MyHistory> undoStack;
-    private Stack<MyHistory> redoStack;
+    private Stack<AppState> undoStack;
+    private Stack<AppState> redoStack;
     private Board board;
 
     public HistoryLogic() {
@@ -26,32 +27,35 @@ public class HistoryLogic {
         this.redoStack = new Stack<>();
     }
 
-    public MyHistory createHistory() {
-        BoardHistory boardHistory = new BoardHistory(board.getStartNode() == null ? null : board.getStartNode().getNodeId(),
-                board.getNodeCounter(), board.getIdNodeCounter());
-        List<ArrowHistory> arrowHistories = createArrowHistory(board.getArrows());
-        List<NodeHistory> nodeHistories = createNodeHistory(board.getNodes());
+    public AppState createHistory() {
+        AppState appState = new AppState();
+        appState.setNodeCounter(board.getNodeCounter());
+        List<ArrowModel> arrowHistories = createArrowHistory(board.getArrows());
+        List<NodeModel> nodeHistories = createNodeHistory(board.getNodes());
+        appState.setNodes(nodeHistories);
+        appState.setArrows(arrowHistories);
 
-        return new MyHistory(boardHistory, nodeHistories, arrowHistories);
+        return appState;
     }
 
-    private List<ArrowHistory> createArrowHistory(List<Arrow> arrows) {
-        List<ArrowHistory> arrowHistories = new ArrayList<>();
+    private List<ArrowModel> createArrowHistory(List<Arrow> arrows) {
+        List<ArrowModel> arrowHistories = new ArrayList<>();
         for (Arrow arrow : arrows) {
-            if (arrow instanceof LineArrow lineArrow) {
-                arrowHistories.add(new ArrowHistory(lineArrow.getStartX(), lineArrow.getStartY(), lineArrow.getEndX(), lineArrow.getEndY(),
-                        lineArrow.getFromId(), lineArrow.getToId(), lineArrow.getTransitions(), lineArrow.getControlX(), lineArrow.getControlY(), true));
-            } else if (arrow instanceof SelfLoopArrow selfLoopArrow) {
-                arrowHistories.add(new ArrowHistory(selfLoopArrow.getFromId(), selfLoopArrow.getToId(), selfLoopArrow.getTransitions(), false));
+            for (TransitionInputs transition : arrow.getTransitions()) {
+                if (arrow instanceof LineArrow la) {
+                    arrowHistories.add(new ArrowModel(la.getFrom().getNodeId(), la.getTo().getNodeId(), transition, la.getControlPointChangeX(), la.getControlPointChangeY()));
+                } else if (arrow instanceof SelfLoopArrow sla) {
+                    arrowHistories.add(new ArrowModel(sla.getFrom().getNodeId(), sla.getTo().getNodeId(), transition));
+                }
             }
         }
         return arrowHistories;
     }
 
-    private List<NodeHistory> createNodeHistory(List<MyNode> nodes) {
-        List<NodeHistory> nodeHistories = new ArrayList<>();
+    private List<NodeModel> createNodeHistory(List<MyNode> nodes) {
+        List<NodeModel> nodeHistories = new ArrayList<>();
         for (MyNode node : nodes) {
-            nodeHistories.add(new NodeHistory(node.getName(), node.getAbsoluteCentrePosX(), node.getAbsoluteCentrePosY(), node.isStarting(), node.isEnding(), node.getNodeId()));
+            nodeHistories.add(new NodeModel(node.getName(), node.getAbsoluteCentrePosX(), node.getAbsoluteCentrePosY(), node.isStarting(), node.isEnding(), node.getNodeId()));
         }
         return nodeHistories;
 
@@ -77,7 +81,7 @@ public class HistoryLogic {
     }
 
     public void saveCurrentState() {
-        MyHistory myHistory = this.createHistory();
+        AppState myHistory = this.createHistory();
         undoStack.push(myHistory);
         redoStack.clear();
     }
@@ -85,16 +89,16 @@ public class HistoryLogic {
     public void undo() {
         if (!undoStack.isEmpty()) {
             redoStack.push(this.createHistory());
-            MyHistory boardHistory = undoStack.pop();
-            board.restoreBoardFromHistory(boardHistory);
+            AppState boardHistory = undoStack.pop();
+            board.createBoardFromAppState(boardHistory);
         }
     }
 
     public void redo() {
         if (!redoStack.isEmpty()) {
             undoStack.push(this.createHistory());
-            MyHistory nextState = redoStack.pop();
-            board.restoreBoardFromHistory(nextState);
+            AppState nextState = redoStack.pop();
+            board.createBoardFromAppState(nextState);
         }
     }
 }

@@ -3,9 +3,11 @@ package com.example.bakalar.canvas.arrow;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
+
 @Getter
 @Setter
-public class TransitionInputs {
+public class TransitionInputs implements Serializable {
     private String read;
     private String pop;
     private String push;
