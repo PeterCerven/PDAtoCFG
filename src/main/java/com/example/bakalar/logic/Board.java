@@ -506,6 +506,8 @@ public class Board implements Serializable {
             return;
         }
         arrow = new SelfLoopArrow(from, to, this, List.of(transitionInputs));
+        from.addArrow(arrow, "from");
+        to.addArrow(arrow, "to");
         this.makeErasable(arrow);
         this.addObject(arrow);
     }
@@ -521,6 +523,8 @@ public class Board implements Serializable {
             return;
         }
         arrow = new LineArrow(from, to, controlPointChangeX, controlPointChangeY, this, List.of(transitionInputs));
+        from.addArrow(arrow, "from");
+        to.addArrow(arrow, "to");
         this.makeErasable(arrow);
         this.makeCurveDraggable((LineArrow) arrow);
         this.addObject(arrow);
