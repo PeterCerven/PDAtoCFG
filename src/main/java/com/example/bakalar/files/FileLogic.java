@@ -21,7 +21,7 @@ public class FileLogic {
     public FileLogic() {
     }
 
-    public void saveToJson(List<MyNode> nodes, List<Arrow> arrows, int nodeCounter, Stage primaryStage) {
+    public void saveToJson(List<MyNode> nodes, List<Arrow> arrows, int nodeCounter, Long idCounter, Stage primaryStage) {
         File file = showSaveFileDialog(primaryStage);
         if (file != null) {
             List<NodeModel> myNodeModels = nodes.stream().map(node -> {
@@ -46,15 +46,15 @@ public class FileLogic {
                 }
             }
 
-            saveToJson(myNodeModels, arrowModels, nodeCounter, file.getAbsolutePath());
+            saveToJson(myNodeModels, arrowModels, nodeCounter, idCounter, file.getAbsolutePath());
         }
     }
 
-    private void saveToJson(List<NodeModel> nodes, List<ArrowModel> arrows, int nodeCounter, String filePath) {
+    private void saveToJson(List<NodeModel> nodes, List<ArrowModel> arrows, int nodeCounter, Long idCounter, String filePath) {
         try {
             ObjectMapper mapper = new ObjectMapper();
             // Create a wrapper object that holds both lists
-            AppState state = new AppState(nodes, arrows, nodeCounter);
+            AppState state = new AppState(nodes, arrows, nodeCounter, idCounter);
             // Write JSON to the file
             mapper.writeValue(new File(filePath), state);
         } catch (Exception e) {

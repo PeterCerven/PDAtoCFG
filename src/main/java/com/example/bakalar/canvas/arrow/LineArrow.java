@@ -225,6 +225,7 @@ public class LineArrow extends Arrow {
 
     private Circle createControlIndicator() {
         Circle controlIndicator = new Circle(NODE_RADIUS / 6.0 ,  Color.WHITE);
+        controlIndicator.setStyle("-fx-cursor: hand");
         controlIndicator.setStroke(Color.BLACK);
         controlIndicator.setTranslateX(controlX);
         controlIndicator.setTranslateY(controlY);

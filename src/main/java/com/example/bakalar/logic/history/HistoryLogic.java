@@ -13,7 +13,6 @@ import lombok.Setter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
-import java.util.UUID;
 
 @Getter
 @Setter
@@ -43,9 +42,9 @@ public class HistoryLogic {
         for (Arrow arrow : arrows) {
             for (TransitionInputs transition : arrow.getTransitions()) {
                 if (arrow instanceof LineArrow la) {
-                    arrowHistories.add(new ArrowModel(la.getFrom().getNodeId(), la.getTo().getNodeId(), transition, la.getControlPointChangeX(), la.getControlPointChangeY()));
+                    arrowHistories.add(new ArrowModel(la.getFrom().getNodeId(), la.getTo().getNodeId(), transition.copy(), la.getControlPointChangeX(), la.getControlPointChangeY()));
                 } else if (arrow instanceof SelfLoopArrow sla) {
-                    arrowHistories.add(new ArrowModel(sla.getFrom().getNodeId(), sla.getTo().getNodeId(), transition));
+                    arrowHistories.add(new ArrowModel(sla.getFrom().getNodeId(), sla.getTo().getNodeId(), transition.copy()));
                 }
             }
         }
@@ -62,7 +61,7 @@ public class HistoryLogic {
     }
 
 
-    public MyNode findNodeById(UUID toId) {
+    public MyNode findNodeById(Long toId) {
         for (MyNode node : board.getNodes()) {
             if (node.getNodeId().equals(toId)) {
                 return node;

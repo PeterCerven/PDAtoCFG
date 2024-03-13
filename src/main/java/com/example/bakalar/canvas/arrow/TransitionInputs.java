@@ -18,21 +18,37 @@ public class TransitionInputs implements Serializable {
         this.push = push;
     }
 
+    public TransitionInputs() {
+    }
+
+    public TransitionInputs copy() {
+        return new TransitionInputs(this.read, this.pop, this.push);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof TransitionInputs that)) return false;
 
-        if (getRead() != null ? !getRead().equals(that.getRead()) : that.getRead() != null) return false;
-        if (getPop() != null ? !getPop().equals(that.getPop()) : that.getPop() != null) return false;
-        return getPush() != null ? getPush().equals(that.getPush()) : that.getPush() == null;
+        if (!getRead().equals(that.getRead())) return false;
+        if (!getPop().equals(that.getPop())) return false;
+        return getPush().equals(that.getPush());
     }
 
     @Override
     public int hashCode() {
-        int result = getRead() != null ? getRead().hashCode() : 0;
-        result = 31 * result + (getPop() != null ? getPop().hashCode() : 0);
-        result = 31 * result + (getPush() != null ? getPush().hashCode() : 0);
+        int result = getRead().hashCode();
+        result = 31 * result + getPop().hashCode();
+        result = 31 * result + getPush().hashCode();
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return "TransitionInputs{" +
+                "read='" + read + '\'' +
+                ", pop='" + pop + '\'' +
+                ", push='" + push + '\'' +
+                '}';
     }
 }

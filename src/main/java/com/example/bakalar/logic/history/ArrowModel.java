@@ -5,14 +5,12 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.io.Serializable;
-import java.util.List;
-import java.util.UUID;
 
 @Getter
 @Setter
 public class ArrowModel implements Serializable {
-    private UUID fromNodeId;
-    private UUID toNodeId;
+    private Long fromNodeId;
+    private Long toNodeId;
     private TransitionInputs transition;
     private Double controlPointChangeX;
     private Double controlPointChangeY;
@@ -21,7 +19,7 @@ public class ArrowModel implements Serializable {
     public ArrowModel() {
     }
 
-    public ArrowModel(UUID fromNodeId, UUID toNodeId, TransitionInputs transition, Double controlPointChangeX, Double controlPointChangeY) {
+    public ArrowModel(Long fromNodeId, Long toNodeId, TransitionInputs transition, Double controlPointChangeX, Double controlPointChangeY) {
         this.fromNodeId = fromNodeId;
         this.toNodeId = toNodeId;
         this.transition = transition;
@@ -30,7 +28,7 @@ public class ArrowModel implements Serializable {
         this.isLineArrow = true;
     }
 
-    public ArrowModel(UUID fromNodeId, UUID toNodeId, TransitionInputs transition) {
+    public ArrowModel(Long fromNodeId, Long toNodeId, TransitionInputs transition) {
         this.fromNodeId = fromNodeId;
         this.toNodeId = toNodeId;
         this.transition = transition;

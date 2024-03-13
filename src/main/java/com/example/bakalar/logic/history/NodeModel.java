@@ -4,7 +4,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.io.Serializable;
-import java.util.UUID;
 
 @Getter
 @Setter
@@ -14,9 +13,9 @@ public class NodeModel implements Serializable {
     private double y;
     private boolean starting;
     private boolean ending;
-    private UUID nodeId;
+    private Long nodeId;
 
-    public NodeModel(String name, double x, double y, boolean starting, boolean ending, UUID nodeId) {
+    public NodeModel(String name, double x, double y, boolean starting, boolean ending, Long nodeId) {
         this.name = name;
         this.x = x;
         this.y = y;

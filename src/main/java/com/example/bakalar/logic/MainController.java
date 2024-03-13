@@ -6,7 +6,6 @@ import com.example.bakalar.logic.conversion.ConversionLogic;
 import com.example.bakalar.logic.history.HistoryLogic;
 import com.example.bakalar.logic.transitions.runPDALogic;
 import com.example.bakalar.logic.utility.ButtonState;
-import com.example.bakalar.logic.utility.DescribeCFG;
 import com.example.bakalar.logic.utility.DescribePDA;
 import javafx.fxml.FXML;
 import javafx.scene.Cursor;
@@ -18,7 +17,6 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
@@ -27,7 +25,6 @@ import org.apache.logging.log4j.Logger;
 import java.util.List;
 
 import static com.example.bakalar.logic.Board.EPSILON;
-import static com.example.bakalar.logic.Board.STARTING_Z;
 
 
 public class MainController {
@@ -158,7 +155,7 @@ public class MainController {
 
     public void createNode(MouseEvent event) {
         if (currentState.equals(ButtonState.NODE) && event.getButton() == MouseButton.PRIMARY) {
-            currentBoard.saveCurrentState();
+            currentBoard.saveCurrentStateToHistory();
             currentBoard.createMyNode(event.getX(), event.getY());
         }
     }
@@ -166,7 +163,7 @@ public class MainController {
     // Buttons actions
 
     public void resetAll() {
-        currentBoard.saveCurrentState();
+        currentBoard.saveCurrentStateToHistory();
         currentBoard.clearBoard();
         currentState = ButtonState.SELECT;
         currentBoard.setSelectedNode(null);
@@ -190,7 +187,7 @@ public class MainController {
     }
 
     public void testBoard() {
-        currentBoard.saveCurrentState();
+        currentBoard.saveCurrentStateToHistory();
         currentBoard.clearBoard();
         MyNode firstNode = currentBoard.createMyNode(120, 150);
         currentBoard.setStarting(firstNode, true);

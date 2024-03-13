@@ -13,7 +13,6 @@ import org.apache.logging.log4j.Logger;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import static com.example.bakalar.logic.MainController.NODE_RADIUS;
 
@@ -31,11 +30,11 @@ public class MyNode extends Group implements Serializable {
     private EndNode endNode;
     private StartNodeArrow startNodeArrow;
     private boolean selected;
-    private UUID nodeId;
+    private Long nodeId;
 
-    public MyNode(double x, double y, double radius) {
+    public MyNode(double x, double y, double radius, Long nodeId) {
         super();
-        this.nodeId = UUID.randomUUID();
+        this.nodeId = nodeId;
         circle = createCircle(x, y, radius);
         nameText = createNameText();
 
@@ -50,10 +49,9 @@ public class MyNode extends Group implements Serializable {
         this.arrowsTo = new ArrayList<>();
     }
 
-    public MyNode(String name, double x, double y, UUID nodeId, boolean starting, boolean ending) {
-        this(x, y, NODE_RADIUS);
+    public MyNode(String name, double x, double y, Long nodeId, boolean starting, boolean ending) {
+        this(x, y, NODE_RADIUS, nodeId);
         this.name = name;
-        this.nodeId = nodeId;
         this.starting = starting;
         this.ending = ending;
         this.setName(name);
@@ -158,5 +156,15 @@ public class MyNode extends Group implements Serializable {
         return getNodeId().equals(myNode.getNodeId());
     }
 
-
+    @Override
+    public String toString() {
+        return "MyNode{" +
+                "nodeId=" + nodeId +
+                ", name='" + name + '\'' +
+                ", arrowsFrom=" + arrowsFrom +
+                ", arrowsTo=" + arrowsTo +
+                ", starting=" + starting +
+                ", ending=" + ending +
+                '}';
+    }
 }

@@ -22,4 +22,9 @@ public class StartNodeArrow extends Path implements Serializable {
                 new LineTo(startNode, nodeY)
         );
     }
+
+    @Override
+    public String toString() {
+        return "StartNodeArrow{}";
+    }
 }

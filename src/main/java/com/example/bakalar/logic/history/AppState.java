@@ -12,11 +12,13 @@ public class AppState implements Serializable {
     private List<NodeModel> nodes;
     private List<ArrowModel> arrows;
     private int nodeCounter;
+    private Long idCounter;
 
-    public AppState(List<NodeModel> nodes, List<ArrowModel> arrows, int nodeCounter) {
+    public AppState(List<NodeModel> nodes, List<ArrowModel> arrows, int nodeCounter, Long idCounter) {
         this.nodes = nodes;
         this.arrows = arrows;
         this.nodeCounter = nodeCounter;
+        this.idCounter = idCounter;
     }
 
     public AppState() {

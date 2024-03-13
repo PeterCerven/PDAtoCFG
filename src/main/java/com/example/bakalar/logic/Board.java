@@ -1,13 +1,18 @@
 package com.example.bakalar.logic;
 
-import com.example.bakalar.canvas.arrow.*;
+import com.example.bakalar.canvas.arrow.Arrow;
+import com.example.bakalar.canvas.arrow.LineArrow;
+import com.example.bakalar.canvas.arrow.SelfLoopArrow;
+import com.example.bakalar.canvas.arrow.TransitionInputs;
 import com.example.bakalar.canvas.node.MyNode;
 import com.example.bakalar.canvas.node.StartNodeArrow;
 import com.example.bakalar.exceptions.MyCustomException;
-import com.example.bakalar.logic.history.AppState;
 import com.example.bakalar.files.FileLogic;
 import com.example.bakalar.logic.conversion.CFGRule;
-import com.example.bakalar.logic.history.*;
+import com.example.bakalar.logic.history.AppState;
+import com.example.bakalar.logic.history.ArrowModel;
+import com.example.bakalar.logic.history.HistoryLogic;
+import com.example.bakalar.logic.history.NodeModel;
 import com.example.bakalar.logic.transitions.Transition;
 import com.example.bakalar.logic.utility.*;
 import javafx.geometry.Insets;
@@ -57,6 +62,8 @@ public class Board implements Serializable {
     private DescribeCFG describeCFG;
     private FileLogic fileLogic;
     private Stage stage;
+    private boolean dragging;
+    private Long idCounter;
 
 
     public Board(AnchorPane mainPane, DescribePDA describePDA, HistoryLogic historyLogic, ButtonState currentState, Stage stage) {
@@ -76,20 +83,24 @@ public class Board implements Serializable {
         this.historyLogic = historyLogic;
         this.fileLogic = new FileLogic();
         this.stage = stage;
+        this.dragging = false;
+        this.idCounter = 0L;
     }
 
     // file operations
 
     public void saveCurrentStateToFile() {
-        fileLogic.saveToJson(nodes, arrows, nodeCounter, this.stage);
+        fileLogic.saveToJson(nodes, arrows, nodeCounter, idCounter ,stage);
     }
 
     public void loadStateFromFile() {
         AppState appState = fileLogic.loadFromJson(this.stage);
-        createBoardFromAppState(appState);
+        if (appState == null) {
+            showErrorDialog("Nepodarilo sa načítať súbor");
+        } else {
+            createBoardFromAppState(appState);
+        }
     }
-
-
 
 
     public void updateAllDescribePDA() {
@@ -180,18 +191,20 @@ public class Board implements Serializable {
         } else if (node instanceof MyNode myNode) {
             char character = (char) (nodeCounter + '₀');
             String name = "q" + character;
+            idCounter++;
 
             myNode.setName(name);
             nodeCounter++;
             nodes.add(myNode);
 
         }
+//        log.info("Adding object to board" + node.toString());
         mainPane.getChildren().add(node);
         updateAllDescribePDA();
     }
 
     public MyNode createMyNode(double x, double y) {
-        MyNode myNode = new MyNode(x, y, NODE_RADIUS);
+        MyNode myNode = new MyNode(x, y, NODE_RADIUS, idCounter);
         this.makeDraggable(myNode);
         this.enableArrowCreation(myNode);
         this.cursorChange(myNode);
@@ -199,7 +212,7 @@ public class Board implements Serializable {
         return myNode;
     }
 
-    public void createMyNodeFromHistory(String name, double x, double y, UUID nodeId, boolean starting, boolean ending) {
+    public void createMyNodeFromHistory(String name, double x, double y, Long nodeId, boolean starting, boolean ending) {
         MyNode myNode = new MyNode(name, x, y, nodeId, starting, ending);
         this.makeDraggable(myNode);
         this.enableArrowCreation(myNode);
@@ -209,7 +222,7 @@ public class Board implements Serializable {
 
     private void createArrow(MyNode node) {
         if (selectedNode != null) {
-            saveCurrentState();
+            saveCurrentStateToHistory();
             createMyArrow(selectedNode.getNodeId(), node.getNodeId(), null);
             this.selectNode(selectedNode, false);
             selectedNode = null;
@@ -220,7 +233,7 @@ public class Board implements Serializable {
         }
     }
 
-    public void createMyArrow(UUID fromId, UUID toId, TransitionInputs transitionInputs) {
+    public void createMyArrow(Long fromId, Long toId, TransitionInputs transitionInputs) {
         try {
             MyNode fromNode = findNodeById(fromId);
             MyNode toNode = findNodeById(toId);
@@ -279,7 +292,7 @@ public class Board implements Serializable {
         this.setStartNode(node);
     }
 
-    private MyNode findNodeById(UUID nodeId) throws MyCustomException {
+    private MyNode findNodeById(Long nodeId) throws MyCustomException {
         for (MyNode node : nodes) {
             if (node.getNodeId().equals(nodeId)) {
                 return node;
@@ -333,7 +346,6 @@ public class Board implements Serializable {
             String newPop = input2.getText().isBlank() ? EPSILON : input2.getText();
             String newPush = input3.getText().isBlank() ? EPSILON : input3.getText();
 
-            this.updateAllDescribePDA();
             return new TransitionInputs(newRead, newPop, newPush);
         }
         return null;
@@ -363,6 +375,7 @@ public class Board implements Serializable {
         Optional<ButtonType> result = dialog.showAndWait();
         result.ifPresent(buttonType -> {
             if (buttonType == ButtonType.OK) {
+                saveCurrentStateToHistory();
                 node.setName(nameField.getText());
                 if (startingCheckBox.isSelected()) {
                     removeStartingFromOtherNodes();
@@ -389,15 +402,21 @@ public class Board implements Serializable {
 
         arrow.getControlIndicator().setOnMouseDragged(e -> {
             if (currentState.equals(ButtonState.SELECT)) {
+                if (!dragging) {
+                    dragging = true;
+                    this.saveCurrentStateToHistory();
+                }
                 arrow.moveControlPoint(e.getSceneX() - startX, e.getSceneY() - startY);
             }
         });
 
-        arrow.getControlIndicator().setOnMouseEntered(e -> {
+        arrow.getControlIndicator().setOnMouseReleased(e -> {
             if (currentState.equals(ButtonState.SELECT)) {
-                arrow.getControlIndicator().setStyle("-fx-cursor: hand");
+                dragging = false;
             }
         });
+
+
     }
 
     public void makeDraggable(MyNode node) {
@@ -414,6 +433,10 @@ public class Board implements Serializable {
 
         node.setOnMouseDragged(e -> {
             if (currentState.equals(ButtonState.SELECT)) {
+                if (!dragging) {
+                    dragging = true;
+                    this.saveCurrentStateToHistory();
+                }
                 node.move(e.getSceneX() - startX, e.getSceneY() - startY);
                 node.updateArrows(false);
             }
@@ -422,6 +445,7 @@ public class Board implements Serializable {
         node.setOnMouseReleased(event -> {
             if (currentState.equals(ButtonState.SELECT)) {
                 node.updateArrows(true);
+                dragging = false;
             }
         });
     }
@@ -432,7 +456,7 @@ public class Board implements Serializable {
             if (currentState.equals(ButtonState.ARROW) && event.getButton() == MouseButton.PRIMARY) {
                 createArrow(node);
             } else if (currentState.equals(ButtonState.ERASE) && event.getButton() == MouseButton.PRIMARY) {
-                saveCurrentState();
+                saveCurrentStateToHistory();
                 this.removeObject(node);
             }
         });
@@ -453,7 +477,7 @@ public class Board implements Serializable {
     public void makeErasable(Node node) {
         node.setOnMouseClicked(event -> {
             if (currentState.equals(ButtonState.ERASE) && event.getButton() == MouseButton.PRIMARY) {
-                saveCurrentState();
+                saveCurrentStateToHistory();
                 this.removeObject(node);
             }
         });
@@ -461,7 +485,7 @@ public class Board implements Serializable {
 
     // history
 
-    public void saveCurrentState() {
+    public void saveCurrentStateToHistory() {
         historyLogic.saveCurrentState();
     }
 
