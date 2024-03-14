@@ -42,9 +42,9 @@ public class HistoryLogic {
         for (Arrow arrow : arrows) {
             for (TransitionInputs transition : arrow.getTransitions()) {
                 if (arrow instanceof LineArrow la) {
-                    arrowHistories.add(new ArrowModel(la.getFrom().getNodeId(), la.getTo().getNodeId(), transition.copy(), la.getControlPointChangeX(), la.getControlPointChangeY()));
+                    arrowHistories.add(new ArrowModel(la.getArrowId(), la.getFrom().getNodeId(), la.getTo().getNodeId(), transition.copy(), la.getControlPointChangeX(), la.getControlPointChangeY()));
                 } else if (arrow instanceof SelfLoopArrow sla) {
-                    arrowHistories.add(new ArrowModel(sla.getFrom().getNodeId(), sla.getTo().getNodeId(), transition.copy()));
+                    arrowHistories.add(new ArrowModel(sla.getArrowId(), sla.getFrom().getNodeId(), sla.getTo().getNodeId(), transition.copy()));
                 }
             }
         }

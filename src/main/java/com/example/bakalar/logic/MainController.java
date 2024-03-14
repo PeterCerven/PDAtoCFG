@@ -9,16 +9,20 @@ import com.example.bakalar.logic.utility.ButtonState;
 import com.example.bakalar.logic.utility.DescribePDA;
 import javafx.fxml.FXML;
 import javafx.scene.Cursor;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import lombok.Setter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -65,13 +69,12 @@ public class MainController {
     private TextField describeEndStates;
     @FXML
     private VBox transFunctions;
-    @FXML
-    private BorderPane mainContainer;
     private ButtonState currentState = ButtonState.SELECT;
     private Board currentBoard;
-    private runPDALogic runPDALogic;
     private ConversionLogic conversionLogic;
+    @Setter
     private Stage stage;
+    private Scene mainScene;
 
 
     @FXML
@@ -81,29 +84,22 @@ public class MainController {
     }
 
     private void setupBoard() {
-
-
-
         List<TextField> describePDAFields = List.of(describeStates, describeAlphabet, describeStackAlphabet, describeEndStates);
         DescribePDA describePDA = new DescribePDA(describePDAFields, transFunctions);
-
-
-
         HistoryLogic historyLogic = new HistoryLogic();
-
         currentBoard = new Board(mainPane, describePDA, historyLogic, currentState, stage);
         historyLogic.setBoard(currentBoard);
-//        this.runPDALogic = new runPDALogic(currentBoard, this.stateContainer);
         this.conversionLogic = new ConversionLogic(currentBoard);
-//        inputFieldAlphabet.textProperty().addListener((observable, oldValue, newValue) -> {
-//            currentBoard.updateAllDescribePDA();
-//        });
     }
 
-    public void setStage(Stage stage) {
-        this.stage = stage;
+    public void setMainScene(Scene mainScene) {
+        this.mainScene = mainScene;
+        mainScene.addEventHandler(KeyEvent.KEY_PRESSED, keyEvent -> {
+            if (keyEvent.getCode() == KeyCode.ESCAPE) {
+                keyAction(keyEvent);
+            }
+        });
     }
-
 
     // set images
 
@@ -168,10 +164,6 @@ public class MainController {
         currentState = ButtonState.SELECT;
         currentBoard.setSelectedNode(null);
         updateButtonStates();
-    }
-
-    public void step() {
-        runPDALogic.step();
     }
 
     public void buttonRedo() {
@@ -244,6 +236,15 @@ public class MainController {
 
     public void loadFromFile() {
         currentBoard.loadStateFromFile();
+    }
+
+    // key actions
+    public void keyAction(KeyEvent event) {
+        if (event.getCode() == KeyCode.ESCAPE) {
+            currentState = ButtonState.SELECT;
+            updateButtonStates();
+            currentBoard.setCurrentState(currentState);
+        }
     }
 
 }

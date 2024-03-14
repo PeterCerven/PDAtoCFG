@@ -40,6 +40,7 @@ public class FileLogic {
             for (Arrow arrow : arrows) {
                 for (TransitionInputs inputs : arrow.getTransitions()) {
                     ArrowModel arrowModel = new ArrowModel();
+                    arrowModel.setArrowId(arrow.getArrowId());
                     arrowModel.setFromNodeId(arrow.getFrom().getNodeId());
                     arrowModel.setToNodeId(arrow.getTo().getNodeId());
                     arrowModel.setTransition(inputs);

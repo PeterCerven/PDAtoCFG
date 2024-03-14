@@ -9,6 +9,7 @@ import java.io.Serializable;
 @Getter
 @Setter
 public class ArrowModel implements Serializable {
+    private Long arrowId;
     private Long fromNodeId;
     private Long toNodeId;
     private TransitionInputs transition;
@@ -19,7 +20,8 @@ public class ArrowModel implements Serializable {
     public ArrowModel() {
     }
 
-    public ArrowModel(Long fromNodeId, Long toNodeId, TransitionInputs transition, Double controlPointChangeX, Double controlPointChangeY) {
+    public ArrowModel(Long arrowId, Long fromNodeId, Long toNodeId, TransitionInputs transition, Double controlPointChangeX, Double controlPointChangeY) {
+        this.arrowId = arrowId;
         this.fromNodeId = fromNodeId;
         this.toNodeId = toNodeId;
         this.transition = transition;
@@ -28,7 +30,8 @@ public class ArrowModel implements Serializable {
         this.isLineArrow = true;
     }
 
-    public ArrowModel(Long fromNodeId, Long toNodeId, TransitionInputs transition) {
+    public ArrowModel(Long arrowId, Long fromNodeId, Long toNodeId, TransitionInputs transition) {
+        this.arrowId = arrowId;
         this.fromNodeId = fromNodeId;
         this.toNodeId = toNodeId;
         this.transition = transition;

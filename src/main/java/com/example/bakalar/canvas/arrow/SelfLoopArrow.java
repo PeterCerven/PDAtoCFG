@@ -21,8 +21,8 @@ public class SelfLoopArrow extends Arrow {
     private Arc arc;
 
 
-    public SelfLoopArrow(MyNode from, MyNode to, Board board, List<TransitionInputs> transitionInputs) {
-        super(from, to, board, transitionInputs);
+    public SelfLoopArrow(MyNode from, MyNode to, Board board, List<TransitionInputs> transitionInputs, Long arrowId) {
+        super(from, to, board, transitionInputs, arrowId);
 
         createArc();
         this.getChildren().add(arc);

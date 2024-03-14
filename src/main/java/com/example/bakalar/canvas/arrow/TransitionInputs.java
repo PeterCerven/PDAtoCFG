@@ -37,9 +37,9 @@ public class TransitionInputs implements Serializable {
 
     @Override
     public int hashCode() {
-        int result = getRead().hashCode();
-        result = 31 * result + getPop().hashCode();
-        result = 31 * result + getPush().hashCode();
+        int result = getRead() != null ? getRead().hashCode() : 0;
+        result = 31 * result + (getPop() != null ? getPop().hashCode() : 0);
+        result = 31 * result + (getPush() != null ? getPush().hashCode() : 0);
         return result;
     }
 

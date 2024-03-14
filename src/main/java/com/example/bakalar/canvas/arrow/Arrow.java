@@ -21,7 +21,6 @@ import org.apache.logging.log4j.Logger;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import static com.example.bakalar.logic.MainController.NODE_RADIUS;
 
@@ -38,13 +37,15 @@ public abstract class Arrow extends Group implements Serializable {
     protected Board board;
     protected Long fromId;
     protected Long toId;
+    protected Long arrowId;
 
 
-    public Arrow(MyNode from, MyNode to, Board board, List<TransitionInputs> transitionInputs) {
+    public Arrow(MyNode from, MyNode to, Board board, List<TransitionInputs> transitionInputs, Long arrowId) {
         super();
         this.transitions = new ArrayList<>();
         this.from = from;
         this.to = to;
+        this.arrowId = arrowId;
         this.fromId = from.getNodeId();
         this.toId = to.getNodeId();
         this.board = board;
@@ -175,11 +176,18 @@ public abstract class Arrow extends Group implements Serializable {
         if (this == o) return true;
         if (!(o instanceof Arrow arrow)) return false;
 
-        if (!getTransitions().equals(arrow.getTransitions())) return false;
-        if (!getFromId().equals(arrow.getFromId())) return false;
-        return getToId().equals(arrow.getToId());
+        if (getFromId() != null ? !getFromId().equals(arrow.getFromId()) : arrow.getFromId() != null) return false;
+        if (getToId() != null ? !getToId().equals(arrow.getToId()) : arrow.getToId() != null) return false;
+        return getArrowId() != null ? getArrowId().equals(arrow.getArrowId()) : arrow.getArrowId() == null;
     }
 
+    @Override
+    public int hashCode() {
+        int result = getFromId() != null ? getFromId().hashCode() : 0;
+        result = 31 * result + (getToId() != null ? getToId().hashCode() : 0);
+        result = 31 * result + (getArrowId() != null ? getArrowId().hashCode() : 0);
+        return result;
+    }
 
     @Override
     public String toString() {

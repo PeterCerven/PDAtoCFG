@@ -71,6 +71,7 @@ public class Board implements Serializable {
         this.rules = new ArrayList<>();
         this.describePDA = describePDA;
         this.arrows = new ArrayList<>();
+        this.idCounter = 0L;
         this.mainPane = mainPane;
         this.startNodeArrow = new StartNodeArrow(0, 0, 0);
         this.addObject(startNodeArrow);
@@ -84,13 +85,12 @@ public class Board implements Serializable {
         this.fileLogic = new FileLogic();
         this.stage = stage;
         this.dragging = false;
-        this.idCounter = 0L;
     }
 
     // file operations
 
     public void saveCurrentStateToFile() {
-        fileLogic.saveToJson(nodes, arrows, nodeCounter, idCounter ,stage);
+        fileLogic.saveToJson(nodes, arrows, nodeCounter, idCounter, stage);
     }
 
     public void loadStateFromFile() {
@@ -170,12 +170,12 @@ public class Board implements Serializable {
         }
         List<TransitionInputs> transitions = List.of(transitionInputs);
         if (from == to) {
-            arrow = new SelfLoopArrow(from, to, this, transitions);
+            arrow = new SelfLoopArrow(from, to, this, transitions, this.idCounter);
         } else {
             if (oppositeExists(from, to)) {
-                arrow = new LineArrow(from, to, 30, this, transitions);
+                arrow = new LineArrow(from, to, 30, this, transitions, this.idCounter);
             } else {
-                arrow = new LineArrow(from, to, this, transitions);
+                arrow = new LineArrow(from, to, this, transitions, this.idCounter);
             }
         }
         to.addArrow(arrow, "to");
@@ -191,13 +191,13 @@ public class Board implements Serializable {
         } else if (node instanceof MyNode myNode) {
             char character = (char) (nodeCounter + '₀');
             String name = "q" + character;
-            idCounter++;
 
             myNode.setName(name);
             nodeCounter++;
             nodes.add(myNode);
 
         }
+        idCounter++;
 //        log.info("Adding object to board" + node.toString());
         mainPane.getChildren().add(node);
         updateAllDescribePDA();
@@ -529,7 +529,7 @@ public class Board implements Serializable {
             arrow.addSymbolContainer(transitionInputs);
             return;
         }
-        arrow = new SelfLoopArrow(from, to, this, List.of(transitionInputs));
+        arrow = new SelfLoopArrow(from, to, this, List.of(transitionInputs), this.idCounter);
         from.addArrow(arrow, "from");
         to.addArrow(arrow, "to");
         this.makeErasable(arrow);
@@ -546,7 +546,7 @@ public class Board implements Serializable {
             arrow.addSymbolContainer(transitionInputs);
             return;
         }
-        arrow = new LineArrow(from, to, controlPointChangeX, controlPointChangeY, this, List.of(transitionInputs));
+        arrow = new LineArrow(from, to, controlPointChangeX, controlPointChangeY, this, List.of(transitionInputs), this.idCounter);
         from.addArrow(arrow, "from");
         to.addArrow(arrow, "to");
         this.makeErasable(arrow);
