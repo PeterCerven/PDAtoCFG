@@ -14,6 +14,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -21,29 +23,31 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.*;
 
 import static com.example.bakalar.logic.Board.*;
 
 public class ConversionLogic {
+    private static final Logger log = LogManager.getLogger(ConversionLogic.class.getName());
     private static final String NEXT_ARROW_ICON_PATH = "file:src/main/resources/icons/nextArrow.png";
     private static final String PREVIOUS_ARROW_ICON_PATH = "file:src/main/resources/icons/previousArrow.png";
     private final Board board;
     private Stage transitionStage;
     private TextFlow transitionLabel;
-    private HBox transitionLabelBox;
     private Label transitionIndexLabel;
     private List<Transition> transitions;
-    private VBox contentBox;
     private VBox ruleBox;
     private VBox stepsBox;
     private boolean showSteps = false;
     private Map<Integer, List<CFGRule>> cfgRules;
-    private int currentIndex = 0;
+    private int currentIndex;
     private Label helpingLabelComment;
     private BorderPane root;
-    private ConversionUI conversionUI;
+    private final ConversionUI conversionUI;
+    private Button showStepsButton;
 
 
     public ConversionLogic(Board board) {
@@ -52,6 +56,7 @@ public class ConversionLogic {
     }
 
     public void convertPDA() {
+        currentIndex = 0;
         List<Transition> transitions = board.getNodesTransitions();
         if (transitions.isEmpty()) {
             board.showErrorDialog("Nemožno previesť Nemáte žiadne prechodové funkcie.");
@@ -105,14 +110,21 @@ public class ConversionLogic {
         transitionLabel.setTextAlignment(TextAlignment.CENTER);
         this.transitionIndexLabel = new Label();
         this.ruleBox = new VBox();
-        this.contentBox = new VBox();
+        ScrollPane ruleBoxScrollPane = new ScrollPane();
+        ruleBoxScrollPane.setFitToWidth(true);
+        ruleBoxScrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        ruleBoxScrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        ruleBoxScrollPane.setPadding(new Insets(10));
+        ruleBoxScrollPane.setStyle("-fx-background-color: #f4f4f4; ");
+        ruleBoxScrollPane.setContent(ruleBox);
+        VBox contentBox = new VBox();
         contentBox.setAlignment(Pos.TOP_CENTER);
         this.stepsBox = new VBox();
         this.helpingLabelComment = new Label();
         this.cfgRules = new HashMap<>();
         Pane helpingLayout = new Pane();
         HBox arrowsLayoutBox = new HBox();
-        this.transitionLabelBox = new HBox(helpingLayout, transitionLabel, arrowsLayoutBox);
+        HBox transitionLabelBox = new HBox(helpingLayout, transitionLabel, arrowsLayoutBox);
         helpingLayout.prefWidthProperty().bind(arrowsLayoutBox.widthProperty());
         arrowsLayoutBox.prefWidthProperty().bind(Bindings.divide(transitionLabelBox.widthProperty(), 4));
         transitionLabelBox.setAlignment(Pos.CENTER);
@@ -120,16 +132,18 @@ public class ConversionLogic {
 
 
 
-        Button showStepsButton = new Button("Ukáž kroky");
+        showStepsButton = new Button("Ukáž kroky");
+        showStepsButton.setFocusTraversable(false);
         showStepsButton.setAlignment(Pos.BOTTOM_CENTER);
         showStepsButton.setPadding(new Insets(10));
-        showStepsButton.setPrefSize(120, 26);
+        showStepsButton.setPrefSize(140, 26);
         showStepsButton.setFont(new Font(18));
         showStepsButton.setAlignment(Pos.CENTER);
         showStepsButton.setOnAction(e -> steps());
 
 
         Button nextButton = new Button();
+        nextButton.setFocusTraversable(false);
         Image nextArrowImage = new Image(NEXT_ARROW_ICON_PATH);
         ImageView nextArrowView = new ImageView(nextArrowImage);
         nextArrowView.setFitHeight(20);
@@ -138,6 +152,7 @@ public class ConversionLogic {
         nextButton.setOnAction(e -> updateTransition(1));
 
         Button prevButton = new Button();
+        prevButton.setFocusTraversable(false);
         Image previousArrowImage = new Image(PREVIOUS_ARROW_ICON_PATH);
         ImageView previousArrowView = new ImageView(previousArrowImage);
         previousArrowView.setFitHeight(20);
@@ -178,7 +193,7 @@ public class ConversionLogic {
 
         BorderPane ruleBoxPane = new BorderPane();
         ruleBoxPane.setPadding(new Insets(10));
-        contentBox.getChildren().add(ruleBox);
+        contentBox.getChildren().add(ruleBoxScrollPane);
         contentBox.getChildren().add(showStepsButton);
         contentBox.getChildren().add(stepsBox);
         contentBox.setAlignment(Pos.TOP_CENTER);
@@ -198,6 +213,15 @@ public class ConversionLogic {
         scene.getStylesheets().add(conversionStyle);
         transitionStage.setScene(scene);
         transitionStage.setTitle("Detaily prechodových funkcií");
+
+
+        scene.addEventHandler(KeyEvent.KEY_PRESSED, e -> {
+            if (e.getCode() == KeyCode.RIGHT) {
+                updateTransition(1);
+            } else if (e.getCode() == KeyCode.LEFT) {
+                updateTransition(-1);
+            }
+        });
     }
 
 
@@ -348,9 +372,12 @@ public class ConversionLogic {
 
     private void hideSteps() {
         stepsBox.getChildren().clear();
+        updateTransition(currentIndex);
     }
 
     private void showSteps() {
+        showStepsButton.setText("Ukáž pravidlá");
+        ruleBox.getChildren().clear();
         stepsBox.getChildren().clear();
         VBox stepsLayout = new VBox(10);
         ScrollPane scrollPane = new ScrollPane();
@@ -398,6 +425,7 @@ public class ConversionLogic {
     private void showTransitionStage() {
         updateTransition(0);
         transitionStage.show();
+        root.requestFocus();
     }
 
     private void resetStates() {
@@ -407,6 +435,7 @@ public class ConversionLogic {
     }
 
     private void updateTransition(int step) {
+        showStepsButton.setText("Ukáž kroky");
         currentIndex += step;
         if (currentIndex < 0) currentIndex = 0;
         if (currentIndex >= transitions.size()) currentIndex = transitions.size() - 1;

@@ -314,6 +314,10 @@ public class Board implements Serializable {
 
     public TransitionInputs createArrowTransition(String read, String pop, String push) {
         Dialog<ButtonType> dialog = new Dialog<>();
+
+        dialog.getDialogPane().getStylesheets().add(Objects.requireNonNull(getClass().getResource("/css/styles.css")).toExternalForm());
+        dialog.getDialogPane().getStyleClass().add("custom-dialog");
+
         dialog.setTitle("Vytvorte prechodovú funkciu");
         dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 
@@ -354,6 +358,9 @@ public class Board implements Serializable {
     public void showDialog(MyNode node) {
         Dialog<ButtonType> dialog = new Dialog<>();
         dialog.setTitle("Zmeň stav");
+
+        dialog.getDialogPane().getStylesheets().add(Objects.requireNonNull(getClass().getResource("/css/styles.css")).toExternalForm());
+        dialog.getDialogPane().getStyleClass().add("custom-dialog");
 
         GridPane gridPane = new GridPane();
         gridPane.setHgap(10);

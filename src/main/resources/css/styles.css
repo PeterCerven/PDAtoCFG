@@ -57,6 +57,32 @@
     -fx-border-color: #0b270c; /* Slightly darker border when clicked */
 }
 
+/*.custom-dialog {*/
+/*    -fx-background-color: #0b270c;*/
+/*}*/
+
+/*.custom-dialog .label {*/
+/*    -fx-text-fill: #ffffff;*/
+/*}*/
+
+/*.custom-dialog .text-field, .custom-dialog .check-box {*/
+/*    -fx-background-color: #113a11;*/
+/*    -fx-text-fill: #ffffff;*/
+/*}*/
+
+/*.custom-dialog .button {*/
+/*    -fx-background-color: #113a11;*/
+/*    -fx-text-fill: #ffffff;*/
+/*    -fx-border-color: #ffffff;*/
+/*    -fx-border-width: 2;*/
+/*}*/
+
+/*.custom-dialog .button:hover {*/
+/*    -fx-background-color: #0b270c;*/
+/*    -fx-text-fill: #ffffff;*/
+/*    -fx-border-color: #ffffff;*/
+/*}*/
+
 
 
 
