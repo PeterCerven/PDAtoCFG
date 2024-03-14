@@ -1,10 +1,11 @@
 package com.example.bakalar.files;
 
 import com.example.bakalar.canvas.arrow.Arrow;
-import com.example.bakalar.logic.history.AppState;
-import com.example.bakalar.logic.history.ArrowModel;
+import com.example.bakalar.canvas.arrow.LineArrow;
 import com.example.bakalar.canvas.arrow.TransitionInputs;
 import com.example.bakalar.canvas.node.MyNode;
+import com.example.bakalar.logic.history.AppState;
+import com.example.bakalar.logic.history.ArrowModel;
 import com.example.bakalar.logic.history.NodeModel;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.stage.FileChooser;
@@ -17,13 +18,13 @@ import java.util.List;
 public class FileLogic {
 
 
-
     public FileLogic() {
     }
 
     public void saveToJson(List<MyNode> nodes, List<Arrow> arrows, int nodeCounter, Long idCounter, Stage primaryStage) {
         File file = showSaveFileDialog(primaryStage);
         if (file != null) {
+            file = file.getName().endsWith(".pda") ? file : new File(file.getAbsolutePath() + ".pda");
             List<NodeModel> myNodeModels = nodes.stream().map(node -> {
                 NodeModel myNodeModel = new NodeModel();
                 myNodeModel.setNodeId(node.getNodeId());
@@ -43,6 +44,11 @@ public class FileLogic {
                     arrowModel.setToNodeId(arrow.getTo().getNodeId());
                     arrowModel.setTransition(inputs);
                     arrowModels.add(arrowModel);
+                    if (arrow instanceof LineArrow lineArrow) {
+                        arrowModel.setLineArrow(true);
+                        arrowModel.setControlPointChangeX(lineArrow.getControlPointChangeX());
+                        arrowModel.setControlPointChangeY(lineArrow.getControlPointChangeY());
+                    }
                 }
             }
 

@@ -22,11 +22,7 @@ public class MyApp extends Application {
         String styles = Objects.requireNonNull(getClass().getResource("/css/styles.css")).toExternalForm();
         scene.getStylesheets().add(styles);
 
-        scene.addEventHandler(KeyEvent.KEY_PRESSED, keyEvent -> {
-            if (keyEvent.getCode() == KeyCode.ESCAPE) {
-                stage.close();
-            }
-        });
+
         stage.setTitle("Context Free Grammar");
         stage.setScene(scene);
         stage.setMinWidth(700);

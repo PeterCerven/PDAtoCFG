@@ -180,10 +180,6 @@ public abstract class Arrow extends Group implements Serializable {
         return getToId().equals(arrow.getToId());
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(fromId, toId, transitions);
-    }
 
     @Override
     public String toString() {
