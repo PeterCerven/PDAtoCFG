@@ -4,12 +4,10 @@ import com.example.bakalar.canvas.arrow.TransitionInputs;
 import com.example.bakalar.canvas.node.MyNode;
 import com.example.bakalar.logic.conversion.ConversionLogic;
 import com.example.bakalar.logic.history.HistoryLogic;
-import com.example.bakalar.logic.transitions.runPDALogic;
 import com.example.bakalar.logic.utility.ButtonState;
 import com.example.bakalar.logic.utility.DescribePDA;
 import javafx.fxml.FXML;
 import javafx.scene.Cursor;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
@@ -19,7 +17,6 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import lombok.Setter;
@@ -58,8 +55,6 @@ public class MainController {
     @FXML
     private Button conversionBtn;
     @FXML
-    private Button testBtn;
-    @FXML
     private TextField describeStates;
     @FXML
     private TextField describeAlphabet;
@@ -74,7 +69,6 @@ public class MainController {
     private ConversionLogic conversionLogic;
     @Setter
     private Stage stage;
-    private Scene mainScene;
 
 
     @FXML
@@ -90,15 +84,6 @@ public class MainController {
         currentBoard = new Board(mainPane, describePDA, historyLogic, currentState, stage);
         historyLogic.setBoard(currentBoard);
         this.conversionLogic = new ConversionLogic(currentBoard);
-    }
-
-    public void setMainScene(Scene mainScene) {
-        this.mainScene = mainScene;
-        mainScene.addEventHandler(KeyEvent.KEY_PRESSED, keyEvent -> {
-            if (keyEvent.getCode() == KeyCode.ESCAPE) {
-                keyAction(keyEvent);
-            }
-        });
     }
 
     // set images

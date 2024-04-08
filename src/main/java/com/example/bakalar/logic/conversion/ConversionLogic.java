@@ -1,22 +1,23 @@
 package com.example.bakalar.logic.conversion;
 
 import com.example.bakalar.logic.Board;
+import com.example.bakalar.logic.conversion.window.ConversionStage;
+import com.example.bakalar.logic.conversion.window.ConversionWindow;
+import com.example.bakalar.logic.conversion.window.InformationWindow;
+import com.example.bakalar.logic.conversion.window.TransitionWindow;
 import com.example.bakalar.logic.transitions.Transition;
 import com.example.bakalar.logic.utility.MySymbol;
 import com.example.bakalar.logic.utility.SpecialNonTerminal;
-import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.*;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
@@ -32,27 +33,24 @@ import static com.example.bakalar.logic.Board.*;
 
 public class ConversionLogic {
     private static final Logger log = LogManager.getLogger(ConversionLogic.class.getName());
-    private static final String NEXT_ARROW_ICON_PATH = "file:src/main/resources/icons/nextArrow.png";
-    private static final String PREVIOUS_ARROW_ICON_PATH = "file:src/main/resources/icons/previousArrow.png";
     private final Board board;
-    private Stage transitionStage;
-    private TextFlow transitionLabel;
-    private Label transitionIndexLabel;
+    private final ConversionUI conversionUI;
     private List<Transition> transitions;
-    private VBox ruleBox;
-    private VBox stepsBox;
     private boolean showSteps = false;
     private Map<Integer, List<CFGRule>> cfgRules;
     private int currentIndex;
-    private Label helpingLabelComment;
-    private BorderPane root;
-    private final ConversionUI conversionUI;
-    private Button showStepsButton;
+    private List<ConversionWindow> conversionWindows;
+    private TransitionWindow transitionWindow;
+    private InformationWindow informationWindow;
+    private ConversionStage conversionStage;
 
 
     public ConversionLogic(Board board) {
+        this.conversionWindows = new ArrayList<>();
         this.board = board;
         this.conversionUI = new ConversionUI();
+        this.transitionWindow = new TransitionWindow();
+        this.informationWindow = new InformationWindow();
     }
 
     public void convertPDA() {
@@ -105,115 +103,11 @@ public class ConversionLogic {
 
     private void setupTransitionStage(List<Transition> transitions) {
         this.transitions = transitions;
-        this.transitionStage = new Stage();
-        this.transitionLabel = new TextFlow();
-        transitionLabel.setTextAlignment(TextAlignment.CENTER);
-        this.transitionIndexLabel = new Label();
-        this.ruleBox = new VBox();
-        ScrollPane ruleBoxScrollPane = new ScrollPane();
-        ruleBoxScrollPane.setFitToWidth(true);
-        ruleBoxScrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
-        ruleBoxScrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-        ruleBoxScrollPane.setPadding(new Insets(10));
-        ruleBoxScrollPane.setStyle("-fx-background-color: #f4f4f4; ");
-        ruleBoxScrollPane.setContent(ruleBox);
-        VBox contentBox = new VBox();
-        contentBox.setAlignment(Pos.TOP_CENTER);
-        this.stepsBox = new VBox();
-        this.helpingLabelComment = new Label();
-        this.cfgRules = new HashMap<>();
-        Pane helpingLayout = new Pane();
-        HBox arrowsLayoutBox = new HBox();
-        HBox transitionLabelBox = new HBox(helpingLayout, transitionLabel, arrowsLayoutBox);
-        helpingLayout.prefWidthProperty().bind(arrowsLayoutBox.widthProperty());
-        arrowsLayoutBox.prefWidthProperty().bind(Bindings.divide(transitionLabelBox.widthProperty(), 4));
-        transitionLabelBox.setAlignment(Pos.CENTER);
-        HBox.setHgrow(transitionLabel, Priority.ALWAYS);
-
-
-
-        showStepsButton = new Button("Ukáž kroky");
-        showStepsButton.setFocusTraversable(false);
-        showStepsButton.setAlignment(Pos.BOTTOM_CENTER);
-        showStepsButton.setPadding(new Insets(10));
-        showStepsButton.setPrefSize(140, 26);
-        showStepsButton.setFont(new Font(18));
-        showStepsButton.setAlignment(Pos.CENTER);
-        showStepsButton.setOnAction(e -> steps());
-
-
-        Button nextButton = new Button();
-        nextButton.setFocusTraversable(false);
-        Image nextArrowImage = new Image(NEXT_ARROW_ICON_PATH);
-        ImageView nextArrowView = new ImageView(nextArrowImage);
-        nextArrowView.setFitHeight(20);
-        nextArrowView.setFitWidth(20);
-        nextButton.setGraphic(nextArrowView);
-        nextButton.setOnAction(e -> updateTransition(1));
-
-        Button prevButton = new Button();
-        prevButton.setFocusTraversable(false);
-        Image previousArrowImage = new Image(PREVIOUS_ARROW_ICON_PATH);
-        ImageView previousArrowView = new ImageView(previousArrowImage);
-        previousArrowView.setFitHeight(20);
-        previousArrowView.setFitWidth(20);
-        prevButton.setGraphic(previousArrowView);
-        prevButton.setOnAction(e -> updateTransition(-1));
-
-        HBox buttonLayout = new HBox(10, prevButton, nextButton);
-        buttonLayout.setAlignment(Pos.BASELINE_CENTER);
-
-        VBox helpingComments = new VBox();
-        helpingComments.setAlignment(Pos.CENTER);
-        helpingComments.setPadding(new Insets(10));
-        helpingComments.setStyle("-fx-background-color: lightblue;");
-        this.helpingLabelComment = new Label();
-        helpingLabelComment.setTextAlignment(TextAlignment.CENTER);
-        helpingLabelComment.setContentDisplay(ContentDisplay.TEXT_ONLY);
-        helpingLabelComment.setWrapText(true);
-        helpingLabelComment.setFont(new Font(18));
-        helpingLabelComment.setStyle("-fx-font-weight: bold;");
-        helpingComments.getChildren().add(helpingLabelComment);
-
-
-        transitionIndexLabel.setFont(new Font("Arial", 22));
-        arrowsLayoutBox.getChildren().add(transitionIndexLabel);
-        arrowsLayoutBox.getChildren().add(buttonLayout);
-        arrowsLayoutBox.setAlignment(Pos.CENTER_RIGHT);
-        arrowsLayoutBox.setPadding(new Insets(10));
-        arrowsLayoutBox.setSpacing(10);
-
-
         for (Transition transition : transitions) {
             this.cfgRules.put(transitions.indexOf(transition), convertTransitions(transition));
         }
 
-        VBox topMenu = new VBox(10, transitionLabelBox, helpingComments);
-        topMenu.setAlignment(Pos.TOP_CENTER);
-
-        BorderPane ruleBoxPane = new BorderPane();
-        ruleBoxPane.setPadding(new Insets(10));
-        contentBox.getChildren().add(ruleBoxScrollPane);
-        contentBox.getChildren().add(showStepsButton);
-        contentBox.getChildren().add(stepsBox);
-        contentBox.setAlignment(Pos.TOP_CENTER);
-        contentBox.setSpacing(10);
-        ruleBoxPane.setCenter(contentBox);
-
-
-        root = new BorderPane();
-        root.setPadding(new Insets(10));
-        root.setCenter(ruleBoxPane);
-        root.setTop(topMenu);
-
-        Scene scene = new Scene(root, 800, 800);
-        String styles = Objects.requireNonNull(getClass().getResource("/css/styles.css")).toExternalForm();
-        String conversionStyle = Objects.requireNonNull(getClass().getResource("/css/conversion.css")).toExternalForm();
-        scene.getStylesheets().add(styles);
-        scene.getStylesheets().add(conversionStyle);
-        transitionStage.setScene(scene);
-        transitionStage.setTitle("Detaily prechodových funkcií");
-
+        Scene scene = conversionStage.getScene();
 
         scene.addEventHandler(KeyEvent.KEY_PRESSED, e -> {
             if (e.getCode() == KeyCode.RIGHT) {
@@ -222,6 +116,14 @@ public class ConversionLogic {
                 updateTransition(-1);
             }
         });
+
+        Button prevButton = conversionStage.getPreviousButton();
+        Button nextButton = conversionStage.getNextButton();
+        Button showStepsButton = transitionWindow.getShowStepsButton();
+
+        prevButton.setOnAction(e -> updateTransition(-1));
+        nextButton.setOnAction(e -> updateTransition(1));
+        showStepsButton.setOnAction(e -> steps());
     }
 
 
@@ -361,7 +263,7 @@ public class ConversionLogic {
     }
 
     // steps
-    private void steps() {
+    public void steps() {
         this.showSteps = !showSteps;
         if (showSteps) {
             showSteps();
@@ -382,7 +284,7 @@ public class ConversionLogic {
         VBox stepsLayout = new VBox(10);
         ScrollPane scrollPane = new ScrollPane();
         scrollPane.setContent(stepsLayout);
-        conversionUI.setScrollPaneStyle(scrollPane);
+        transitionWindow.setScrollPaneStyle(scrollPane);
 
         List<CFGRule> cfgRules = this.cfgRules.get(currentIndex);
         for (int i = 0; i < cfgRules.get(0).getSteps().size(); i++) {
@@ -414,7 +316,7 @@ public class ConversionLogic {
                     transitionTextFlow.setStyle("-fx-background-color: #deeff5;");
                 }
             }
-            Label helpingLabelComment = conversionUI.createHelpingComment(helpingComment);
+            Label helpingLabelComment = transitionWindow.createHelpingComment(helpingComment);
             stepLayout.getChildren().add(0, helpingLabelComment);
             stepLayout.getChildren().add(0, transitionTextFlow);
             stepsLayout.getChildren().add(stepLayout);
@@ -434,7 +336,7 @@ public class ConversionLogic {
         this.showSteps = false;
     }
 
-    private void updateTransition(int step) {
+    public void updateTransition(int step) {
         showStepsButton.setText("Ukáž kroky");
         currentIndex += step;
         if (currentIndex < 0) currentIndex = 0;

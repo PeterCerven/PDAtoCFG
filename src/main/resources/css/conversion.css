@@ -9,23 +9,23 @@
 }
 
 .scroll-bar:vertical {
-    -fx-pref-width: 18px; /* Making the scrollbar thicker */
+    -fx-pref-width: 18px;
 
 }
 
 .scroll-bar:vertical .thumb {
-    -fx-background-color: #125c1d; /* Lighter green for the thumb (the part you drag) */
+    -fx-background-color: #125c1d;
     -fx-pref-height: 10px;
     -fx-background-radius: 10px;
-    -fx-min-height: 3px; /* Minimum height of the thumb */
-    -fx-max-height: 50px; /* Maximum height you want to allow for the thumb */
+    -fx-min-height: 3px;
+    -fx-max-height: 50px;
 }
 
 .scroll-bar:vertical .track {
-    -fx-background-color: white; /* A different shade of green for the track */
+    -fx-background-color: white;
     -fx-background-radius: 10px;
-    -fx-start-margin: 2px; /* Margin to the left of the track */
-    -fx-end-margin: 2px; /* Margin to the right of the track */
+    -fx-start-margin: 2px;
+    -fx-end-margin: 2px;
 }
 
 .scroll-bar:vertical .increment-button,
@@ -42,7 +42,7 @@
 .scroll-bar:vertical .decrement-arrow,
 .scroll-bar:horizontal .increment-arrow,
 .scroll-bar:horizontal .decrement-arrow {
-    -fx-shape: " "; /* Empty string effectively removes the arrow shape */
+    -fx-shape: " ";
 }
 
 

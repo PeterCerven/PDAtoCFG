@@ -60,9 +60,7 @@ public class FileLogic {
     private void saveToJson(List<NodeModel> nodes, List<ArrowModel> arrows, int nodeCounter, Long idCounter, String filePath) {
         try {
             ObjectMapper mapper = new ObjectMapper();
-            // Create a wrapper object that holds both lists
             AppState state = new AppState(nodes, arrows, nodeCounter, idCounter);
-            // Write JSON to the file
             mapper.writeValue(new File(filePath), state);
         } catch (Exception e) {
             e.printStackTrace();
@@ -78,8 +76,7 @@ public class FileLogic {
             }
 
             ObjectMapper mapper = new ObjectMapper();
-            AppState state = mapper.readValue(file, AppState.class);
-            return state;
+            return mapper.readValue(file, AppState.class);
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -90,27 +87,20 @@ public class FileLogic {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Save File");
 
-        // Set extension filter
         FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("MyDiagram files (*.pda)", "pda");
         fileChooser.getExtensionFilters().add(extFilter);
 
-        // Show save file dialog
-        File file = fileChooser.showSaveDialog(primaryStage);
-
-        return file;
+        return fileChooser.showSaveDialog(primaryStage);
     }
 
     public File showOpenFileDialog(Stage primaryStage) {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Open File");
 
-        // Set extension filter for your custom file type
         FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("MyDiagram files (*.pda)", "*.pda");
         fileChooser.getExtensionFilters().add(extFilter);
 
-        // Show open file dialog
-        File file = fileChooser.showOpenDialog(primaryStage);
 
-        return file; // Can be null if the dialog is canceled
+        return fileChooser.showOpenDialog(primaryStage);
     }
 }

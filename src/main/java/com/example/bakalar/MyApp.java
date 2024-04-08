@@ -18,7 +18,6 @@ public class MyApp extends Application {
         Scene scene = new Scene(fxmlLoader.load());
         MainController controller = fxmlLoader.getController();
         controller.setStage(stage);
-        controller.setMainScene(scene);
 
         String styles = Objects.requireNonNull(getClass().getResource("/css/styles.css")).toExternalForm();
         scene.getStylesheets().add(styles);
