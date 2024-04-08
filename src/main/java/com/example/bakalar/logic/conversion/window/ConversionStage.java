@@ -1,6 +1,5 @@
 package com.example.bakalar.logic.conversion.window;
 
-import com.example.bakalar.logic.conversion.ConversionLogic;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -9,8 +8,6 @@ import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
@@ -27,20 +24,18 @@ import java.util.Objects;
 @Getter
 @Setter
 public class ConversionStage {
-    private Stage conversionStage;
+    private Stage stage;
     private Scene scene;
     private BorderPane rootPane;
-    private ConversionLogic conversionLogic;
     private Button previousButton;
     private Button nextButton;
     private static final String NEXT_ARROW_ICON_PATH = "file:src/main/resources/icons/nextArrow.png";
     private static final String PREVIOUS_ARROW_ICON_PATH = "file:src/main/resources/icons/previousArrow.png";
 
-    public ConversionStage(ConversionLogic conversionLogic) {
-        this.conversionStage = new Stage();
+    public ConversionStage() {
+        this.stage = new Stage();
         this.rootPane = new BorderPane();
         this.scene = new Scene(rootPane, 800, 800);
-        this.conversionLogic = conversionLogic;
         this.previousButton = new Button();
         this.nextButton = new Button();
         initStage();
@@ -50,21 +45,9 @@ public class ConversionStage {
         Pane helpingLayout = new Pane();
         TextFlow transitionLabel = new TextFlow();
 
-        Button nextButton = new Button();
-        nextButton.setFocusTraversable(false);
-        Image nextArrowImage = new Image(NEXT_ARROW_ICON_PATH);
-        ImageView nextArrowView = new ImageView(nextArrowImage);
-        nextArrowView.setFitHeight(20);
-        nextArrowView.setFitWidth(20);
-        nextButton.setGraphic(nextArrowView);
+        Button nextButton = buttonsSetUp(NEXT_ARROW_ICON_PATH);
 
-        Button prevButton = new Button();
-        prevButton.setFocusTraversable(false);
-        Image previousArrowImage = new Image(PREVIOUS_ARROW_ICON_PATH);
-        ImageView previousArrowView = new ImageView(previousArrowImage);
-        previousArrowView.setFitHeight(20);
-        previousArrowView.setFitWidth(20);
-        prevButton.setGraphic(previousArrowView);
+        Button prevButton = buttonsSetUp(PREVIOUS_ARROW_ICON_PATH);
 
         HBox buttonLayout = new HBox(10, prevButton, nextButton);
         buttonLayout.setAlignment(Pos.BASELINE_CENTER);
@@ -105,8 +88,18 @@ public class ConversionStage {
         String conversionStyle = Objects.requireNonNull(getClass().getResource("/css/conversion.css")).toExternalForm();
         scene.getStylesheets().add(styles);
         scene.getStylesheets().add(conversionStyle);
-        conversionStage.setScene(scene);
-        conversionStage.setTitle("Detaily prechodových funkcií");
+        stage.setScene(scene);
+        stage.setTitle("Detaily prechodových funkcií");
+    }
 
+    private Button buttonsSetUp(String nextArrowIconPath) {
+        Button nextButton = new Button();
+        nextButton.setFocusTraversable(false);
+        Image nextArrowImage = new Image(nextArrowIconPath);
+        ImageView nextArrowView = new ImageView(nextArrowImage);
+        nextArrowView.setFitHeight(20);
+        nextArrowView.setFitWidth(20);
+        nextButton.setGraphic(nextArrowView);
+        return nextButton;
     }
 }

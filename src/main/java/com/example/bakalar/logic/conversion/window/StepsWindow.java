@@ -1,37 +1,26 @@
 package com.example.bakalar.logic.conversion.window;
 
-import com.example.bakalar.logic.conversion.ConversionLogic;
-import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
-import javafx.scene.text.TextFlow;
-import javafx.stage.Stage;
 import lombok.Getter;
-
-import java.util.Objects;
+import lombok.Setter;
 
 @Getter
-public class TransitionWindow extends ConversionWindow {
-    private Button showStepsButton;
+@Setter
+public class StepsWindow extends ConversionWindow {
+    private final Button showStepsButton;
+    private BorderPane ruleBoxPane;
 
 
-    public TransitionWindow() {
+    public StepsWindow() {
         super();
-    }
-
-    public void initializeElements(BorderPane root) {
         VBox ruleBox = new VBox();
         VBox stepsBox = new VBox();
 
@@ -59,11 +48,9 @@ public class TransitionWindow extends ConversionWindow {
         contentBox.setAlignment(Pos.TOP_CENTER);
         contentBox.setSpacing(10);
 
-        BorderPane ruleBoxPane = new BorderPane();
+        ruleBoxPane = new BorderPane();
         ruleBoxPane.setPadding(new Insets(10));
         ruleBoxPane.setCenter(contentBox);
-
-        root.setCenter(ruleBoxPane);
     }
 
     public Label createHelpingComment(String text) {

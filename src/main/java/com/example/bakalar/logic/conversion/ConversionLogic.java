@@ -2,9 +2,8 @@ package com.example.bakalar.logic.conversion;
 
 import com.example.bakalar.logic.Board;
 import com.example.bakalar.logic.conversion.window.ConversionStage;
-import com.example.bakalar.logic.conversion.window.ConversionWindow;
 import com.example.bakalar.logic.conversion.window.InformationWindow;
-import com.example.bakalar.logic.conversion.window.TransitionWindow;
+import com.example.bakalar.logic.conversion.window.StepsWindow;
 import com.example.bakalar.logic.transitions.Transition;
 import com.example.bakalar.logic.utility.MySymbol;
 import com.example.bakalar.logic.utility.SpecialNonTerminal;
@@ -16,14 +15,12 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
-import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -34,22 +31,19 @@ import static com.example.bakalar.logic.Board.*;
 public class ConversionLogic {
     private static final Logger log = LogManager.getLogger(ConversionLogic.class.getName());
     private final Board board;
-    private final ConversionUI conversionUI;
     private List<Transition> transitions;
     private boolean showSteps = false;
-    private Map<Integer, List<CFGRule>> cfgRules;
+    private List<RulesWindows> rulesWindows;
     private int currentIndex;
-    private List<ConversionWindow> conversionWindows;
-    private TransitionWindow transitionWindow;
+    private StepsWindow stepsWindow;
     private InformationWindow informationWindow;
     private ConversionStage conversionStage;
 
 
     public ConversionLogic(Board board) {
-        this.conversionWindows = new ArrayList<>();
         this.board = board;
-        this.conversionUI = new ConversionUI();
-        this.transitionWindow = new TransitionWindow();
+        this.conversionStage = new ConversionStage();
+        this.stepsWindow = new StepsWindow();
         this.informationWindow = new InformationWindow();
     }
 
@@ -64,7 +58,8 @@ public class ConversionLogic {
             board.showErrorDialog("Nemožno previesť Nemáte žiadny začiatočný stav.");
             return;
         }
-        transitions.add(0, new Transition(board.getStartNode().getName(), TransitionType.START));
+        transitions.add(0, new Transition(WindowType.INFORMATION));
+        transitions.add(1, new Transition(board.getStartNode().getName(), WindowType.START));
         setupTransitionStage(transitions);
         showTransitionStage();
         board.showCFG(getAllNonTerminals(), getAllTerminals(), getAllRules(), STARTING_S);
@@ -72,7 +67,7 @@ public class ConversionLogic {
 
     private Set<SpecialNonTerminal> getAllNonTerminals() {
         Set<SpecialNonTerminal> nonTerminals = new HashSet<>();
-        for (List<CFGRule> lists : cfgRules.values()) {
+        for (List<CFGRule> lists : rulesWindows) {
             for (CFGRule rule : lists) {
                 if (rule.getLeftSide() != null)
                     nonTerminals.add(rule.getLeftSide());
@@ -84,7 +79,7 @@ public class ConversionLogic {
 
     private List<CFGRule> getAllRules() {
         List<CFGRule> allRules = new ArrayList<>();
-        for (List<CFGRule> lists : cfgRules.values()) {
+        for (List<CFGRule> lists : rulesWindows) {
             allRules.addAll(lists);
         }
         return allRules;
@@ -104,32 +99,35 @@ public class ConversionLogic {
     private void setupTransitionStage(List<Transition> transitions) {
         this.transitions = transitions;
         for (Transition transition : transitions) {
-            this.cfgRules.put(transitions.indexOf(transition), convertTransitions(transition));
+            this.rulesWindows.add(transitions.indexOf(transition), convertTransitions(transition));
         }
 
         Scene scene = conversionStage.getScene();
 
         scene.addEventHandler(KeyEvent.KEY_PRESSED, e -> {
             if (e.getCode() == KeyCode.RIGHT) {
-                updateTransition(1);
+                updateWindow(1);
             } else if (e.getCode() == KeyCode.LEFT) {
-                updateTransition(-1);
+                updateWindow(-1);
             }
         });
 
         Button prevButton = conversionStage.getPreviousButton();
         Button nextButton = conversionStage.getNextButton();
-        Button showStepsButton = transitionWindow.getShowStepsButton();
+        Button showStepsButton = stepsWindow.getShowStepsButton();
 
-        prevButton.setOnAction(e -> updateTransition(-1));
-        nextButton.setOnAction(e -> updateTransition(1));
+        prevButton.setOnAction(e -> updateWindow(-1));
+        nextButton.setOnAction(e -> updateWindow(1));
         showStepsButton.setOnAction(e -> steps());
+        updateWindow(0);
+        conversionStage.getStage().show();
     }
 
 
     private List<CFGRule> convertTransitions(Transition transition) {
         List<CFGRule> cfgRules = new ArrayList<>();
-        switch (transition.getTransitionType()) {
+        switch (transition.getWindowType()) {
+            case INFORMATION -> cfgRules.add(new CFGRule());
             case START -> cfgRules.addAll(startMove(transition));
             case NORMAL -> cfgRules.addAll(pushMove(transition));
             case TERMINAL -> cfgRules.addAll(terminalMove(transition));
@@ -274,7 +272,7 @@ public class ConversionLogic {
 
     private void hideSteps() {
         stepsBox.getChildren().clear();
-        updateTransition(currentIndex);
+        updateWindow(currentIndex);
     }
 
     private void showSteps() {
@@ -284,9 +282,9 @@ public class ConversionLogic {
         VBox stepsLayout = new VBox(10);
         ScrollPane scrollPane = new ScrollPane();
         scrollPane.setContent(stepsLayout);
-        transitionWindow.setScrollPaneStyle(scrollPane);
+        stepsWindow.setScrollPaneStyle(scrollPane);
 
-        List<CFGRule> cfgRules = this.cfgRules.get(currentIndex);
+        List<CFGRule> cfgRules = this.rulesWindows.get(currentIndex);
         for (int i = 0; i < cfgRules.get(0).getSteps().size(); i++) {
 
             VBox stepLayout = new VBox();
@@ -306,7 +304,7 @@ public class ConversionLogic {
 
                 stepLayout.getChildren().addAll(textFlow);
 
-                if (stepRule.getTransition().getTransitionType() != TransitionType.START) {
+                if (stepRule.getTransition().getWindowType() != WindowType.START) {
                     Transition transition = stepRule.getTransition();
                     List<Text> transitionTexts = transition.createTextFromStep();
                     transitionTextFlow = new TextFlow();
@@ -316,7 +314,7 @@ public class ConversionLogic {
                     transitionTextFlow.setStyle("-fx-background-color: #deeff5;");
                 }
             }
-            Label helpingLabelComment = transitionWindow.createHelpingComment(helpingComment);
+            Label helpingLabelComment = stepsWindow.createHelpingComment(helpingComment);
             stepLayout.getChildren().add(0, helpingLabelComment);
             stepLayout.getChildren().add(0, transitionTextFlow);
             stepsLayout.getChildren().add(stepLayout);
@@ -325,7 +323,7 @@ public class ConversionLogic {
     }
 
     private void showTransitionStage() {
-        updateTransition(0);
+        updateWindow(0);
         transitionStage.show();
         root.requestFocus();
     }
@@ -336,7 +334,7 @@ public class ConversionLogic {
         this.showSteps = false;
     }
 
-    public void updateTransition(int step) {
+    public void updateWindow(int step) {
         showStepsButton.setText("Ukáž kroky");
         currentIndex += step;
         if (currentIndex < 0) currentIndex = 0;
@@ -347,7 +345,7 @@ public class ConversionLogic {
         Text labelText = new Text();
         labelText.setFont(new Font(22));
         labelText.setStyle("-fx-font-weight: bold;");
-        switch (currentTransition.getTransitionType()) {
+        switch (currentTransition.getWindowType()) {
             case START -> {
                 labelText.setText("Začiatočná prechodová funkcia");
                 transitionLabel.getChildren().add(labelText);
@@ -377,7 +375,7 @@ public class ConversionLogic {
             }
         }
         transitionIndexLabel.setText((currentIndex + 1) + "/" + transitions.size());
-        List<CFGRule> cfgRules = this.cfgRules.get(currentIndex);
+        List<CFGRule> cfgRules = this.rulesWindows.get(currentIndex);
         ruleBox.getChildren().clear();
         for (CFGRule cfgRule : cfgRules) {
             TextFlow textFlow = new TextFlow();

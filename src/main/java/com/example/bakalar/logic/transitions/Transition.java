@@ -1,9 +1,8 @@
 package com.example.bakalar.logic.transitions;
 
 import com.example.bakalar.logic.conversion.CustomText;
-import com.example.bakalar.logic.conversion.TransitionType;
+import com.example.bakalar.logic.conversion.WindowType;
 import com.example.bakalar.logic.utility.MySymbol;
-import com.example.bakalar.logic.utility.SpecialNonTerminal;
 import javafx.scene.text.Text;
 import lombok.Getter;
 import lombok.Setter;
@@ -22,7 +21,7 @@ public class Transition {
     private MySymbol symbolToPop;
     private MySymbol nextState;
     private List<MySymbol> symbolsToPush;
-    private TransitionType transitionType;
+    private WindowType windowType;
 
     public Transition(String currentState, String inputSymbolToRead, String symbolToPop, String nextState, String symbolsToPush) {
         this.currentState = new MySymbol(currentState);
@@ -30,17 +29,21 @@ public class Transition {
         this.symbolToPop = new MySymbol(symbolToPop);
         this.nextState = new MySymbol(nextState);
         this.symbolsToPush = convertStringToList(symbolsToPush);
-        this.transitionType = TransitionType.NORMAL;
+        this.windowType = WindowType.NORMAL;
         if (this.symbolsToPush.size() == 1 && this.symbolsToPush.get(0).getName().equals(EPSILON)) {
-            this.transitionType = TransitionType.TERMINAL;
+            this.windowType = WindowType.TERMINAL;
         }
     }
 
-    public Transition(String currentState, TransitionType transitionType) {
+    public Transition(String currentState, WindowType windowType) {
         this.currentState = new MySymbol(currentState);
-        this.transitionType = transitionType;
+        this.windowType = windowType;
         this.symbolsToPush = new ArrayList<>();
 
+    }
+
+    public Transition(WindowType windowType) {
+        this.windowType = windowType;
     }
 
     public Transition(MySymbol mySymbol, MySymbol inputSymbolToRead, MySymbol symbolToPop, MySymbol nextState, String symbolsToPushAsString) {
@@ -49,9 +52,9 @@ public class Transition {
         this.symbolToPop = new MySymbol(symbolToPop.getName());
         this.nextState = new MySymbol(nextState.getName());
         this.symbolsToPush = convertStringToList(symbolsToPushAsString);
-        this.transitionType = TransitionType.NORMAL;
+        this.windowType = WindowType.NORMAL;
         if (this.symbolsToPush.size() == 1 && this.symbolsToPush.get(0).getName().equals(EPSILON)) {
-            this.transitionType = TransitionType.TERMINAL;
+            this.windowType = WindowType.TERMINAL;
         }
     }
 
