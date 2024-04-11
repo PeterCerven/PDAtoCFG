@@ -12,7 +12,6 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.VBox;
@@ -33,11 +32,11 @@ public class ConversionLogic {
     private final Board board;
     private List<Transition> transitions;
     private boolean showSteps = false;
-    private List<RulesWindows> rulesWindows;
+    private final List<RulesWindows> rulesWindows;
     private int currentIndex;
-    private StepsWindow stepsWindow;
-    private InformationWindow informationWindow;
-    private ConversionStage conversionStage;
+    private final StepsWindow stepsWindow;
+    private final InformationWindow informationWindow;
+    private final ConversionStage conversionStage;
 
 
     public ConversionLogic(Board board) {
@@ -45,6 +44,7 @@ public class ConversionLogic {
         this.conversionStage = new ConversionStage();
         this.stepsWindow = new StepsWindow();
         this.informationWindow = new InformationWindow();
+        rulesWindows = new ArrayList<>();
     }
 
     public void convertPDA() {
@@ -62,13 +62,12 @@ public class ConversionLogic {
         transitions.add(1, new Transition(board.getStartNode().getName(), WindowType.START));
         setupTransitionStage(transitions);
         showTransitionStage();
-        board.showCFG(getAllNonTerminals(), getAllTerminals(), getAllRules(), STARTING_S);
     }
 
     private Set<SpecialNonTerminal> getAllNonTerminals() {
         Set<SpecialNonTerminal> nonTerminals = new HashSet<>();
-        for (List<CFGRule> lists : rulesWindows) {
-            for (CFGRule rule : lists) {
+        for (RulesWindows ruleWindow : rulesWindows) {
+            for (CFGRule rule : ruleWindow.getRules()) {
                 if (rule.getLeftSide() != null)
                     nonTerminals.add(rule.getLeftSide());
                 nonTerminals.addAll(rule.getRightSide());
@@ -79,8 +78,8 @@ public class ConversionLogic {
 
     private List<CFGRule> getAllRules() {
         List<CFGRule> allRules = new ArrayList<>();
-        for (List<CFGRule> lists : rulesWindows) {
-            allRules.addAll(lists);
+        for (RulesWindows ruleWindow : rulesWindows) {
+            allRules.addAll(ruleWindow.getRules());
         }
         return allRules;
     }
@@ -99,7 +98,7 @@ public class ConversionLogic {
     private void setupTransitionStage(List<Transition> transitions) {
         this.transitions = transitions;
         for (Transition transition : transitions) {
-            this.rulesWindows.add(transitions.indexOf(transition), convertTransitions(transition));
+            this.rulesWindows.add(new RulesWindows(convertTransitions(transition), transition.getWindowType()));
         }
 
         Scene scene = conversionStage.getScene();
@@ -271,20 +270,13 @@ public class ConversionLogic {
     }
 
     private void hideSteps() {
-        stepsBox.getChildren().clear();
+        stepsWindow.getStepsBox().getChildren().clear();
         updateWindow(currentIndex);
     }
 
     private void showSteps() {
-        showStepsButton.setText("Ukáž pravidlá");
-        ruleBox.getChildren().clear();
-        stepsBox.getChildren().clear();
-        VBox stepsLayout = new VBox(10);
-        ScrollPane scrollPane = new ScrollPane();
-        scrollPane.setContent(stepsLayout);
-        stepsWindow.setScrollPaneStyle(scrollPane);
-
-        List<CFGRule> cfgRules = this.rulesWindows.get(currentIndex);
+        stepsWindow.updateStepsWindow();
+        List<CFGRule> cfgRules = this.rulesWindows.get(currentIndex).getRules();
         for (int i = 0; i < cfgRules.get(0).getSteps().size(); i++) {
 
             VBox stepLayout = new VBox();
@@ -317,25 +309,25 @@ public class ConversionLogic {
             Label helpingLabelComment = stepsWindow.createHelpingComment(helpingComment);
             stepLayout.getChildren().add(0, helpingLabelComment);
             stepLayout.getChildren().add(0, transitionTextFlow);
-            stepsLayout.getChildren().add(stepLayout);
+            stepsWindow.getStepsLayout().getChildren().add(stepLayout);
         }
-        stepsBox.getChildren().add(scrollPane);
+        stepsWindow.getStepsBox().getChildren().add(stepsWindow.getScrollPane());
     }
 
     private void showTransitionStage() {
         updateWindow(0);
-        transitionStage.show();
-        root.requestFocus();
+        conversionStage.getStage().show();
+        conversionStage.getRootPane().requestFocus();
     }
 
     private void resetStates() {
-        transitionLabel.getChildren().clear();
-        stepsBox.getChildren().clear();
+        conversionStage.getTransitionLabel().getChildren().clear();
+        stepsWindow.getStepsBox().getChildren().clear();
         this.showSteps = false;
     }
 
     public void updateWindow(int step) {
-        showStepsButton.setText("Ukáž kroky");
+        stepsWindow.getShowStepsButton().setText("Ukáž kroky");
         currentIndex += step;
         if (currentIndex < 0) currentIndex = 0;
         if (currentIndex >= transitions.size()) currentIndex = transitions.size() - 1;
@@ -345,45 +337,55 @@ public class ConversionLogic {
         Text labelText = new Text();
         labelText.setFont(new Font(22));
         labelText.setStyle("-fx-font-weight: bold;");
+        conversionStage.getTransitionIndexLabel().setText((currentIndex + 1) + "/" + transitions.size());
         switch (currentTransition.getWindowType()) {
             case START -> {
                 labelText.setText("Začiatočná prechodová funkcia");
-                transitionLabel.getChildren().add(labelText);
-                helpingLabelComment.setText("Pre každú bez-kontextovú gramatiku sa pridá začiatočný symbol S," +
+                conversionStage.getTransitionLabel().getChildren().add(labelText);
+                conversionStage.getHelpingLabelComment().setText("Pre každú bez-kontextovú gramatiku sa pridá začiatočný symbol S," +
                         " ktorý simuluje pridávanie začiatočného stavu zásobníka symbolu Z.");
+                conversionStage.getRootPane().setCenter(stepsWindow.getRuleBoxPane());
             }
             case NORMAL -> {
                 List<Text> transitionTexts = currentTransition.createTextFromStep();
                 String transitionText = transitionTexts.stream().map(Text::getText).reduce("", String::concat);
                 labelText.setText(transitionText);
-                transitionLabel.getChildren().add(labelText);
-                helpingLabelComment.setText("Prechodová funkcia vyžiera zo zásobníka a pridáva nový symbol na zásobník." +
+                conversionStage.getTransitionLabel().getChildren().add(labelText);
+                conversionStage.getHelpingLabelComment().setText("Prechodová funkcia vyžiera zo zásobníka a pridáva nový symbol na zásobník." +
                         " Počet nových pravidiel závisí od počtu stavov a od počtu nových zásobníkových symbolov.");
+                conversionStage.getRootPane().setCenter(stepsWindow.getRuleBoxPane());
             }
             case TERMINAL -> {
                 List<Text> transitionTexts = currentTransition.createTextFromStep();
                 String transitionText = transitionTexts.stream().map(Text::getText).reduce("", String::concat);
                 labelText.setText(transitionText);
-                transitionLabel.getChildren().add(labelText);
-                helpingLabelComment.setText("Prechodová funkcia prečíta symbol. Zo zásobníka jeden vyžerie.");
+                conversionStage.getTransitionLabel().getChildren().add(labelText);
+                conversionStage.getHelpingLabelComment().setText("Prechodová funkcia prečíta symbol. Zo zásobníka jeden vyžerie.");
+                conversionStage.getRootPane().setCenter(stepsWindow.getRuleBoxPane());
+            }
+            case INFORMATION -> {
+                labelText.setText("Informácie");
+                conversionStage.getTransitionLabel().getChildren().add(labelText);
+                conversionStage.getHelpingLabelComment().setText("Informácie o prechodových funkciách.");
+                conversionStage.getRootPane().setCenter(informationWindow.getInformationPane(this.getAllNonTerminals(), this.getAllTerminals(), this.getAllRules(), STARTING_S));
+                return;
             }
             default -> {
                 List<Text> transitionTexts = currentTransition.createTextFromStep();
                 String transitionText = transitionTexts.stream().map(Text::getText).reduce("", String::concat);
                 labelText.setText(transitionText);
-                transitionLabel.getChildren().add(labelText);
+                conversionStage.getTransitionLabel().getChildren().add(labelText);
             }
         }
-        transitionIndexLabel.setText((currentIndex + 1) + "/" + transitions.size());
-        List<CFGRule> cfgRules = this.rulesWindows.get(currentIndex);
-        ruleBox.getChildren().clear();
+        List<CFGRule> cfgRules = this.rulesWindows.get(currentIndex).getRules();
+        stepsWindow.getRuleBox().getChildren().clear();
         for (CFGRule cfgRule : cfgRules) {
             TextFlow textFlow = new TextFlow();
             Text text = new Text(cfgRule.toString());
             text.setFont(new Font(22));
             textFlow.getChildren().add(text);
             textFlow.setTextAlignment(TextAlignment.CENTER);
-            ruleBox.getChildren().add(textFlow);
+            stepsWindow.getRuleBox().getChildren().add(textFlow);
         }
     }
 

@@ -107,10 +107,6 @@ public class Board implements Serializable {
         this.describePDA.updateAllDescribePDA(this.nodes, this.arrows, this.getNodesTransitions());
     }
 
-    public void showCFG(Set<SpecialNonTerminal> allNonTerminals, Set<MySymbol> allTerminals, List<CFGRule> allRules, String startingS) {
-//        this.describeCFG.updateAllDescribeCFG(allNonTerminals, allTerminals, allRules, startingS);
-    }
-
 
     public List<Transition> getNodesTransitions() {
         List<Transition> transitions = new ArrayList<>();

@@ -3,21 +3,24 @@ package com.example.bakalar.logic.utility;
 import com.example.bakalar.logic.conversion.CFGRule;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
+import lombok.Getter;
 
 import java.util.List;
 import java.util.Set;
 
+@Getter
 public class DescribeCFG {
     private final TextField nonTerminals;
     private final TextField terminals;
     private final TextField startSymbol;
     private final VBox rulesContainer;
     
-    public DescribeCFG(List<TextField> describeCFGFields, VBox rulesContainer) {
-        this.nonTerminals = describeCFGFields.get(0);
-        this.terminals = describeCFGFields.get(1);
-        this.startSymbol = describeCFGFields.get(2);
-        this.rulesContainer = rulesContainer;
+    public DescribeCFG() {
+        this.nonTerminals = new TextField();
+        this.terminals = new TextField();
+        this.startSymbol = new TextField();
+        this.rulesContainer = new VBox();
     }
     public void updateAllDescribeCFG(Set<SpecialNonTerminal> allNonTerminals, Set<MySymbol> allTerminals, List<CFGRule> rules, String startingS) {
         updateNonTerminals(allNonTerminals);
@@ -28,7 +31,10 @@ public class DescribeCFG {
     private void updateRules(List<CFGRule> rules) {
         rulesContainer.getChildren().clear();
         for (CFGRule rule : rules) {
-            rulesContainer.getChildren().add(new TextField(rule.toString()));
+            TextField textField = new TextField();
+            textField.setText(rule.toString());
+            textField.setFont(new Font(18));
+            rulesContainer.getChildren().add(textField);
         }
     }
 

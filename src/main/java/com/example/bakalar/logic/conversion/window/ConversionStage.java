@@ -1,5 +1,6 @@
 package com.example.bakalar.logic.conversion.window;
 
+import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -8,10 +9,7 @@ import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
@@ -29,6 +27,9 @@ public class ConversionStage {
     private BorderPane rootPane;
     private Button previousButton;
     private Button nextButton;
+    private TextFlow transitionLabel;
+    private Label helpingLabelComment;
+    private Label transitionIndexLabel;
     private static final String NEXT_ARROW_ICON_PATH = "file:src/main/resources/icons/nextArrow.png";
     private static final String PREVIOUS_ARROW_ICON_PATH = "file:src/main/resources/icons/previousArrow.png";
 
@@ -36,23 +37,24 @@ public class ConversionStage {
         this.stage = new Stage();
         this.rootPane = new BorderPane();
         this.scene = new Scene(rootPane, 800, 800);
-        this.previousButton = new Button();
-        this.nextButton = new Button();
+
         initStage();
     }
 
     private void initStage() {
         Pane helpingLayout = new Pane();
-        TextFlow transitionLabel = new TextFlow();
 
-        Button nextButton = buttonsSetUp(NEXT_ARROW_ICON_PATH);
+        transitionLabel = new TextFlow();
+        transitionLabel.setTextAlignment(TextAlignment.CENTER);
 
-        Button prevButton = buttonsSetUp(PREVIOUS_ARROW_ICON_PATH);
+        nextButton = buttonsSetUp(NEXT_ARROW_ICON_PATH);
 
-        HBox buttonLayout = new HBox(10, prevButton, nextButton);
+        previousButton = buttonsSetUp(PREVIOUS_ARROW_ICON_PATH);
+
+        HBox buttonLayout = new HBox(10, previousButton, nextButton);
         buttonLayout.setAlignment(Pos.BASELINE_CENTER);
 
-        Label transitionIndexLabel = new Label();
+        transitionIndexLabel = new Label();
         transitionIndexLabel.setFont(new Font("Arial", 22));
 
         HBox arrowsLayoutBox = new HBox();
@@ -63,8 +65,13 @@ public class ConversionStage {
         arrowsLayoutBox.setSpacing(10);
 
         HBox transitionLabelBox = new HBox(helpingLayout, transitionLabel, arrowsLayoutBox);
+        transitionLabelBox.setAlignment(Pos.CENTER);
 
-        Label helpingLabelComment = new Label();
+        arrowsLayoutBox.prefWidthProperty().bind(Bindings.divide(transitionLabelBox.widthProperty(), 4));
+        helpingLayout.prefWidthProperty().bind(arrowsLayoutBox.widthProperty());
+        HBox.setHgrow(transitionLabel, Priority.ALWAYS);
+
+        helpingLabelComment = new Label();
         helpingLabelComment.setTextAlignment(TextAlignment.CENTER);
         helpingLabelComment.setContentDisplay(ContentDisplay.TEXT_ONLY);
         helpingLabelComment.setWrapText(true);

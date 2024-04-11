@@ -14,15 +14,19 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class StepsWindow extends ConversionWindow {
+public class StepsWindow {
     private final Button showStepsButton;
     private BorderPane ruleBoxPane;
+    private VBox ruleBox;
+    private VBox stepsBox;
+    private VBox stepsLayout;
+    private ScrollPane scrollPane;
 
 
     public StepsWindow() {
         super();
-        VBox ruleBox = new VBox();
-        VBox stepsBox = new VBox();
+        ruleBox = new VBox();
+        stepsBox = new VBox();
 
         ScrollPane ruleBoxScrollPane = new ScrollPane();
         ruleBoxScrollPane.setFitToWidth(true);
@@ -71,5 +75,17 @@ public class StepsWindow extends ConversionWindow {
         scrollPane.setFitToWidth(true);
         scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+    }
+
+    public void updateStepsWindow() {
+        showStepsButton.setText("Ukáž kroky");
+        ruleBox.getChildren().clear();
+        stepsBox.getChildren().clear();
+
+        stepsLayout = new VBox(10);
+
+        scrollPane = new ScrollPane();
+        scrollPane.setContent(stepsLayout);
+        setScrollPaneStyle(scrollPane);
     }
 }

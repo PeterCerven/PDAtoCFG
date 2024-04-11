@@ -60,25 +60,6 @@ public class HistoryLogic {
 
     }
 
-
-    public MyNode findNodeById(Long toId) {
-        for (MyNode node : board.getNodes()) {
-            if (node.getNodeId().equals(toId)) {
-                return node;
-            }
-        }
-        return null;
-    }
-
-    public Node addObjectFromHistory(Node node, List<MyNode> nodes, List<Arrow> arrows) {
-        if (node instanceof Arrow arrow) {
-            arrows.add(arrow);
-        } else if (node instanceof MyNode myNode) {
-            nodes.add(myNode);
-        }
-        return node;
-    }
-
     public void saveCurrentState() {
         AppState myHistory = this.createHistory();
         undoStack.push(myHistory);
