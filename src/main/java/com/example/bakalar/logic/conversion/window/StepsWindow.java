@@ -77,7 +77,7 @@ public class StepsWindow {
     }
 
     public void updateStepsWindow() {
-        showStepsButton.setText("Ukáž kroky");
+        showStepsButton.setText("Skry kroky");
         ruleBox.getChildren().clear();
         stepsBox.getChildren().clear();
 
@@ -87,4 +87,6 @@ public class StepsWindow {
         scrollPane.setContent(stepsLayout);
         setScrollPaneStyle(scrollPane);
     }
+
+
 }

@@ -88,12 +88,6 @@ public abstract class Arrow extends Group implements Serializable {
                         transitionToChange.setRead(newTransitionInputs.getRead());
                         transitionToChange.setPop(newTransitionInputs.getPop());
                         transitionToChange.setPush(newTransitionInputs.getPush());
-                    } else {
-                        try {
-                            throw new MyCustomException("Bol problem pri zmene prechodu, prechod nebol najdeny.");
-                        } catch (MyCustomException e) {
-                            board.showErrorDialog(e.getMessage());
-                        }
                     }
                     readSymbol.setText(newTransitionInputs.getRead());
                     popSymbol.setText(newTransitionInputs.getPop());

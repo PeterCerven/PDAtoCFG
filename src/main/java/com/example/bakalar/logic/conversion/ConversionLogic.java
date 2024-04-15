@@ -274,13 +274,8 @@ public class ConversionLogic {
         if (showSteps) {
             showSteps();
         } else {
-            hideSteps();
+            updateWindow(0);
         }
-    }
-
-    private void hideSteps() {
-        stepsWindow.getStepsBox().getChildren().clear();
-        updateWindow(currentIndex);
     }
 
     private void showSteps() {
@@ -336,6 +331,7 @@ public class ConversionLogic {
     }
 
     public void updateWindow(int step) {
+        stepsWindow.getStepsBox().getChildren().clear();
         stepsWindow.getShowStepsButton().setText("Ukáž kroky");
         currentIndex += step;
         if (currentIndex < 0) currentIndex = 0;
