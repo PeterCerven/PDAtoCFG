@@ -24,7 +24,6 @@ public class StepsWindow {
 
 
     public StepsWindow() {
-        super();
         ruleBox = new VBox();
         stepsBox = new VBox();
 

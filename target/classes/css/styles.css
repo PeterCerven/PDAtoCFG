@@ -52,6 +52,10 @@
     -fx-font-size: 16px;
 }
 
+.box-label {
+    -fx-font-size: 23px;
+}
+
 .button:pressed {
     -fx-background-color: #113a11;
     -fx-border-color: #0b270c;

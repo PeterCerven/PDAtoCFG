@@ -7,9 +7,7 @@ import com.example.bakalar.logic.utility.MySymbol;
 import com.example.bakalar.logic.utility.SpecialNonTerminal;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -21,22 +19,27 @@ import java.util.Set;
 
 @Getter
 public class InformationWindow {
-    private DescribeCFG describeCFG;
-    private BorderPane informationPane;
+    private final DescribeCFG describeCFG;
+    private final BorderPane informationPane;
+    private final Button downloadBtn;
     public InformationWindow() {
-        super();
         describeCFG = new DescribeCFG();
-        TextField nonTerminals = describeCFG.getNonTerminals();
+        VBox nonTerminals = describeCFG.getNonTerminals();
         TextField terminals = describeCFG.getTerminals();
         TextField startSymbol = describeCFG.getStartSymbol();
         VBox rulesContainer = describeCFG.getRulesContainer();
 
-        Button downloadBtn = new Button("Stiahni");
+        ScrollPane nonTerminalsScrollPane = new ScrollPane();
+        nonTerminalsScrollPane.setFitToWidth(true);
+        nonTerminalsScrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        nonTerminalsScrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        nonTerminalsScrollPane.setPadding(new Insets(10));
+        nonTerminalsScrollPane.setStyle("-fx-background-color: #f4f4f4; ");
+        nonTerminalsScrollPane.setContent(nonTerminals);
+
+        downloadBtn = new Button("Stiahni");
         downloadBtn.setAlignment(Pos.BOTTOM_RIGHT);
         downloadBtn.setFont(new Font(22));
-        downloadBtn.setOnAction(event -> {
-//            ConversionLogic.downloadCFG(nonTerminals.getText(), terminals.getText(), rulesContainer.getChildren(), startSymbol.getText());
-        });
 
         HBox hBox = new HBox();
         hBox.getChildren().add(downloadBtn);
@@ -50,10 +53,18 @@ public class InformationWindow {
         ruleBoxScrollPane.setStyle("-fx-background-color: #f4f4f4; ");
         ruleBoxScrollPane.setContent(rulesContainer);
 
+        Label label = new Label("Neterminálne symboly");
+        label.getStyleClass().add("box-label");
+
         VBox vBox = new VBox();
-        vBox.getChildren().add(nonTerminals);
-        vBox.getChildren().add(terminals);
+        vBox.setSpacing(5);
+        vBox.setAlignment(Pos.TOP_CENTER);
+        vBox.setPadding(new Insets(10));
+        vBox.setPrefWidth(250);
         vBox.getChildren().add(startSymbol);
+        vBox.getChildren().add(terminals);
+        vBox.getChildren().add(label);
+        vBox.getChildren().add(nonTerminalsScrollPane);
 
 
         informationPane = new BorderPane();
@@ -62,7 +73,6 @@ public class InformationWindow {
         informationPane.setBottom(hBox);
 
 
-        nonTerminals.setEditable(false);
         terminals.setEditable(false);
         startSymbol.setEditable(false);
 
@@ -72,7 +82,6 @@ public class InformationWindow {
 
         rulesContainer.setPrefWidth(200);
 
-        nonTerminals.setPromptText("N = { }");
         terminals.setPromptText("T = { }");
         startSymbol.setPromptText("S = ");
 
@@ -80,11 +89,9 @@ public class InformationWindow {
 
         informationPane.setPrefWidth(400);
 
-        nonTerminals.setPrefHeight(50);
         terminals.setPrefHeight(50);
         startSymbol.setPrefHeight(50);
 
-        nonTerminals.setFont(new Font(18));
         terminals.setFont(new Font(18));
         startSymbol.setFont(new Font(18));
 

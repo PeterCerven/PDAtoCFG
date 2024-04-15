@@ -1,6 +1,8 @@
 package com.example.bakalar.logic.utility;
 
 import com.example.bakalar.logic.conversion.CFGRule;
+import javafx.geometry.Pos;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
@@ -11,13 +13,13 @@ import java.util.Set;
 
 @Getter
 public class DescribeCFG {
-    private final TextField nonTerminals;
+    private final VBox nonTerminals;
     private final TextField terminals;
     private final TextField startSymbol;
     private final VBox rulesContainer;
     
     public DescribeCFG() {
-        this.nonTerminals = new TextField();
+        this.nonTerminals = new VBox();
         this.terminals = new TextField();
         this.startSymbol = new TextField();
         this.rulesContainer = new VBox();
@@ -39,7 +41,7 @@ public class DescribeCFG {
     }
 
     private void updateStartSymbol(String startingS) {
-        startSymbol.setText(startingS);
+        startSymbol.setText("Začiatočný symbol -> " + startingS);
     }
 
     private void updateTerminals(Set<MySymbol> terminals) {
@@ -55,15 +57,18 @@ public class DescribeCFG {
     }
 
     private void updateNonTerminals(Set<SpecialNonTerminal> nonTerminals) {
-        StringBuilder text = new StringBuilder("N = {");
+        this.nonTerminals.getChildren().clear();
         for (SpecialNonTerminal nonTerminal : nonTerminals) {
-            text.append(nonTerminal.toString()).append(", ");
+            TextField textField = new TextField();
+            textField.setEditable(false);
+            textField.setStyle("-fx-background-color: #f4f4f4; ");
+            textField.setPrefWidth(200);
+            textField.setAlignment(Pos.CENTER);
+            textField.setText(nonTerminal.toString());
+            textField.setFont(new Font(22));
+            this.nonTerminals.getChildren().add(textField);
         }
-        if (!nonTerminals.isEmpty()) {
-            text.delete(text.length() - 2, text.length());
-        }
-        text.append("}");
-        this.nonTerminals.setText(text.toString());
+
     }
 
 }

@@ -42,10 +42,6 @@ public class Transition {
 
     }
 
-    public Transition(WindowType windowType) {
-        this.windowType = windowType;
-    }
-
     public Transition(MySymbol mySymbol, MySymbol inputSymbolToRead, MySymbol symbolToPop, MySymbol nextState, String symbolsToPushAsString) {
         this.currentState = new MySymbol(mySymbol.getName());
         this.inputSymbolToRead = new MySymbol(inputSymbolToRead.getName());

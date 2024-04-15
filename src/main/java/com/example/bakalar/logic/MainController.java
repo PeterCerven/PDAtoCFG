@@ -2,6 +2,7 @@ package com.example.bakalar.logic;
 
 import com.example.bakalar.canvas.arrow.TransitionInputs;
 import com.example.bakalar.canvas.node.MyNode;
+import com.example.bakalar.exceptions.MyCustomException;
 import com.example.bakalar.logic.conversion.ConversionLogic;
 import com.example.bakalar.logic.history.HistoryLogic;
 import com.example.bakalar.logic.utility.ButtonState;
@@ -26,6 +27,7 @@ import org.apache.logging.log4j.Logger;
 import java.util.List;
 
 import static com.example.bakalar.logic.Board.EPSILON;
+import static com.example.bakalar.logic.utility.ErrorPopUp.showErrorDialog;
 
 
 public class MainController {
@@ -160,7 +162,11 @@ public class MainController {
     }
 
     public void convertPDA() {
-        conversionLogic.convertPDA();
+        try {
+            conversionLogic.convertPDA();
+        } catch (MyCustomException e) {
+            showErrorDialog(e.getMessage());
+        }
     }
 
     public void testBoard() {

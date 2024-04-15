@@ -4,6 +4,7 @@ import com.example.bakalar.canvas.arrow.Arrow;
 import com.example.bakalar.canvas.arrow.LineArrow;
 import com.example.bakalar.canvas.arrow.TransitionInputs;
 import com.example.bakalar.canvas.node.MyNode;
+import com.example.bakalar.logic.conversion.CFGRule;
 import com.example.bakalar.logic.history.AppState;
 import com.example.bakalar.logic.history.ArrowModel;
 import com.example.bakalar.logic.history.NodeModel;
@@ -12,6 +13,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import java.io.File;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -102,5 +104,27 @@ public class FileLogic {
 
 
         return fileChooser.showOpenDialog(primaryStage);
+    }
+
+    public void saveToTextFile(List<CFGRule> allRules, Stage informationStage) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Save File");
+
+        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("Text files (*.txt)", "txt");
+        fileChooser.getExtensionFilters().add(extFilter);
+
+        File file = fileChooser.showSaveDialog(informationStage);
+        if (file != null) {
+            file = file.getName().endsWith(".txt") ? file : new File(file.getAbsolutePath() + ".txt");
+            try {
+                PrintWriter writer = new PrintWriter(file);
+                for (CFGRule rule : allRules) {
+                    writer.println(rule.toString());
+                }
+                writer.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

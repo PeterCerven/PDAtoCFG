@@ -1,5 +1,6 @@
 package com.example.bakalar.logic.conversion;
 
+import com.example.bakalar.exceptions.MyCustomException;
 import com.example.bakalar.logic.Board;
 import com.example.bakalar.logic.conversion.window.ConversionStage;
 import com.example.bakalar.logic.conversion.window.InformationWindow;
@@ -26,13 +27,13 @@ import org.apache.logging.log4j.Logger;
 import java.util.*;
 
 import static com.example.bakalar.logic.Board.*;
+import static com.example.bakalar.logic.utility.ErrorPopUp.showErrorDialog;
 
 public class ConversionLogic {
     private static final Logger log = LogManager.getLogger(ConversionLogic.class.getName());
     private final Board board;
-    private List<Transition> transitions;
     private boolean showSteps = false;
-    private final List<RulesWindows> rulesWindows;
+    private List<RulesWindows> rulesWindows;
     private int currentIndex;
     private final StepsWindow stepsWindow;
     private final InformationWindow informationWindow;
@@ -44,22 +45,22 @@ public class ConversionLogic {
         this.conversionStage = new ConversionStage();
         this.stepsWindow = new StepsWindow();
         this.informationWindow = new InformationWindow();
-        rulesWindows = new ArrayList<>();
     }
 
-    public void convertPDA() {
+    public void convertPDA() throws MyCustomException {
+        rulesWindows = new ArrayList<>();
         currentIndex = 0;
         List<Transition> transitions = board.getNodesTransitions();
         if (transitions.isEmpty()) {
-            board.showErrorDialog("Nemožno previesť Nemáte žiadne prechodové funkcie.");
+            showErrorDialog("Nemožno previesť Nemáte žiadne prechodové funkcie.");
             return;
         }
         if (board.getStartNode() == null) {
-            board.showErrorDialog("Nemožno previesť Nemáte žiadny začiatočný stav.");
+            showErrorDialog("Nemožno previesť Nemáte žiadny začiatočný stav.");
             return;
         }
-        transitions.add(0, new Transition(WindowType.INFORMATION));
-        transitions.add(1, new Transition(board.getStartNode().getName(), WindowType.START));
+        rulesWindows.add(new RulesWindows(WindowType.INFORMATION));
+        transitions.add(0, new Transition(board.getStartNode().getName(), WindowType.START));
         setupTransitionStage(transitions);
         showTransitionStage();
     }
@@ -87,7 +88,7 @@ public class ConversionLogic {
     private Set<MySymbol> getAllTerminals() {
         Set<MySymbol> terminals = new HashSet<>();
         for (CFGRule rule : getAllRules()) {
-            if (rule.getTerminal() != null) {
+            if (rule.getTerminal() != null && !rule.getTerminal().getName().equals(EPSILON)) {
                 terminals.add(rule.getTerminal());
             }
         }
@@ -95,10 +96,9 @@ public class ConversionLogic {
     }
 
 
-    private void setupTransitionStage(List<Transition> transitions) {
-        this.transitions = transitions;
+    private void setupTransitionStage(List<Transition> transitions) throws MyCustomException {
         for (Transition transition : transitions) {
-            this.rulesWindows.add(new RulesWindows(convertTransitions(transition), transition.getWindowType()));
+            this.rulesWindows.add(convertTransitions(transition));
         }
 
         Scene scene = conversionStage.getScene();
@@ -111,10 +111,12 @@ public class ConversionLogic {
             }
         });
 
+        Button downloadButton = informationWindow.getDownloadBtn();
         Button prevButton = conversionStage.getPreviousButton();
         Button nextButton = conversionStage.getNextButton();
         Button showStepsButton = stepsWindow.getShowStepsButton();
 
+        downloadButton.setOnAction(e -> board.saveCFGFile(getAllRules(), conversionStage.getStage()));
         prevButton.setOnAction(e -> updateWindow(-1));
         nextButton.setOnAction(e -> updateWindow(1));
         showStepsButton.setOnAction(e -> steps());
@@ -123,15 +125,21 @@ public class ConversionLogic {
     }
 
 
-    private List<CFGRule> convertTransitions(Transition transition) {
-        List<CFGRule> cfgRules = new ArrayList<>();
+    private RulesWindows convertTransitions(Transition transition) throws MyCustomException {
         switch (transition.getWindowType()) {
-            case INFORMATION -> cfgRules.add(new CFGRule());
-            case START -> cfgRules.addAll(startMove(transition));
-            case NORMAL -> cfgRules.addAll(pushMove(transition));
-            case TERMINAL -> cfgRules.addAll(terminalMove(transition));
+            case START -> {
+                return new RulesWindows(startMove(transition), transition, WindowType.START);
+            }
+            case NORMAL -> {
+                return new RulesWindows(pushMove(transition), transition, WindowType.NORMAL);
+            }
+            case TERMINAL -> {
+                return new RulesWindows(terminalMove(transition),transition, WindowType.TERMINAL);
+            }
+            default -> {
+                throw new MyCustomException("Nepodporovaný typ prechodovej funkcie.");
+            }
         }
-        return cfgRules;
     }
 
     private void recursiveLoop(int totalLoops, int iterations, String[] statesPos, int currentLoop, Transition transition, List<CFGRule> cfgRules) {
@@ -245,6 +253,7 @@ public class ConversionLogic {
     private List<CFGRule> startMove(Transition transition) {
         List<MySymbol> allStateSymbols = board.getNodes().stream().map(node -> new MySymbol(node.getName())).toList();
         List<CFGRule> cfgRules = new ArrayList<>();
+
         MySymbol startSymbol = new MySymbol(STARTING_S);
         MySymbol startStackSymbol = new MySymbol(STARTING_Z);
         for (MySymbol stateSymbol : allStateSymbols) {
@@ -330,15 +339,15 @@ public class ConversionLogic {
         stepsWindow.getShowStepsButton().setText("Ukáž kroky");
         currentIndex += step;
         if (currentIndex < 0) currentIndex = 0;
-        if (currentIndex >= transitions.size()) currentIndex = transitions.size() - 1;
+        if (currentIndex >= rulesWindows.size()) currentIndex = rulesWindows.size() - 1;
 
-        Transition currentTransition = transitions.get(currentIndex);
+        RulesWindows currentWindow = rulesWindows.get(currentIndex);
         resetStates();
         Text labelText = new Text();
         labelText.setFont(new Font(22));
         labelText.setStyle("-fx-font-weight: bold;");
-        conversionStage.getTransitionIndexLabel().setText((currentIndex + 1) + "/" + transitions.size());
-        switch (currentTransition.getWindowType()) {
+        conversionStage.getTransitionIndexLabel().setText((currentIndex + 1) + "/" + rulesWindows.size());
+        switch (currentWindow.getWindowType()) {
             case START -> {
                 labelText.setText("Začiatočná prechodová funkcia");
                 conversionStage.getTransitionLabel().getChildren().add(labelText);
@@ -347,16 +356,16 @@ public class ConversionLogic {
                 conversionStage.getRootPane().setCenter(stepsWindow.getRuleBoxPane());
             }
             case NORMAL -> {
-                List<Text> transitionTexts = currentTransition.createTextFromStep();
+                List<Text> transitionTexts = currentWindow.getTransition().createTextFromStep();
                 String transitionText = transitionTexts.stream().map(Text::getText).reduce("", String::concat);
                 labelText.setText(transitionText);
                 conversionStage.getTransitionLabel().getChildren().add(labelText);
-                conversionStage.getHelpingLabelComment().setText("Prechodová funkcia vyžiera zo zásobníka a pridáva nový symbol na zásobník." +
-                        " Počet nových pravidiel závisí od počtu stavov a od počtu nových zásobníkových symbolov.");
+                conversionStage.getHelpingLabelComment().setText("Prechodová funkcia vyžiera zo zásobníka a pridáva nový" +
+                        " symbol na zásobník. Počet nových pravidiel závisí od počtu stavov a od počtu nových zásobníkových symbolov.");
                 conversionStage.getRootPane().setCenter(stepsWindow.getRuleBoxPane());
             }
             case TERMINAL -> {
-                List<Text> transitionTexts = currentTransition.createTextFromStep();
+                List<Text> transitionTexts = currentWindow.getTransition().createTextFromStep();
                 String transitionText = transitionTexts.stream().map(Text::getText).reduce("", String::concat);
                 labelText.setText(transitionText);
                 conversionStage.getTransitionLabel().getChildren().add(labelText);
@@ -367,14 +376,12 @@ public class ConversionLogic {
                 labelText.setText("Informácie");
                 conversionStage.getTransitionLabel().getChildren().add(labelText);
                 conversionStage.getHelpingLabelComment().setText("Informácie o prechodových funkciách.");
-                conversionStage.getRootPane().setCenter(informationWindow.getInformationPane(this.getAllNonTerminals(), this.getAllTerminals(), this.getAllRules(), STARTING_S));
+                conversionStage.getRootPane().setCenter(informationWindow.getInformationPane(this.getAllNonTerminals(),
+                        this.getAllTerminals(), this.getAllRules(), STARTING_S));
                 return;
             }
             default -> {
-                List<Text> transitionTexts = currentTransition.createTextFromStep();
-                String transitionText = transitionTexts.stream().map(Text::getText).reduce("", String::concat);
-                labelText.setText(transitionText);
-                conversionStage.getTransitionLabel().getChildren().add(labelText);
+                return;
             }
         }
         List<CFGRule> cfgRules = this.rulesWindows.get(currentIndex).getRules();

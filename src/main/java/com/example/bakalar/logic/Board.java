@@ -32,6 +32,7 @@ import java.io.Serializable;
 import java.util.*;
 
 import static com.example.bakalar.logic.MainController.NODE_RADIUS;
+import static com.example.bakalar.logic.utility.ErrorPopUp.showErrorDialog;
 
 @Getter
 @Setter
@@ -88,6 +89,10 @@ public class Board implements Serializable {
     }
 
     // file operations
+
+    public void saveCFGFile(List<CFGRule> allRules, Stage stage) {
+        fileLogic.saveToTextFile(allRules, stage);
+    }
 
     public void saveCurrentStateToFile() {
         fileLogic.saveToJson(nodes, arrows, nodeCounter, idCounter, stage);
@@ -556,16 +561,5 @@ public class Board implements Serializable {
         this.makeCurveDraggable((LineArrow) arrow);
         this.addObject(arrow);
     }
-
-    // error handling
-
-    public void showErrorDialog(String errorMessage) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle("Error");
-        alert.setHeaderText(null);
-        alert.setContentText(errorMessage);
-        alert.showAndWait();
-    }
-
 
 }
