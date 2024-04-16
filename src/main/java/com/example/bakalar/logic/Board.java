@@ -36,6 +36,7 @@ import java.util.*;
 
 import static com.example.bakalar.logic.MainController.NODE_RADIUS;
 import static com.example.bakalar.logic.utility.ErrorPopUp.showErrorDialog;
+import static com.example.bakalar.logic.utility.StageUtils.setStageIcon;
 
 @Getter
 @Setter
@@ -318,6 +319,9 @@ public class Board implements Serializable {
         dialog.getDialogPane().getStylesheets().add(Objects.requireNonNull(getClass().getResource("/css/styles.css")).toExternalForm());
         dialog.getDialogPane().getStyleClass().add("custom-dialog");
 
+        Stage dialogStage = (Stage) dialog.getDialogPane().getScene().getWindow();
+        setStageIcon(dialogStage);
+
         dialog.setTitle("Vytvorte prechodovú funkciu");
         dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 
@@ -361,9 +365,13 @@ public class Board implements Serializable {
     public void showDialog(MyNode node) {
         Dialog<ButtonType> dialog = new Dialog<>();
         dialog.setTitle("Zmeň stav");
+        dialog.setHeaderText(null);
 
         dialog.getDialogPane().getStylesheets().add(Objects.requireNonNull(getClass().getResource("/css/styles.css")).toExternalForm());
         dialog.getDialogPane().getStyleClass().add("custom-dialog");
+
+        Stage dialogStage = (Stage) dialog.getDialogPane().getScene().getWindow();
+        setStageIcon(dialogStage);
 
         GridPane gridPane = new GridPane();
         gridPane.setHgap(10);

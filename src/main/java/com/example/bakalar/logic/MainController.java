@@ -26,6 +26,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.List;
+import java.util.Objects;
 
 import static com.example.bakalar.logic.Board.EPSILON;
 import static com.example.bakalar.logic.utility.ErrorPopUp.showErrorDialog;
@@ -35,12 +36,12 @@ public class MainController {
 
     public static final int NODE_RADIUS = 34;
     private static final Logger log = LogManager.getLogger(MainController.class.getName());
-    private static final String ARROW_ICON_PATH = "file:src/main/resources/icons/Arrow.png";
-    private static final String ERASER_ICON_PATH = "file:src/main/resources/icons/Eraser.png";
-    private static final String NODE_ICON_PATH = "file:src/main/resources/icons/Node.png";
-    private static final String ERASE_ALL_ICON_PATH = "file:src/main/resources/icons/EraseAll.png";
-    private static final String UNDO_ICON_PATH = "file:src/main/resources/icons/Undo.png";
-    private static final String REDO_ICON_PATH = "file:src/main/resources/icons/Redo.png";
+    private static final String ARROW_ICON_PATH = "/icons/Arrow.png";
+    private static final String ERASER_ICON_PATH = "/icons/Eraser.png";
+    private static final String NODE_ICON_PATH = "/icons/Node.png";
+    private static final String ERASE_ALL_ICON_PATH = "/icons/EraseAll.png";
+    private static final String UNDO_ICON_PATH = "/icons/Undo.png";
+    private static final String REDO_ICON_PATH = "/icons/Redo.png";
     @FXML
     private AnchorPane mainPane;
     @FXML
@@ -88,7 +89,7 @@ public class MainController {
         currentBoard = new Board(mainPane, describePDA, historyLogic, currentState, stage);
         historyLogic.setBoard(currentBoard);
         this.conversionLogic = new ConversionLogic(currentBoard);
-        
+
 
     }
 
@@ -102,38 +103,38 @@ public class MainController {
 
 
     private void setUpButtons() {
-        Image image = new Image(ARROW_ICON_PATH);
+        Image image = new Image(Objects.requireNonNull(getClass().getResourceAsStream(ARROW_ICON_PATH)));
         ImageView imageView = new ImageView(image);
         this.arrowBtn.setGraphic(imageView);
         arrowBtn.setOnMouseEntered(e -> arrowBtn.setCursor(Cursor.HAND));
         arrowBtn.setOnMouseExited(e -> arrowBtn.setCursor(Cursor.DEFAULT));
 
-        image = new Image(ERASER_ICON_PATH);
+        image = new Image(Objects.requireNonNull(getClass().getResourceAsStream(ERASER_ICON_PATH)));
         imageView = new ImageView(image);
         this.eraseBtn.setGraphic(imageView);
         eraseBtn.setOnMouseEntered(e -> eraseBtn.setCursor(Cursor.HAND));
         eraseBtn.setOnMouseExited(e -> eraseBtn.setCursor(Cursor.DEFAULT));
 
-        image = new Image(NODE_ICON_PATH);
+        image = new Image(Objects.requireNonNull(getClass().getResourceAsStream(NODE_ICON_PATH)));
         imageView = new ImageView(image);
         this.nodeBtn.setGraphic(imageView);
         nodeBtn.setOnMouseEntered(e -> nodeBtn.setCursor(Cursor.HAND));
         nodeBtn.setOnMouseExited(e -> nodeBtn.setCursor(Cursor.DEFAULT));
 
-        image = new Image(ERASE_ALL_ICON_PATH);
+        image = new Image(Objects.requireNonNull(getClass().getResourceAsStream(ERASE_ALL_ICON_PATH)));
         imageView = new ImageView(image);
         this.resetBtn.setGraphic(imageView);
         resetBtn.setOnMouseEntered(e -> resetBtn.setCursor(Cursor.HAND));
         resetBtn.setOnMouseExited(e -> resetBtn.setCursor(Cursor.DEFAULT));
 
 
-        image = new Image(UNDO_ICON_PATH);
+        image = new Image(Objects.requireNonNull(getClass().getResourceAsStream(UNDO_ICON_PATH)));
         imageView = new ImageView(image);
         this.undoBtn.setGraphic(imageView);
         undoBtn.setOnMouseEntered(e -> undoBtn.setCursor(Cursor.HAND));
         undoBtn.setOnMouseExited(e -> undoBtn.setCursor(Cursor.DEFAULT));
 
-        image = new Image(REDO_ICON_PATH);
+        image = new Image(Objects.requireNonNull(getClass().getResourceAsStream(REDO_ICON_PATH)));
         imageView = new ImageView(image);
         this.reUndoBtn.setGraphic(imageView);
         reUndoBtn.setOnMouseEntered(e -> reUndoBtn.setCursor(Cursor.HAND));

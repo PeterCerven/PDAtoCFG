@@ -19,6 +19,8 @@ import lombok.Setter;
 
 import java.util.Objects;
 
+import static com.example.bakalar.logic.utility.StageUtils.setStageIcon;
+
 @Getter
 @Setter
 public class ConversionStage {
@@ -35,6 +37,7 @@ public class ConversionStage {
 
     public ConversionStage() {
         this.stage = new Stage();
+        setStageIcon(stage);
         this.rootPane = new BorderPane();
         this.scene = new Scene(rootPane, 800, 800);
 

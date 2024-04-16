@@ -9,7 +9,10 @@ import javafx.stage.Stage;
 import java.io.IOException;
 import java.util.Objects;
 
+import static com.example.bakalar.logic.utility.StageUtils.setStageIcon;
+
 public class MyApp extends Application {
+    private static final String NODE_ICON_PATH = "/icons/Node.png";
     @Override
     public void start(Stage stage) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(MyApp.class.getResource("my-scene.fxml"));
@@ -22,6 +25,8 @@ public class MyApp extends Application {
         scene.getStylesheets().add(styles);
 
 
+
+        setStageIcon(stage);
         stage.setTitle("Context Free Grammar");
         stage.setScene(scene);
         stage.setMinWidth(700);
