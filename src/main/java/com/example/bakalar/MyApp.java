@@ -4,12 +4,10 @@ import com.example.bakalar.logic.MainController;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.Objects;
 
 public class MyApp extends Application {
     @Override
@@ -18,6 +16,7 @@ public class MyApp extends Application {
         Scene scene = new Scene(fxmlLoader.load());
         MainController controller = fxmlLoader.getController();
         controller.setStage(stage);
+        controller.setMainScene(scene);
 
         String styles = Objects.requireNonNull(getClass().getResource("/css/styles.css")).toExternalForm();
         scene.getStylesheets().add(styles);

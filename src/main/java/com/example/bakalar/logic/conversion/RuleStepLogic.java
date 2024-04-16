@@ -129,18 +129,21 @@ public class RuleStepLogic {
     // normal step
     public void addLeftSideStep(SpecialNonTerminal leftSide, String symbol) {
         // transition step
+
+        String helpingComment = "";
         Transition newTransition = new Transition(transition.getCurrentState().getName(), transition.getInputSymbolToRead().getName(),
                 transition.getSymbolToPop().getName(), transition.getNextState().getName(), transition.getSymbolsToPushAsString());
         if (symbol.equals("current")) {
             newTransition.setCurrentState(new MySymbol(leftSide.getStateSymbolFrom().getName(), Color.RED));
+            helpingComment = "Do ľavej strany pravidla pridávame nový symbol súčastného stavu.";
         } else if (symbol.equals("pop")) {
             newTransition.setSymbolToPop(new MySymbol(leftSide.getStackSymbol().getName(), Color.RED));
+            helpingComment = "Do ľavej strany pravidla pridávame symbol ktorý vyžierame zo zásobníka.";
         }
 
         // rule step
         templateRule.resetFontColor();
         templateRule.setLeftSide(leftSide);
-        String helpingComment = "Do ľavej strany pravidla pridávame nový symbol súčastného stavu.";
         stepRules.add(new StepRule(templateRule.copyLeftSide(), templateRule.copyTerminal(), templateRule.copyRightSide(), newTransition, helpingComment));
     }
 

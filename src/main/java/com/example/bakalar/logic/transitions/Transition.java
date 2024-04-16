@@ -43,10 +43,10 @@ public class Transition {
     }
 
     public Transition(MySymbol mySymbol, MySymbol inputSymbolToRead, MySymbol symbolToPop, MySymbol nextState, String symbolsToPushAsString) {
-        this.currentState = new MySymbol(mySymbol.getName());
-        this.inputSymbolToRead = new MySymbol(inputSymbolToRead.getName());
-        this.symbolToPop = new MySymbol(symbolToPop.getName());
-        this.nextState = new MySymbol(nextState.getName());
+        this.currentState = mySymbol;
+        this.inputSymbolToRead = inputSymbolToRead;
+        this.symbolToPop = symbolToPop;
+        this.nextState = nextState;
         this.symbolsToPush = convertStringToList(symbolsToPushAsString);
         this.windowType = WindowType.NORMAL;
         if (this.symbolsToPush.size() == 1 && this.symbolsToPush.get(0).getName().equals(EPSILON)) {

@@ -274,12 +274,17 @@ public class ConversionLogic {
         if (showSteps) {
             showSteps();
         } else {
-            updateWindow(0);
+            hideSteps();
         }
     }
 
+    private void hideSteps() {
+        stepsWindow.hideSteps();
+        updateWindow(0);
+    }
+
     private void showSteps() {
-        stepsWindow.updateStepsWindow();
+        stepsWindow.showSteps();
         List<CFGRule> cfgRules = this.rulesWindows.get(currentIndex).getRules();
         for (int i = 0; i < cfgRules.get(0).getSteps().size(); i++) {
 
@@ -337,6 +342,10 @@ public class ConversionLogic {
         if (currentIndex < 0) currentIndex = 0;
         if (currentIndex >= rulesWindows.size()) currentIndex = rulesWindows.size() - 1;
 
+        if (!stepsWindow.getContentBox().getChildren().contains(stepsWindow.getRuleBoxScrollPane())) {
+            stepsWindow.getContentBox().getChildren().add(0, stepsWindow.getRuleBoxScrollPane());
+        }
+
         RulesWindows currentWindow = rulesWindows.get(currentIndex);
         resetStates();
         Text labelText = new Text();
@@ -369,9 +378,9 @@ public class ConversionLogic {
                 conversionStage.getRootPane().setCenter(stepsWindow.getRuleBoxPane());
             }
             case INFORMATION -> {
-                labelText.setText("Informácie");
+                labelText.setText("Bezkontextová gramatika");
                 conversionStage.getTransitionLabel().getChildren().add(labelText);
-                conversionStage.getHelpingLabelComment().setText("Informácie o prechodových funkciách.");
+                conversionStage.getHelpingLabelComment().setText("Pravidlá bezkontextovej gramatiky.");
                 conversionStage.getRootPane().setCenter(informationWindow.getInformationPane(this.getAllNonTerminals(),
                         this.getAllTerminals(), this.getAllRules(), STARTING_S));
                 return;

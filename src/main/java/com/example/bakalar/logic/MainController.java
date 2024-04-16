@@ -9,6 +9,7 @@ import com.example.bakalar.logic.utility.ButtonState;
 import com.example.bakalar.logic.utility.DescribePDA;
 import javafx.fxml.FXML;
 import javafx.scene.Cursor;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
@@ -71,6 +72,7 @@ public class MainController {
     private ConversionLogic conversionLogic;
     @Setter
     private Stage stage;
+    private Scene mainScene;
 
 
     @FXML
@@ -86,6 +88,14 @@ public class MainController {
         currentBoard = new Board(mainPane, describePDA, historyLogic, currentState, stage);
         historyLogic.setBoard(currentBoard);
         this.conversionLogic = new ConversionLogic(currentBoard);
+        
+
+    }
+
+    public void setMainScene(Scene mainScene) {
+        this.mainScene = mainScene;
+        mainScene.setOnKeyPressed(this::keyAction);
+        mainScene.setOnMouseClicked(this::mouseAction);
     }
 
     // set images
@@ -232,6 +242,14 @@ public class MainController {
     // key actions
     public void keyAction(KeyEvent event) {
         if (event.getCode() == KeyCode.ESCAPE) {
+            currentState = ButtonState.SELECT;
+            updateButtonStates();
+            currentBoard.setCurrentState(currentState);
+        }
+    }
+
+    public void mouseAction(MouseEvent event) {
+        if (event.getButton() == MouseButton.SECONDARY) {
             currentState = ButtonState.SELECT;
             updateButtonStates();
             currentBoard.setCurrentState(currentState);

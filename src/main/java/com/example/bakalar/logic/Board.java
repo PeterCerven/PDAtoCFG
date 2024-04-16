@@ -14,7 +14,10 @@ import com.example.bakalar.logic.history.ArrowModel;
 import com.example.bakalar.logic.history.HistoryLogic;
 import com.example.bakalar.logic.history.NodeModel;
 import com.example.bakalar.logic.transitions.Transition;
-import com.example.bakalar.logic.utility.*;
+import com.example.bakalar.logic.utility.ButtonState;
+import com.example.bakalar.logic.utility.DescribeCFG;
+import com.example.bakalar.logic.utility.DescribePDA;
+import com.example.bakalar.logic.utility.LimitedTextField;
 import javafx.geometry.Insets;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
@@ -281,16 +284,12 @@ public class Board implements Serializable {
 
     // starting and ending nodes
 
-
-    public void removeStartingFromOtherNodes() {
-        for (MyNode node : nodes) {
-            setStarting(node, false);
-        }
-    }
-
     public void setStarting(MyNode node, boolean starting) {
+        if (startNode != null) {
+            this.startNode.setStarting(false);
+        }
         node.setStarting(starting);
-        this.setStartNode(node);
+        this.startNode = starting ? node : null;
     }
 
     private MyNode findNodeById(Long nodeId) throws MyCustomException {
@@ -322,15 +321,18 @@ public class Board implements Serializable {
         dialog.setTitle("Vytvorte prechodovú funkciu");
         dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 
-        TextField input1 = new TextField(read == null || read.isBlank() ? EPSILON : read);
-        input1.setPromptText("Čítaj");
-        Label label1 = new Label("Čítaj");
-        TextField input2 = new TextField(pop == null || pop.isBlank() ? EPSILON : pop);
-        input2.setPromptText("Vyber zo zásobníka");
-        Label label2 = new Label("Vyber zo zásobníka");
-        TextField input3 = new TextField(push == null || push.isBlank() ? EPSILON : push);
-        input3.setPromptText("Daj na zásobník");
+        LimitedTextField input1 = new LimitedTextField(read == null || read.isBlank() ? "" : read, 1);
+        input1.setPromptText("(Read)");
+        Label label1 = new Label("Čítaj symbol");
+        label1.setLabelFor(input1);
+        LimitedTextField input2 = new LimitedTextField(pop == null || pop.isBlank() ? "" : pop, 1);
+        input2.setPromptText("(Pop)");
+        Label label2 = new Label("Odstráň zo zásobníka");
+        label2.setLabelFor(input2);
+        LimitedTextField input3 = new LimitedTextField(push == null || push.isBlank() ? "" : push, 5);
+        input3.setPromptText("(Push)");
         Label label3 = new Label("Daj na zásobník");
+        label3.setLabelFor(input3);
 
         GridPane grid = new GridPane();
         grid.setHgap(5);
@@ -347,9 +349,9 @@ public class Board implements Serializable {
         Optional<ButtonType> result = dialog.showAndWait();
 
         if (result.isPresent() && result.get() == ButtonType.OK) {
-            String newRead = input1.getText().isBlank() ? EPSILON : input1.getText();
-            String newPop = input2.getText().isBlank() ? EPSILON : input2.getText();
-            String newPush = input3.getText().isBlank() ? EPSILON : input3.getText();
+            String newRead = input1.getText().isBlank() ? EPSILON : input1.getText().trim();
+            String newPop = input2.getText().isBlank() ? EPSILON : input2.getText().trim();
+            String newPush = input3.getText().isBlank() ? EPSILON : input3.getText().trim();
 
             return new TransitionInputs(newRead, newPop, newPush);
         }
@@ -385,11 +387,9 @@ public class Board implements Serializable {
             if (buttonType == ButtonType.OK) {
                 saveCurrentStateToHistory();
                 node.setName(nameField.getText());
-                if (startingCheckBox.isSelected()) {
-                    removeStartingFromOtherNodes();
-                    this.startNode = node;
+                if (node.isStarting() != startingCheckBox.isSelected()) {
+                    setStarting(node, startingCheckBox.isSelected());
                 }
-                setStarting(node, startingCheckBox.isSelected());
                 setEnding(node, endingCheckBox.isSelected());
             }
             updateAllDescribePDA();

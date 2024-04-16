@@ -21,13 +21,15 @@ public class StepsWindow {
     private VBox stepsBox;
     private VBox stepsLayout;
     private ScrollPane scrollPane;
+    private ScrollPane ruleBoxScrollPane;
+    private VBox contentBox;
 
 
     public StepsWindow() {
         ruleBox = new VBox();
         stepsBox = new VBox();
 
-        ScrollPane ruleBoxScrollPane = new ScrollPane();
+        ruleBoxScrollPane = new ScrollPane();
         ruleBoxScrollPane.setFitToWidth(true);
         ruleBoxScrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         ruleBoxScrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
@@ -43,7 +45,7 @@ public class StepsWindow {
         showStepsButton.setFont(new Font(18));
         showStepsButton.setAlignment(Pos.CENTER);
 
-        VBox contentBox = new VBox();
+        contentBox = new VBox();
         contentBox.setAlignment(Pos.TOP_CENTER);
         contentBox.getChildren().add(ruleBoxScrollPane);
         contentBox.getChildren().add(showStepsButton);
@@ -76,16 +78,24 @@ public class StepsWindow {
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
     }
 
-    public void updateStepsWindow() {
+    public void showSteps() {
         showStepsButton.setText("Skry kroky");
         ruleBox.getChildren().clear();
         stepsBox.getChildren().clear();
+        contentBox.getChildren().remove(ruleBoxScrollPane);
 
         stepsLayout = new VBox(10);
 
         scrollPane = new ScrollPane();
         scrollPane.setContent(stepsLayout);
         setScrollPaneStyle(scrollPane);
+    }
+
+    public void hideSteps() {
+        showStepsButton.setText("Ukáž kroky");
+        ruleBox.getChildren().clear();
+        stepsBox.getChildren().clear();
+        contentBox.getChildren().add(0, ruleBoxScrollPane);
     }
 
 

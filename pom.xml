@@ -51,39 +51,6 @@
             <version>0.4.0</version>
         </dependency>
         <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-params</artifactId>
-            <version>5.8.1</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter</artifactId>
-            <version>5.7.1</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.vintage</groupId>
-            <artifactId>junit-vintage-engine</artifactId>
-            <version>5.7.1</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <!--        Mockito -->
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-core</artifactId>
-            <version>4.8.0</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <!--        Mockito -->
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-junit-jupiter</artifactId>
-            <version>4.8.0</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-core</artifactId>
             <version>2.20.0</version>

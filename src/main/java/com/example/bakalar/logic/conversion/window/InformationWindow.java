@@ -37,7 +37,7 @@ public class InformationWindow {
         nonTerminalsScrollPane.setStyle("-fx-background-color: #f4f4f4; ");
         nonTerminalsScrollPane.setContent(nonTerminals);
 
-        downloadBtn = new Button("Stiahni");
+        downloadBtn = new Button("Stiahni pravidlá");
         downloadBtn.setAlignment(Pos.BOTTOM_RIGHT);
         downloadBtn.setFont(new Font(22));
 
