@@ -8,12 +8,14 @@ import com.example.bakalar.logic.conversion.CFGRule;
 import com.example.bakalar.logic.history.AppState;
 import com.example.bakalar.logic.history.ArrowModel;
 import com.example.bakalar.logic.history.NodeModel;
+import com.example.bakalar.logic.utility.ErrorPopUp;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import java.io.File;
 import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -65,7 +67,7 @@ public class FileLogic {
             AppState state = new AppState(nodes, arrows, nodeCounter, idCounter);
             mapper.writeValue(new File(filePath), state);
         } catch (Exception e) {
-            e.printStackTrace();
+            ErrorPopUp.showErrorDialog("Error pri ukladaní súboru");
         }
     }
 
@@ -80,7 +82,6 @@ public class FileLogic {
             ObjectMapper mapper = new ObjectMapper();
             return mapper.readValue(file, AppState.class);
         } catch (Exception e) {
-            e.printStackTrace();
             return null;
         }
     }
@@ -117,13 +118,13 @@ public class FileLogic {
         if (file != null) {
             file = file.getName().endsWith(".txt") ? file : new File(file.getAbsolutePath() + ".txt");
             try {
-                PrintWriter writer = new PrintWriter(file);
+                PrintWriter writer = new PrintWriter(file, StandardCharsets.UTF_8);
                 for (CFGRule rule : allRules) {
                     writer.println(rule.toString());
                 }
                 writer.close();
             } catch (Exception e) {
-                e.printStackTrace();
+                ErrorPopUp.showErrorDialog("Error pri ukladaní súboru");
             }
         }
     }

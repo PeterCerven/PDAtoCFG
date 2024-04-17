@@ -4,12 +4,7 @@ module com.example.bakalar {
 
     requires org.controlsfx.controls;
     requires org.kordamp.bootstrapfx.core;
-    requires org.apache.logging.log4j.core;
-    requires org.apache.logging.log4j;
-    requires org.apache.commons.lang3;
     requires lombok;
-    requires modelmapper;
-    requires javafx.web;
     requires com.fasterxml.jackson.databind;
     requires com.fasterxml.jackson.core;
 

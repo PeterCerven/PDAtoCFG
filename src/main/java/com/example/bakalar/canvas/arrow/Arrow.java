@@ -15,8 +15,6 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -28,7 +26,6 @@ import static com.example.bakalar.logic.MainController.NODE_RADIUS;
 @Setter
 public abstract class Arrow extends Group implements Serializable {
     public static final int ARROW_HEAD_SZIE = NODE_RADIUS / 2;
-    protected static final Logger log = LogManager.getLogger(Arrow.class.getName());
     protected MyNode from;
     protected MyNode to;
     protected List<TransitionInputs> transitions;
@@ -185,7 +182,6 @@ public abstract class Arrow extends Group implements Serializable {
 
     @Override
     public String toString() {
-        log.info("Arrow toString");
         return "Arrow{" +
                 "transitions=" + transitions +
                 ", fromId=" + fromId +

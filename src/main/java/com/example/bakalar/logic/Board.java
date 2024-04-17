@@ -28,9 +28,6 @@ import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import java.io.Serializable;
 import java.util.*;
 
@@ -47,7 +44,6 @@ public class Board implements Serializable {
     public static final String DELTA_LOWER = "δ";
     public static final String STARTING_Z = "Z";
     public static final String STARTING_S = "S";
-    private static final Logger log = LogManager.getLogger(Board.class.getName());
     private List<MyNode> nodes;
     private List<Arrow> arrows;
     private MyNode startNode;
@@ -203,7 +199,6 @@ public class Board implements Serializable {
 
         }
         idCounter++;
-//        log.info("Adding object to board" + node.toString());
         mainPane.getChildren().add(node);
         updateAllDescribePDA();
     }
@@ -219,6 +214,9 @@ public class Board implements Serializable {
 
     public void createMyNodeFromHistory(String name, double x, double y, Long nodeId, boolean starting, boolean ending) {
         MyNode myNode = new MyNode(name, x, y, nodeId, starting, ending);
+        if (starting) {
+            setStarting(myNode, true);
+        }
         this.makeDraggable(myNode);
         this.enableArrowCreation(myNode);
         this.cursorChange(myNode);

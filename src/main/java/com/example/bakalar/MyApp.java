@@ -12,7 +12,6 @@ import java.util.Objects;
 import static com.example.bakalar.logic.utility.StageUtils.setStageIcon;
 
 public class MyApp extends Application {
-    private static final String NODE_ICON_PATH = "/icons/Node.png";
     @Override
     public void start(Stage stage) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(MyApp.class.getResource("my-scene.fxml"));

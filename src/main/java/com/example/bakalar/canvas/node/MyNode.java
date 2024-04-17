@@ -7,9 +7,6 @@ import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +16,6 @@ import static com.example.bakalar.logic.MainController.NODE_RADIUS;
 @Getter
 @Setter
 public class MyNode extends Group implements Serializable {
-    private static final Logger log = LogManager.getLogger(MyNode.class.getName());
     private Circle circle;
     private Text nameText;
     private String name;
@@ -55,12 +51,8 @@ public class MyNode extends Group implements Serializable {
         this.starting = starting;
         this.ending = ending;
         this.setName(name);
-        if (starting) {
-            startNodeArrow.setVisible(true);
-        }
-        if (ending) {
-            endNode.setVisible(true);
-        }
+        setStarting(starting);
+        setEnding(ending);
     }
 
     private Circle createCircle(double x, double y, double radius) {
@@ -109,7 +101,6 @@ public class MyNode extends Group implements Serializable {
         switch (fromTo) {
             case "to" -> this.arrowsTo.add(arrow);
             case "from" -> this.arrowsFrom.add(arrow);
-            default -> log.error("Wrong fromTo value");
         }
     }
 

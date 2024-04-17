@@ -22,8 +22,6 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import lombok.Setter;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.util.List;
 import java.util.Objects;
@@ -35,7 +33,6 @@ import static com.example.bakalar.logic.utility.ErrorPopUp.showErrorDialog;
 public class MainController {
 
     public static final int NODE_RADIUS = 34;
-    private static final Logger log = LogManager.getLogger(MainController.class.getName());
     private static final String ARROW_ICON_PATH = "/icons/Arrow.png";
     private static final String ERASER_ICON_PATH = "/icons/Eraser.png";
     private static final String NODE_ICON_PATH = "/icons/Node.png";
@@ -73,7 +70,6 @@ public class MainController {
     private ConversionLogic conversionLogic;
     @Setter
     private Stage stage;
-    private Scene mainScene;
 
 
     @FXML
@@ -85,7 +81,7 @@ public class MainController {
     private void setupBoard() {
         List<TextField> describePDAFields = List.of(describeStates, describeAlphabet, describeStackAlphabet, describeEndStates);
         DescribePDA describePDA = new DescribePDA(describePDAFields, transFunctions);
-        HistoryLogic historyLogic = new HistoryLogic();
+        HistoryLogic historyLogic = new HistoryLogic(undoBtn, reUndoBtn);
         currentBoard = new Board(mainPane, describePDA, historyLogic, currentState, stage);
         historyLogic.setBoard(currentBoard);
         this.conversionLogic = new ConversionLogic(currentBoard);
@@ -94,7 +90,6 @@ public class MainController {
     }
 
     public void setMainScene(Scene mainScene) {
-        this.mainScene = mainScene;
         mainScene.setOnKeyPressed(this::keyAction);
         mainScene.setOnMouseClicked(this::mouseAction);
     }

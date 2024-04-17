@@ -21,8 +21,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+
 
 import java.util.*;
 
@@ -30,7 +29,6 @@ import static com.example.bakalar.logic.Board.*;
 import static com.example.bakalar.logic.utility.ErrorPopUp.showErrorDialog;
 
 public class ConversionLogic {
-    private static final Logger log = LogManager.getLogger(ConversionLogic.class.getName());
     private final Board board;
     private boolean showSteps = false;
     private List<RulesWindows> rulesWindows;

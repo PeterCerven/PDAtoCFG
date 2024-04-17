@@ -32,8 +32,8 @@ public class ConversionStage {
     private TextFlow transitionLabel;
     private Label helpingLabelComment;
     private Label transitionIndexLabel;
-    private static final String NEXT_ARROW_ICON_PATH = "file:src/main/resources/icons/nextArrow.png";
-    private static final String PREVIOUS_ARROW_ICON_PATH = "file:src/main/resources/icons/previousArrow.png";
+    private static final String NEXT_ARROW_ICON_PATH = "/icons/nextArrow.png";
+    private static final String PREVIOUS_ARROW_ICON_PATH = "/icons/previousArrow.png";
 
     public ConversionStage() {
         this.stage = new Stage();
@@ -105,7 +105,7 @@ public class ConversionStage {
     private Button buttonsSetUp(String nextArrowIconPath) {
         Button nextButton = new Button();
         nextButton.setFocusTraversable(false);
-        Image nextArrowImage = new Image(nextArrowIconPath);
+        Image nextArrowImage = new Image(Objects.requireNonNull(getClass().getResourceAsStream(nextArrowIconPath)));
         ImageView nextArrowView = new ImageView(nextArrowImage);
         nextArrowView.setFitHeight(20);
         nextArrowView.setFitWidth(20);
