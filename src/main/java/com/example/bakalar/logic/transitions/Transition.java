@@ -75,7 +75,7 @@ public class Transition {
         texts.add(new CustomText(inputSymbolToRead, size));
         texts.add(new CustomText(", ", size));
         texts.add(new CustomText(symbolToPop, size));
-        texts.add(new CustomText(") -> (", size));
+        texts.add(new CustomText(") = (", size));
         texts.add(new CustomText(nextState, size));
         texts.add(new CustomText(", ", size));
         for (MySymbol symbol : symbolsToPush) {
@@ -87,7 +87,7 @@ public class Transition {
 
     @Override
     public String toString() {
-        return "δ(" + currentState + ", " + inputSymbolToRead + ", " + symbolToPop + ") -> " +
+        return "δ(" + currentState + ", " + inputSymbolToRead + ", " + symbolToPop + ") = " +
                 "(" + nextState + ", " + (symbolsToPush == null ? "" : symbolsToPush.stream().map(MySymbol::getName).collect(Collectors.joining())) + ")";
     }
 }
