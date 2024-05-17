@@ -2,7 +2,6 @@ package com.example.bakalar.logic.utility;
 
 import com.example.bakalar.logic.conversion.CFGRule;
 import javafx.geometry.Pos;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;

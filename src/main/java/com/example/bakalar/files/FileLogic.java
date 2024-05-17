@@ -67,6 +67,7 @@ public class FileLogic {
             AppState state = new AppState(nodes, arrows, nodeCounter, idCounter);
             mapper.writeValue(new File(filePath), state);
         } catch (Exception e) {
+            e.printStackTrace();
             ErrorPopUp.showErrorDialog("Error pri ukladaní súboru");
         }
     }
@@ -82,6 +83,7 @@ public class FileLogic {
             ObjectMapper mapper = new ObjectMapper();
             return mapper.readValue(file, AppState.class);
         } catch (Exception e) {
+            e.printStackTrace();
             return null;
         }
     }
@@ -124,6 +126,7 @@ public class FileLogic {
                 }
                 writer.close();
             } catch (Exception e) {
+                e.printStackTrace();
                 ErrorPopUp.showErrorDialog("Error pri ukladaní súboru");
             }
         }
