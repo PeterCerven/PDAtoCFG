@@ -1,7 +1,7 @@
 package com.example.bakalar.logic.transitions;
 
 import com.example.bakalar.logic.conversion.CustomText;
-import com.example.bakalar.logic.conversion.WindowType;
+import com.example.bakalar.logic.conversion.window.WindowType;
 import com.example.bakalar.logic.utility.MySymbol;
 import javafx.scene.text.Text;
 import lombok.Getter;

@@ -31,12 +31,13 @@ public class DescribeCFG {
     }
     private void updateRules(List<CFGRule> rules) {
         rulesContainer.getChildren().clear();
-        for (CFGRule rule : rules) {
-            TextField textField = new TextField();
-            textField.setText(rule.toString());
-            textField.setFont(new Font(18));
-            rulesContainer.getChildren().add(textField);
-        }
+        rules.stream()
+                .map(CFGRule::toString)
+                .sorted()
+                .map(TextField::new)
+                .peek(textField -> textField.setFont(new Font(18)))
+                .peek(textField -> textField.setEditable(false))
+                .forEach(rulesContainer.getChildren()::add);
     }
 
     private void updateStartSymbol(String startingS) {

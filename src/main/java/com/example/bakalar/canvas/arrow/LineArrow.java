@@ -1,13 +1,12 @@
 package com.example.bakalar.canvas.arrow;
 
-import com.example.bakalar.logic.Board;
 import com.example.bakalar.canvas.node.MyNode;
+import com.example.bakalar.logic.Board;
 import javafx.geometry.Point2D;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.QuadCurve;
-import javafx.scene.shape.StrokeType;
 import javafx.scene.transform.Rotate;
 import lombok.Getter;
 
@@ -188,10 +187,14 @@ public class LineArrow extends Arrow {
 
     private QuadCurve createLine() {
         QuadCurve line = new QuadCurve();
-        line.setStrokeType(StrokeType.OUTSIDE);
+        line.setViewOrder(1);
         line.setStrokeWidth(2);
+        line.setMouseTransparent(true);
         line.setFill(Color.TRANSPARENT);
         line.setStroke(Color.BLACK);
+        line.addEventFilter(javafx.scene.input.MouseEvent.MOUSE_PRESSED, event -> {
+            System.out.println("pressed line");
+        });
         return line;
     }
 

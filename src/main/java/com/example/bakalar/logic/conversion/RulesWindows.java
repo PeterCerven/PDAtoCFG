@@ -1,5 +1,6 @@
 package com.example.bakalar.logic.conversion;
 
+import com.example.bakalar.logic.conversion.window.WindowType;
 import com.example.bakalar.logic.transitions.Transition;
 import lombok.Getter;
 import lombok.Setter;

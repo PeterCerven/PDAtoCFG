@@ -1,10 +1,12 @@
 package com.example.bakalar.logic.conversion;
 
+import com.example.bakalar.canvas.node.MyNode;
 import com.example.bakalar.exceptions.MyCustomException;
-import com.example.bakalar.logic.Board;
+import com.example.bakalar.files.FileLogic;
 import com.example.bakalar.logic.conversion.window.ConversionStage;
 import com.example.bakalar.logic.conversion.window.InformationWindow;
 import com.example.bakalar.logic.conversion.window.StepsWindow;
+import com.example.bakalar.logic.conversion.window.WindowType;
 import com.example.bakalar.logic.transitions.Transition;
 import com.example.bakalar.logic.utility.MySymbol;
 import com.example.bakalar.logic.utility.SpecialNonTerminal;
@@ -22,43 +24,44 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
 
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import static com.example.bakalar.logic.Board.*;
 import static com.example.bakalar.logic.utility.ErrorPopUp.showErrorDialog;
 
 public class ConversionLogic {
-    private final Board board;
-    private boolean showSteps = false;
-    private List<RulesWindows> rulesWindows;
-    private int currentIndex;
+    private List<MyNode> nodes;
     private final StepsWindow stepsWindow;
     private final InformationWindow informationWindow;
     private final ConversionStage conversionStage;
+    private boolean showSteps = false;
+    private List<RulesWindows> rulesWindows;
+    private int currentIndex;
 
 
-    public ConversionLogic(Board board) {
-        this.board = board;
+    public ConversionLogic() {
         this.conversionStage = new ConversionStage();
         this.stepsWindow = new StepsWindow();
         this.informationWindow = new InformationWindow();
     }
 
-    public void convertPDA() throws MyCustomException {
+    public void convertPDA(List<Transition> transitions, List<MyNode> nodes, MyNode startNode) throws MyCustomException {
+        this.nodes = nodes;
         rulesWindows = new ArrayList<>();
         currentIndex = 0;
-        List<Transition> transitions = board.getNodesTransitions();
         if (transitions.isEmpty()) {
             showErrorDialog("Nemožno previesť Nemáte žiadne prechodové funkcie.");
             return;
         }
-        if (board.getStartNode() == null) {
+        if (startNode == null) {
             showErrorDialog("Nemožno previesť Nemáte žiadny začiatočný stav.");
             return;
         }
         rulesWindows.add(new RulesWindows(WindowType.INFORMATION));
-        transitions.add(0, new Transition(board.getStartNode().getName(), WindowType.START));
+        transitions.add(0, new Transition(startNode.getName(), WindowType.START));
         setupTransitionStage(transitions);
         showTransitionStage();
     }
@@ -114,7 +117,8 @@ public class ConversionLogic {
         Button nextButton = conversionStage.getNextButton();
         Button showStepsButton = stepsWindow.getShowStepsButton();
 
-        downloadButton.setOnAction(e -> board.saveCFGFile(getAllRules(), conversionStage.getStage()));
+        FileLogic fileLogic = new FileLogic();
+        downloadButton.setOnAction(e -> fileLogic.saveToTextFile(getAllRules(), conversionStage.getStage()));
         prevButton.setOnAction(e -> updateWindow(-1));
         nextButton.setOnAction(e -> updateWindow(1));
         showStepsButton.setOnAction(e -> steps());
@@ -132,7 +136,7 @@ public class ConversionLogic {
                 return new RulesWindows(pushMove(transition), transition, WindowType.NORMAL);
             }
             case TERMINAL -> {
-                return new RulesWindows(terminalMove(transition),transition, WindowType.TERMINAL);
+                return new RulesWindows(terminalMove(transition), transition, WindowType.TERMINAL);
             }
             default -> {
                 throw new MyCustomException("Nepodporovaný typ prechodovej funkcie.");
@@ -140,7 +144,8 @@ public class ConversionLogic {
         }
     }
 
-    private void recursiveLoop(int totalLoops, int iterations, String[] statesPos, int currentLoop, Transition transition, List<CFGRule> cfgRules) {
+    private void recursiveLoop(int totalLoops, int iterations, String[] statesPos, int currentLoop,
+                               Transition transition, List<CFGRule> cfgRules) {
         if (currentLoop == totalLoops) {
             CFGRule cfgRule = createRule(statesPos, transition);
             cfgRules.add(cfgRule);
@@ -148,7 +153,7 @@ public class ConversionLogic {
         }
 
         for (int i = 0; i < iterations; i++) {
-            statesPos[currentLoop] = board.getNodes().get(i).getName();
+            statesPos[currentLoop] = nodes.get(i).getName();
             recursiveLoop(totalLoops, iterations, statesPos, currentLoop + 1, transition, cfgRules);
         }
     }
@@ -241,7 +246,7 @@ public class ConversionLogic {
 
     private List<CFGRule> pushMove(Transition transition) {
         List<CFGRule> convertedTransitions = new ArrayList<>();
-        recursiveLoop(transition.getSymbolsToPush().size(), board.getNodes().size(), new String[transition.getSymbolsToPush().size()],
+        recursiveLoop(transition.getSymbolsToPush().size(), nodes.size(), new String[transition.getSymbolsToPush().size()],
                 0, transition, convertedTransitions);
 
         return convertedTransitions;
@@ -249,7 +254,7 @@ public class ConversionLogic {
 
 
     private List<CFGRule> startMove(Transition transition) {
-        List<MySymbol> allStateSymbols = board.getNodes().stream().map(node -> new MySymbol(node.getName())).toList();
+        List<MySymbol> allStateSymbols = nodes.stream().map(node -> new MySymbol(node.getName())).toList();
         List<CFGRule> cfgRules = new ArrayList<>();
 
         MySymbol startSymbol = new MySymbol(STARTING_S);
@@ -258,7 +263,7 @@ public class ConversionLogic {
             RuleStepLogic ruleStepLogic = new RuleStepLogic(transition);
             List<SpecialNonTerminal> rightSide = new ArrayList<>();
             rightSide.add(new SpecialNonTerminal(transition.getCurrentState(), startStackSymbol, stateSymbol));
-            ruleStepLogic.createStartingSteps(STARTING_S, STARTING_Z, board.getStartNode().getName(), stateSymbol.getName());
+            ruleStepLogic.createStartingSteps(STARTING_S, STARTING_Z, transition.getCurrentState().getName(), stateSymbol.getName());
             CFGRule cfgRule = new CFGRule(startSymbol, null, rightSide, transition);
             cfgRule.setSteps(ruleStepLogic.getStepRules());
             cfgRules.add(cfgRule);

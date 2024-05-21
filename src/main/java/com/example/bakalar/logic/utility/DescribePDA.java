@@ -115,11 +115,12 @@ public class DescribePDA {
 
     public void updateDescribeTransFunctions(List<Transition> transitions) {
         this.transFunctions.getChildren().clear();
-        for (Transition transition : transitions) {
-            TextField textField = new TextField(transition.toString());
-            textField.setFont(new Font(18));
-            textField.setEditable(false);
-            this.transFunctions.getChildren().add(textField);
-        }
+        transitions.stream()
+                .sorted(new TransitionSorter())
+                .map(Transition::toString)
+                .map(TextField::new)
+                .peek(tf -> tf.setFont(new Font(18)))
+                .peek(tf -> tf.setEditable(false))
+                .forEach(this.transFunctions.getChildren()::add);
     }
 }

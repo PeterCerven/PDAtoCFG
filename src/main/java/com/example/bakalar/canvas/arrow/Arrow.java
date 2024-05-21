@@ -1,7 +1,6 @@
 package com.example.bakalar.canvas.arrow;
 
 import com.example.bakalar.canvas.node.MyNode;
-import com.example.bakalar.exceptions.MyCustomException;
 import com.example.bakalar.logic.Board;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
@@ -48,7 +47,8 @@ public abstract class Arrow extends Group implements Serializable {
         this.board = board;
 
         this.symbolContainers = new VBox();
-        setViewOrder(1);
+        symbolContainers.setViewOrder(1);
+        this.setViewOrder(1);
         this.arrowHead = createArrowHead();
         for (TransitionInputs transition : transitionInputs) {
             addSymbolContainer(transition);
