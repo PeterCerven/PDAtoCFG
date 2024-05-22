@@ -94,9 +94,7 @@ public class Board implements Serializable {
 
     public void loadStateFromFile() {
         AppState appState = fileLogic.loadFromJson(this.stage);
-        if (appState == null) {
-            showErrorDialog("Nepodarilo sa načítať súbor");
-        } else {
+        if (appState != null) {
             createBoardFromAppState(appState);
         }
     }

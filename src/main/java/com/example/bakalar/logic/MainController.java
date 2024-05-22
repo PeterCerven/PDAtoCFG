@@ -72,8 +72,6 @@ public class MainController {
         mainScene.setOnMouseClicked(this::mouseAction);
     }
 
-
-
     // Objects creation
 
     public void createNode(MouseEvent event) {
@@ -83,12 +81,8 @@ public class MainController {
         }
     }
 
-    // Buttons actions
 
-    public void resetAll() {
-        board.saveCurrentStateToHistory();
-        board.clearBoard();
-    }
+    // Buttons actions
 
     public void drawNodeOn() {
         btnBeh.toggleButtonState(ButtonState.NODE);
@@ -100,6 +94,11 @@ public class MainController {
 
     public void eraseFunctionOn() {
         btnBeh.toggleButtonState(ButtonState.ERASE);
+    }
+
+    public void resetAll() {
+        board.saveCurrentStateToHistory();
+        board.clearBoard();
     }
 
     public void buttonRedo() {

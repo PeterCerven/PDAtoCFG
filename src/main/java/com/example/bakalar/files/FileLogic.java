@@ -19,6 +19,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.example.bakalar.logic.utility.ErrorPopUp.showErrorDialog;
+
 public class FileLogic {
 
 
@@ -67,8 +69,7 @@ public class FileLogic {
             AppState state = new AppState(nodes, arrows, nodeCounter, idCounter);
             mapper.writeValue(new File(filePath), state);
         } catch (Exception e) {
-            e.printStackTrace();
-            ErrorPopUp.showErrorDialog("Error pri ukladaní súboru");
+            showErrorDialog("Error pri ukladaní súboru");
         }
     }
 
@@ -83,7 +84,7 @@ public class FileLogic {
             ObjectMapper mapper = new ObjectMapper();
             return mapper.readValue(file, AppState.class);
         } catch (Exception e) {
-            e.printStackTrace();
+            showErrorDialog("Nepodarilo sa načítať súbor");
             return null;
         }
     }
