@@ -18,6 +18,7 @@ import com.example.bakalar.logic.utility.ButtonBehaviour;
 import com.example.bakalar.logic.utility.ButtonState;
 import com.example.bakalar.logic.utility.DescribePDA;
 import com.example.bakalar.logic.utility.LimitedTextField;
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
@@ -45,6 +46,7 @@ public class Board implements Serializable {
     public static final String DELTA_LOWER = "δ";
     public static final String STARTING_Z = "Z";
     public static final String STARTING_S = "S";
+    private static final double DRAG_THRESHOLD = 20;
     private List<MyNode> nodes;
     private List<Arrow> arrows;
     private MyNode startNode;
@@ -54,7 +56,6 @@ public class Board implements Serializable {
     private CheckBox startingCheckBox;
     private CheckBox endingCheckBox;
     private double startX, startY;
-    private MyNode selectedNode;
     private DescribePDA describePDA;
     private HistoryLogic historyLogic;
     private FileLogic fileLogic;
@@ -145,13 +146,14 @@ public class Board implements Serializable {
         updateAllDescribePDA();
     }
 
-    public Arrow createArrow(MyNode from, MyNode to, TransitionInputs transitionInputs) throws MyCustomException {
+    public void createArrow(MyNode from, MyNode to, TransitionInputs transitionInputs) throws MyCustomException {
         if (transitionInputs == null) {
             transitionInputs = createArrowTransition("", "", "");
         }
         if (transitionInputs == null) {
-            return null;
+            return;
         }
+        if (checkArrowForDuplicate(from, to, transitionInputs)) return;
         Arrow arrow = sameArrowExists(from, to);
         if (arrow != null) {
             boolean sameTransition = arrow.sameTransitionExists(transitionInputs);
@@ -159,7 +161,7 @@ public class Board implements Serializable {
                 throw new MyCustomException("Prechodová funkcia už existuje");
             }
             arrow.addSymbolContainer(transitionInputs);
-            return arrow;
+            return;
         }
         List<TransitionInputs> transitions = List.of(transitionInputs);
         if (from == to) {
@@ -170,11 +172,12 @@ public class Board implements Serializable {
             } else {
                 arrow = new LineArrow(from, to, this, transitions, this.idCounter);
             }
+            this.makeCurveDraggable((LineArrow) arrow);
         }
         to.addArrow(arrow, "to");
         from.addArrow(arrow, "from");
         this.addObject(arrow);
-        return arrow;
+        this.makeErasable(arrow);
     }
 
 
@@ -205,14 +208,14 @@ public class Board implements Serializable {
     }
 
     private void createArrow(MyNode node) {
-        if (selectedNode != null) {
+        if (btnBeh.getSelectedNode() != null) {
             saveCurrentStateToHistory();
-            createMyArrow(selectedNode.getNodeId(), node.getNodeId(), null);
-            this.selectNode(selectedNode, false);
-            selectedNode = null;
+            createMyArrow(btnBeh.getSelectedNode().getNodeId(), node.getNodeId(), null);
+            this.selectNode(btnBeh.getSelectedNode(), false);
+            btnBeh.setSelectedNode(null);
 
         } else {
-            selectedNode = node;
+            btnBeh.setSelectedNode(node);
             this.selectNode(node, true);
         }
     }
@@ -221,13 +224,7 @@ public class Board implements Serializable {
         try {
             MyNode fromNode = findNodeById(fromId);
             MyNode toNode = findNodeById(toId);
-            Arrow arrow = this.createArrow(fromNode, toNode, transitionInputs);
-            if (arrow != null) {
-                this.makeErasable(arrow);
-                if (arrow instanceof LineArrow lineArrow) {
-                    this.makeCurveDraggable(lineArrow);
-                }
-            }
+            this.createArrow(fromNode, toNode, transitionInputs);
         } catch (MyCustomException e) {
             showErrorDialog(e.getMessage());
         }
@@ -260,7 +257,6 @@ public class Board implements Serializable {
         nodeCounter = 0;
         startNode = null;
         updateAllDescribePDA();
-        setSelectedNode(null);
         btnBeh.resetToSelect();
     }
 
@@ -292,7 +288,7 @@ public class Board implements Serializable {
         node.setSelected(select);
     }
 
-    // event handlers
+    // dialog windows
 
     public TransitionInputs createArrowTransition(String read, String pop, String push) {
         Dialog<ButtonType> dialog = new Dialog<>();
@@ -330,6 +326,8 @@ public class Board implements Serializable {
         grid.add(label3, 1, 2);
 
         dialog.getDialogPane().setContent(grid);
+
+        Platform.runLater(input1::requestFocus);
 
         Optional<ButtonType> result = dialog.showAndWait();
 
@@ -385,6 +383,8 @@ public class Board implements Serializable {
         });
     }
 
+    // event handlers
+
     public void makeCurveDraggable(LineArrow arrow) {
         arrow.getControlIndicator().setOnMousePressed(event -> {
             if (btnBeh.getCurrentState().equals(ButtonState.ARROW)) {
@@ -421,17 +421,23 @@ public class Board implements Serializable {
 
     public void makeDraggable(MyNode node) {
         node.setOnMousePressed(event -> {
-            if (btnBeh.getCurrentState().equals(ButtonState.SELECT)) {
-                if (event.getButton() == MouseButton.SECONDARY) {
-                    this.showDialog(node);
-                } else if (event.getButton() == MouseButton.PRIMARY) {
-                    startX = event.getSceneX() - node.getTranslateX();
-                    startY = event.getSceneY() - node.getTranslateY();
-                }
+            if (event.getButton() == MouseButton.SECONDARY) {
+                this.showDialog(node);
+            } else if (event.getButton() == MouseButton.PRIMARY) {
+                startX = event.getSceneX() - node.getTranslateX();
+                startY = event.getSceneY() - node.getTranslateY();
+                dragging = false;
             }
         });
 
         node.setOnMouseDragged(e -> {
+            if (!btnBeh.getCurrentState().equals(ButtonState.SELECT)) {
+                double diffX = Math.abs((e.getSceneX() - node.getTranslateX()) - startX);
+                double diffY = Math.abs((e.getSceneY() - node.getTranslateY()) - startY);
+                if (!dragging && (diffX > DRAG_THRESHOLD || diffY > DRAG_THRESHOLD)) {
+                    btnBeh.resetToSelect();
+                }
+            }
             if (btnBeh.getCurrentState().equals(ButtonState.SELECT)) {
                 if (!dragging) {
                     dragging = true;
@@ -522,15 +528,8 @@ public class Board implements Serializable {
     }
 
     private void createSelfLoopArrowFromHistory(MyNode from, MyNode to, TransitionInputs transitionInputs) throws MyCustomException {
-        Arrow arrow = sameArrowExists(from, to);
-        if (arrow != null) {
-            boolean sameTransition = arrow.sameTransitionExists(transitionInputs);
-            if (sameTransition) {
-                throw new MyCustomException("Prechodová funkcia už existuje");
-            }
-            arrow.addSymbolContainer(transitionInputs);
-            return;
-        }
+        if (checkArrowForDuplicate(from, to, transitionInputs)) return;
+        Arrow arrow;
         arrow = new SelfLoopArrow(from, to, this, List.of(transitionInputs), this.idCounter);
         from.addArrow(arrow, "from");
         to.addArrow(arrow, "to");
@@ -539,6 +538,17 @@ public class Board implements Serializable {
     }
 
     private void createLineArrowFromHistory(MyNode from, MyNode to, TransitionInputs transitionInputs, Double controlPointChangeX, Double controlPointChangeY) throws MyCustomException {
+        if (checkArrowForDuplicate(from, to, transitionInputs)) return;
+        LineArrow arrow;
+        arrow = new LineArrow(from, to, controlPointChangeX, controlPointChangeY, this, List.of(transitionInputs), this.idCounter);
+        from.addArrow(arrow, "from");
+        to.addArrow(arrow, "to");
+        this.makeErasable(arrow);
+        this.makeCurveDraggable(arrow);
+        this.addObject(arrow);
+    }
+
+    private boolean checkArrowForDuplicate(MyNode from, MyNode to, TransitionInputs transitionInputs) throws MyCustomException {
         Arrow arrow = sameArrowExists(from, to);
         if (arrow != null) {
             boolean sameTransition = arrow.sameTransitionExists(transitionInputs);
@@ -546,14 +556,9 @@ public class Board implements Serializable {
                 throw new MyCustomException("Prechodová funkcia už existuje");
             }
             arrow.addSymbolContainer(transitionInputs);
-            return;
+            return true;
         }
-        arrow = new LineArrow(from, to, controlPointChangeX, controlPointChangeY, this, List.of(transitionInputs), this.idCounter);
-        from.addArrow(arrow, "from");
-        to.addArrow(arrow, "to");
-        this.makeErasable(arrow);
-        this.makeCurveDraggable((LineArrow) arrow);
-        this.addObject(arrow);
+        return false;
     }
 
     public void createMyNodeFromHistory(String name, double x, double y, Long nodeId, boolean starting, boolean ending) {
@@ -584,6 +589,8 @@ public class Board implements Serializable {
         createMyArrow(secondNode.getNodeId(), secondNode.getNodeId(), new TransitionInputs("1", "X", EPSILON));
         createMyArrow(secondNode.getNodeId(), firstNode.getNodeId(), new TransitionInputs("0", "Z", "Z"));
     }
+
+    // conversion
 
     public void convertPDA() {
         try {

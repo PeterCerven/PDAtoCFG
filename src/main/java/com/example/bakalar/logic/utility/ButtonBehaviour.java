@@ -1,10 +1,12 @@
 package com.example.bakalar.logic.utility;
 
+import com.example.bakalar.canvas.node.MyNode;
 import javafx.scene.Cursor;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Objects;
 
@@ -26,6 +28,9 @@ public class ButtonBehaviour {
     private final Button conversionBtn;
     @Getter
     private ButtonState currentState;
+    @Getter
+    @Setter
+    private MyNode selectedNode;
 
     public ButtonBehaviour(Button nodeBtn, Button arrowBtn, Button resetBtn, Button eraseBtn, Button undoBtn,
                            Button reUndoBtn, Button conversionBtn) {
@@ -37,6 +42,7 @@ public class ButtonBehaviour {
         this.reUndoBtn = reUndoBtn;
         this.conversionBtn = conversionBtn;
         this.currentState = ButtonState.SELECT;
+        this.selectedNode = null;
         setUpButtons();
     }
 
@@ -90,16 +96,18 @@ public class ButtonBehaviour {
 
     public void resetToSelect() {
         currentState = ButtonState.SELECT;
+        if (selectedNode != null) selectedNode.setSelected(false);
+        selectedNode = null;
         updateButtonStates();
     }
 
     public void toggleButtonState(ButtonState newState) {
         if (currentState == newState) {
-            currentState = ButtonState.SELECT;
+            resetToSelect();
         } else {
             currentState = newState;
+            updateButtonStates();
         }
-        updateButtonStates();
     }
 
 

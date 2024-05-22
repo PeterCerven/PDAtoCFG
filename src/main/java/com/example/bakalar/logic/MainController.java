@@ -70,6 +70,7 @@ public class MainController {
     public void setMainScene(Scene mainScene) {
         mainScene.setOnKeyPressed(this::keyAction);
         mainScene.setOnMouseClicked(this::mouseAction);
+        mainScene.setOnKeyPressed(this::arrowCreation);
     }
 
     // Objects creation
@@ -142,6 +143,13 @@ public class MainController {
     public void mouseAction(MouseEvent event) {
         if (event.getButton() == MouseButton.SECONDARY) {
             btnBeh.resetToSelect();
+        }
+    }
+
+    public void arrowCreation(KeyEvent event) {
+        // shift
+        if (event.getCode() == KeyCode.SHIFT){
+            btnBeh.toggleButtonState(ButtonState.ARROW);
         }
     }
 
