@@ -64,6 +64,8 @@ public class Board implements Serializable {
     private Long idCounter;
     private ButtonBehaviour btnBeh;
     private ConversionLogic conversionLogic;
+    private boolean wasArrowEnabled;
+    private boolean canClick;
 
 
     public Board(AnchorPane mainPane, DescribePDA describePDA, HistoryLogic historyLogic,
@@ -85,6 +87,7 @@ public class Board implements Serializable {
         this.dragging = false;
         this.btnBeh = btnBeh;
         this.conversionLogic = new ConversionLogic();
+        this.canClick = true;
     }
 
     // file operations
@@ -389,6 +392,7 @@ public class Board implements Serializable {
         arrow.getControlIndicator().setOnMousePressed(event -> {
             if (btnBeh.getCurrentState().equals(ButtonState.ARROW)) {
                 btnBeh.resetToSelect();
+                wasArrowEnabled = true;
             }
             if (btnBeh.getCurrentState().equals(ButtonState.SELECT)) {
                 if (event.getButton() == MouseButton.PRIMARY) {
@@ -413,6 +417,10 @@ public class Board implements Serializable {
         arrow.getControlIndicator().setOnMouseReleased(e -> {
             if (btnBeh.getCurrentState().equals(ButtonState.SELECT)) {
                 dragging = false;
+                if (wasArrowEnabled) {
+                    btnBeh.toggleButtonState(ButtonState.ARROW);
+                    wasArrowEnabled = false;
+                }
             }
         });
 
@@ -436,6 +444,7 @@ public class Board implements Serializable {
                 double diffY = Math.abs((e.getSceneY() - node.getTranslateY()) - startY);
                 if (!dragging && (diffX > DRAG_THRESHOLD || diffY > DRAG_THRESHOLD)) {
                     btnBeh.resetToSelect();
+                    wasArrowEnabled = true;
                 }
             }
             if (btnBeh.getCurrentState().equals(ButtonState.SELECT)) {
@@ -452,6 +461,11 @@ public class Board implements Serializable {
             if (btnBeh.getCurrentState().equals(ButtonState.SELECT)) {
                 node.updateArrows(true);
                 dragging = false;
+                if (wasArrowEnabled) {
+                    btnBeh.toggleButtonState(ButtonState.ARROW);
+                    wasArrowEnabled = false;
+                    canClick = false;
+                }
             }
         });
     }
@@ -460,7 +474,10 @@ public class Board implements Serializable {
     public void enableArrowCreation(MyNode node) {
         node.setOnMouseClicked(event -> {
             if (btnBeh.getCurrentState().equals(ButtonState.ARROW) && event.getButton() == MouseButton.PRIMARY) {
-                createArrow(node);
+                if (canClick) {
+                    createArrow(node);
+                }
+                canClick = true;
             } else if (btnBeh.getCurrentState().equals(ButtonState.ERASE) && event.getButton() == MouseButton.PRIMARY) {
                 saveCurrentStateToHistory();
                 this.removeObject(node);
