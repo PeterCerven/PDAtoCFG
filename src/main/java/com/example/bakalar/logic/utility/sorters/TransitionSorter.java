@@ -1,4 +1,4 @@
-package com.example.bakalar.logic.utility;
+package com.example.bakalar.logic.utility.sorters;
 
 import com.example.bakalar.logic.transitions.Transition;
 

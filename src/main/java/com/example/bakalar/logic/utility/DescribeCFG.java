@@ -1,6 +1,8 @@
 package com.example.bakalar.logic.utility;
 
 import com.example.bakalar.logic.conversion.CFGRule;
+import com.example.bakalar.logic.utility.sorters.RuleSorter;
+import com.example.bakalar.logic.utility.sorters.SpecialNonTerminalSorter;
 import javafx.geometry.Pos;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
@@ -32,8 +34,8 @@ public class DescribeCFG {
     private void updateRules(List<CFGRule> rules) {
         rulesContainer.getChildren().clear();
         rules.stream()
+                .sorted(new RuleSorter())
                 .map(CFGRule::toString)
-                .sorted()
                 .map(TextField::new)
                 .peek(textField -> textField.setFont(new Font(18)))
                 .peek(textField -> textField.setEditable(false))
@@ -58,16 +60,18 @@ public class DescribeCFG {
 
     private void updateNonTerminals(Set<SpecialNonTerminal> nonTerminals) {
         this.nonTerminals.getChildren().clear();
-        for (SpecialNonTerminal nonTerminal : nonTerminals) {
-            TextField textField = new TextField();
-            textField.setEditable(false);
-            textField.setStyle("-fx-background-color: #f4f4f4; ");
-            textField.setPrefWidth(200);
-            textField.setAlignment(Pos.CENTER);
-            textField.setText(nonTerminal.toString());
-            textField.setFont(new Font(22));
-            this.nonTerminals.getChildren().add(textField);
-        }
+        nonTerminals.stream()
+                .sorted(new SpecialNonTerminalSorter())
+                .map(SpecialNonTerminal::toString)
+                .map(TextField::new)
+                .forEach(textField -> {
+                    textField.setEditable(false);
+                    textField.setStyle("-fx-background-color: #f4f4f4; ");
+                    textField.setPrefWidth(200);
+                    textField.setAlignment(Pos.CENTER);
+                    textField.setFont(new Font(22));
+                    this.nonTerminals.getChildren().add(textField);
+                });
 
     }
 

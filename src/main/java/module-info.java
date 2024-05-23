@@ -30,4 +30,6 @@ module com.example.bakalar {
     opens com.example.bakalar.logic.history to com.fasterxml.jackson.core, com.fasterxml.jackson.databind, javafx.fxml, lombok;
     exports com.example.bakalar.logic.conversion.window;
     opens com.example.bakalar.logic.conversion.window to javafx.fxml, lombok;
+    exports com.example.bakalar.logic.utility.sorters;
+    opens com.example.bakalar.logic.utility.sorters to javafx.fxml, lombok;
 }
