@@ -1,9 +1,11 @@
 package com.example.bakalar.logic;
 
+import com.example.bakalar.instructions.HelpUser;
 import com.example.bakalar.logic.history.HistoryLogic;
 import com.example.bakalar.logic.utility.ButtonBehaviour;
 import com.example.bakalar.logic.utility.ButtonState;
 import com.example.bakalar.logic.utility.DescribePDA;
+import com.example.bakalar.logic.utility.ErrorPopUp;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -17,6 +19,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import lombok.Setter;
 
+import java.io.FileNotFoundException;
 import java.util.List;
 
 
@@ -53,6 +56,7 @@ public class MainController {
     @Setter
     private Stage stage;
     private ButtonBehaviour btnBeh;
+    private HelpUser helpUser;
 
     @FXML
     private void initialize() {
@@ -65,6 +69,7 @@ public class MainController {
         DescribePDA describePDA = new DescribePDA(describePDAFields, transFunctions);
         HistoryLogic historyLogic = new HistoryLogic(undoBtn, reUndoBtn);
         board = new Board(mainPane, describePDA, historyLogic, stage, btnBeh);
+        helpUser = new HelpUser();
     }
 
     public void setMainScene(Scene mainScene) {
@@ -131,6 +136,18 @@ public class MainController {
 
     public void loadFromFile() {
         board.loadStateFromFile();
+    }
+
+    public void about(){
+        helpUser.showAbout(stage);
+    }
+
+    public void controls() {
+        try {
+            helpUser.tutorial();
+        } catch (FileNotFoundException e) {
+            ErrorPopUp.showErrorDialog("Nepodarilo sa načítať návod");
+        }
     }
 
     // key actions

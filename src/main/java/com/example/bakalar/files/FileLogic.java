@@ -9,6 +9,7 @@ import com.example.bakalar.logic.history.AppState;
 import com.example.bakalar.logic.history.ArrowModel;
 import com.example.bakalar.logic.history.NodeModel;
 import com.example.bakalar.logic.utility.ErrorPopUp;
+import com.example.bakalar.logic.utility.sorters.RuleSorter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -122,12 +123,12 @@ public class FileLogic {
             file = file.getName().endsWith(".txt") ? file : new File(file.getAbsolutePath() + ".txt");
             try {
                 PrintWriter writer = new PrintWriter(file, StandardCharsets.UTF_8);
-                for (CFGRule rule : allRules) {
+
+                for (CFGRule rule : allRules.stream().sorted(new RuleSorter()).toList()) {
                     writer.println(rule.toString());
                 }
                 writer.close();
             } catch (Exception e) {
-                e.printStackTrace();
                 ErrorPopUp.showErrorDialog("Error pri ukladaní súboru");
             }
         }

@@ -32,8 +32,8 @@ public class ConversionStage {
     private TextFlow transitionLabel;
     private Label helpingLabelComment;
     private Label transitionIndexLabel;
-    private static final String NEXT_ARROW_ICON_PATH = "/icons/nextArrow.png";
-    private static final String PREVIOUS_ARROW_ICON_PATH = "/icons/previousArrow.png";
+    private static final String NEXT_ARROW_ICON_PATH = "/icons/right-arrow.svg";
+    private static final String PREVIOUS_ARROW_ICON_PATH = "/icons/left-arrow.svg";
 
     public ConversionStage() {
         this.stage = new Stage();
