@@ -67,7 +67,7 @@ public class Board implements Serializable {
     private Long idCounter;
     private ButtonBehaviour btnBeh;
     private ConversionLogic conversionLogic;
-    private boolean wasArrowEnabled;
+    private boolean wasButtonPressed;
     private boolean canClick;
 
 
@@ -240,14 +240,14 @@ public class Board implements Serializable {
         return false;
     }
 
-    public void clearBoard() {
+    public void clearBoard(boolean resetButtons) {
         mainPane.getChildren().clear();
         nodes.clear();
         arrows.clear();
         nodeCounter = 0;
         startNode = null;
         updateAllDescribePDA();
-        btnBeh.resetToSelect();
+        if (resetButtons) btnBeh.resetToSelect();
     }
 
     // starting and ending nodes
@@ -377,9 +377,10 @@ public class Board implements Serializable {
 
     public void makeCurveDraggable(LineArrow arrow) {
         arrow.getControlIndicator().setOnMousePressed(event -> {
-            if (btnBeh.getCurrentState().equals(ButtonState.ARROW)) {
+            if (!btnBeh.getCurrentState().equals(ButtonState.SELECT) && !btnBeh.getCurrentState().equals(ButtonState.ERASE)) {
+                btnBeh.setPreviousState(btnBeh.getCurrentState());
                 btnBeh.resetToSelect();
-                wasArrowEnabled = true;
+                wasButtonPressed = true;
             }
             if (btnBeh.getCurrentState().equals(ButtonState.SELECT)) {
                 if (event.getButton() == MouseButton.PRIMARY) {
@@ -404,9 +405,9 @@ public class Board implements Serializable {
         arrow.getControlIndicator().setOnMouseReleased(e -> {
             if (btnBeh.getCurrentState().equals(ButtonState.SELECT)) {
                 dragging = false;
-                if (wasArrowEnabled) {
-                    btnBeh.toggleButtonState(ButtonState.ARROW);
-                    wasArrowEnabled = false;
+                if (wasButtonPressed) {
+                    btnBeh.toggleButtonState(btnBeh.getPreviousState());
+                    wasButtonPressed = false;
                 }
             }
         });
@@ -426,12 +427,13 @@ public class Board implements Serializable {
         });
 
         node.setOnMouseDragged(e -> {
-            if (!btnBeh.getCurrentState().equals(ButtonState.SELECT)) {
+            if (!btnBeh.getCurrentState().equals(ButtonState.SELECT) && !btnBeh.getCurrentState().equals(ButtonState.ERASE)) {
                 double diffX = Math.abs((e.getSceneX() - node.getTranslateX()) - startX);
                 double diffY = Math.abs((e.getSceneY() - node.getTranslateY()) - startY);
                 if (!dragging && (diffX > DRAG_THRESHOLD || diffY > DRAG_THRESHOLD)) {
+                    btnBeh.setPreviousState(btnBeh.getCurrentState());
                     btnBeh.resetToSelect();
-                    wasArrowEnabled = true;
+                    wasButtonPressed = true;
                 }
             }
             if (btnBeh.getCurrentState().equals(ButtonState.SELECT)) {
@@ -448,9 +450,10 @@ public class Board implements Serializable {
             if (btnBeh.getCurrentState().equals(ButtonState.SELECT)) {
                 node.updateArrows(true);
                 dragging = false;
-                if (wasArrowEnabled) {
-                    btnBeh.toggleButtonState(ButtonState.ARROW);
-                    wasArrowEnabled = false;
+                System.out.println("released");
+                if (wasButtonPressed) {
+                    btnBeh.toggleButtonState(btnBeh.getPreviousState());
+                    wasButtonPressed = false;
                     canClick = false;
                 }
             }
@@ -528,7 +531,7 @@ public class Board implements Serializable {
 
     public void createBoardFromAppState(AppState appState) {
         try {
-            clearBoard();
+            clearBoard(false);
             for (NodeModel myNodeModel : appState.getNodes()) {
                 createMyNodeFromHistory(myNodeModel.getName(), myNodeModel.getX(), myNodeModel.getY(), myNodeModel.getNodeId(),
                         myNodeModel.isStarting(), myNodeModel.isEnding());
@@ -586,7 +589,7 @@ public class Board implements Serializable {
 
     public void testBoard() {
         saveCurrentStateToHistory();
-        clearBoard();
+        clearBoard(true);
         MyNode firstNode = createMyNode(120, 150);
         setStarting(firstNode, true);
         MyNode secondNode = createMyNode(320, 150);

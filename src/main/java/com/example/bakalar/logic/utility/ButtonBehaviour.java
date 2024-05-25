@@ -28,6 +28,8 @@ public class ButtonBehaviour {
     private final Button conversionBtn;
     @Getter
     private ButtonState currentState;
+    @Getter @Setter
+    private ButtonState previousState;
     @Getter
     @Setter
     private MyNode selectedNode;

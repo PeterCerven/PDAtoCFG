@@ -104,7 +104,7 @@ public class MainController {
 
     public void resetAll() {
         board.saveCurrentStateToHistory();
-        board.clearBoard();
+        board.clearBoard(true);
     }
 
     public void buttonRedo() {

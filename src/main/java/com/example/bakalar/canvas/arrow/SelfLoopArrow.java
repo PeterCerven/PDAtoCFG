@@ -59,7 +59,7 @@ public class SelfLoopArrow extends Arrow {
         double midY = from.getAbsoluteCentrePosY() - (from.getCircle().getRadius() + ARC_HEIGHT);
 
         double offsetX = -symbolContainers.getWidth() / 2.0;
-        double offsetY = -symbolContainers.getHeight();
+        double offsetY = -(symbolContainers.getChildren().size() * 20);
 
         symbolContainers.setLayoutX(midX + offsetX);
         symbolContainers.setLayoutY(midY + offsetY);
