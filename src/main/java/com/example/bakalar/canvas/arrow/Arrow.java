@@ -31,7 +31,6 @@ public abstract class Arrow extends MyObject {
     protected MyNode from;
     protected MyNode to;
     protected List<TransitionInputs> transitions;
-    protected StackPane containerStack;
     protected VBox symbolContainers;
     protected Polygon arrowHead;
     protected Board board;
@@ -48,23 +47,20 @@ public abstract class Arrow extends MyObject {
         this.toId = to.getID();
         this.board = board;
 
-        this.containerStack = new StackPane();
 
         this.symbolContainers = new VBox();
         VBox.setVgrow(symbolContainers, Priority.ALWAYS);
         symbolContainers.setAlignment(Pos.BOTTOM_CENTER);
 
 
-        containerStack.getChildren().add(symbolContainers);
-        containerStack.setAlignment(Pos.BOTTOM_CENTER);
         StackPane.setAlignment(symbolContainers, Pos.BOTTOM_CENTER);
-        symbolContainers.setViewOrder(2);
+        symbolContainers.setViewOrder(1);
         this.setViewOrder(1);
         this.arrowHead = createArrowHead();
         for (TransitionInputs transition : transitionInputs) {
             addSymbolContainer(transition);
         }
-        this.getChildren().addAll(arrowHead, containerStack);
+        this.getChildren().addAll(arrowHead, symbolContainers);
     }
 
 
@@ -112,16 +108,16 @@ public abstract class Arrow extends MyObject {
                     board.getArrows().remove(this);
                     this.getFrom().removeArrow(this);
                     this.getTo().removeArrow(this);
+                    board.getMainPane().getChildren().remove(this);
                 }
-                symbolContainers.setMaxHeight(symbolContainers.getHeight() - 20);
-                this.updateStackPanePosition(this.containerStack);
+                this.updateStackPanePosition(this.symbolContainers);
                 this.board.updateAllDescribePDA();
             }
         });
         container.layoutBoundsProperty().addListener((observable, oldValue, newValue) -> {
             container.setLayoutX(newValue.getWidth());
             container.setLayoutX(newValue.getHeight());
-            this.containerStack = updateStackPanePosition(this.containerStack);
+            this.symbolContainers = updateStackPanePosition(this.symbolContainers);
         });
         this.transitions.add(transitionInputs);
         this.symbolContainers.getChildren().add(container);
@@ -140,7 +136,7 @@ public abstract class Arrow extends MyObject {
 
     public abstract void updateObjects(boolean toEdge);
 
-    public abstract StackPane updateStackPanePosition(StackPane containerStack);
+    public abstract VBox updateStackPanePosition(VBox symbolContainers);
 
 
     protected Point2D getNodeEdgePoint(MyNode node, double targetX, double targetY) {

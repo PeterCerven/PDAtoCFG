@@ -2,7 +2,7 @@ package com.example.bakalar.canvas.arrow;
 
 import com.example.bakalar.canvas.node.MyNode;
 import com.example.bakalar.logic.Board;
-import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Arc;
 import javafx.scene.shape.ArcType;
@@ -50,20 +50,20 @@ public class SelfLoopArrow extends Arrow {
         arc.setRadiusY(from.getCircle().getRadius() + ARC_HEIGHT);
 
         updateArrowHead();
-        this.containerStack = updateStackPanePosition(this.containerStack);
+        this.symbolContainers = updateStackPanePosition(this.symbolContainers);
     }
 
     @Override
-    public StackPane updateStackPanePosition(StackPane containerStack) {
+    public VBox updateStackPanePosition(VBox symbolContainers) {
         double midX = from.getAbsoluteCentrePosX();
         double midY = from.getAbsoluteCentrePosY() - (from.getCircle().getRadius() + ARC_HEIGHT);
 
-        double offsetX = -containerStack.getWidth() / 2.0;
-        double offsetY = -containerStack.getHeight();
+        double offsetX = -symbolContainers.getWidth() / 2.0;
+        double offsetY = -symbolContainers.getHeight();
 
-        containerStack.setLayoutX(midX + offsetX);
-        containerStack.setLayoutY(midY + offsetY);
-        return containerStack;
+        symbolContainers.setLayoutX(midX + offsetX);
+        symbolContainers.setLayoutY(midY + offsetY);
+        return symbolContainers;
     }
 
     @Override
