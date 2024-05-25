@@ -49,10 +49,10 @@ public class HistoryLogic {
         for (Arrow arrow : arrows) {
             for (TransitionInputs transition : arrow.getTransitions()) {
                 if (arrow instanceof LineArrow la) {
-                    arrowHistories.add(new ArrowModel(la.getArrowId(), la.getFrom().getNodeId(), la.getTo().getNodeId(),
+                    arrowHistories.add(new ArrowModel(la.getID(), la.getFrom().getID(), la.getTo().getID(),
                             transition.copy(), la.getControlPointChangeX(), la.getControlPointChangeY()));
                 } else if (arrow instanceof SelfLoopArrow sla) {
-                    arrowHistories.add(new ArrowModel(sla.getArrowId(), sla.getFrom().getNodeId(), sla.getTo().getNodeId(), transition.copy()));
+                    arrowHistories.add(new ArrowModel(sla.getID(), sla.getFrom().getID(), sla.getTo().getID(), transition.copy()));
                 }
             }
         }
@@ -63,7 +63,7 @@ public class HistoryLogic {
         List<NodeModel> nodeHistories = new ArrayList<>();
         for (MyNode node : nodes) {
             nodeHistories.add(new NodeModel(node.getName(), node.getAbsoluteCentrePosX(), node.getAbsoluteCentrePosY(),
-                    node.isStarting(), node.isEnding(), node.getNodeId()));
+                    node.isStarting(), node.isEnding(), node.getID()));
         }
         return nodeHistories;
 

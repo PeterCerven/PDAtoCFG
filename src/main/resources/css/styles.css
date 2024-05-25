@@ -61,6 +61,20 @@
     -fx-border-color: #0b270c;
 }
 
+/*VBox {*/
+/*    -fx-spacing: 10px;*/
+/*    -fx-background-color: red;*/
+/*}*/
+
+/*HBox {*/
+/*    -fx-spacing: 10px;*/
+/*    -fx-background-color: blue;*/
+/*}*/
+
+/*StackPane {*/
+/*    -fx-background-color: yellow;*/
+/*}*/
+
 
 
 

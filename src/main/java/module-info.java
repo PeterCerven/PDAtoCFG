@@ -8,7 +8,7 @@ module com.example.bakalar {
     requires com.fasterxml.jackson.databind;
     requires com.fasterxml.jackson.core;
 
-
+    exports com.example.bakalar.canvas;
     exports com.example.bakalar.files;
     exports com.example.bakalar.exceptions;
     opens com.example.bakalar.files to com.fasterxml.jackson.databind, lombok, javafx.fxml, com.fasterxml.jackson.core;

@@ -34,7 +34,7 @@ public class FileLogic {
             file = file.getName().endsWith(".pda") ? file : new File(file.getAbsolutePath() + ".pda");
             List<NodeModel> myNodeModels = nodes.stream().map(node -> {
                 NodeModel myNodeModel = new NodeModel();
-                myNodeModel.setNodeId(node.getNodeId());
+                myNodeModel.setNodeId(node.getID());
                 myNodeModel.setX(node.getAbsoluteCentrePosX());
                 myNodeModel.setY(node.getAbsoluteCentrePosY());
                 myNodeModel.setName(node.getName());
@@ -47,9 +47,9 @@ public class FileLogic {
             for (Arrow arrow : arrows) {
                 for (TransitionInputs inputs : arrow.getTransitions()) {
                     ArrowModel arrowModel = new ArrowModel();
-                    arrowModel.setArrowId(arrow.getArrowId());
-                    arrowModel.setFromNodeId(arrow.getFrom().getNodeId());
-                    arrowModel.setToNodeId(arrow.getTo().getNodeId());
+                    arrowModel.setArrowId(arrow.getID());
+                    arrowModel.setFromNodeId(arrow.getFrom().getID());
+                    arrowModel.setToNodeId(arrow.getTo().getID());
                     arrowModel.setTransition(inputs);
                     arrowModels.add(arrowModel);
                     if (arrow instanceof LineArrow lineArrow) {

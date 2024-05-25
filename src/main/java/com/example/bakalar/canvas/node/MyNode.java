@@ -1,21 +1,23 @@
 package com.example.bakalar.canvas.node;
 
+import com.example.bakalar.canvas.MyObject;
 import com.example.bakalar.canvas.arrow.Arrow;
-import javafx.scene.Group;
+import com.example.bakalar.logic.Board;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
 import lombok.Getter;
 import lombok.Setter;
-import java.io.Serializable;
+
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import static com.example.bakalar.logic.MainController.NODE_RADIUS;
 
 @Getter
 @Setter
-public class MyNode extends Group implements Serializable {
+public class MyNode extends MyObject {
     private Circle circle;
     private Text nameText;
     private String name;
@@ -26,11 +28,9 @@ public class MyNode extends Group implements Serializable {
     private EndNode endNode;
     private StartNodeArrow startNodeArrow;
     private boolean selected;
-    private Long nodeId;
 
-    public MyNode(double x, double y, double radius, Long nodeId) {
-        super();
-        this.nodeId = nodeId;
+    public MyNode(double x, double y, double radius, Long ID) {
+        super(ID);
         circle = createCircle(x, y, radius);
         nameText = createNameText();
 
@@ -45,8 +45,8 @@ public class MyNode extends Group implements Serializable {
         this.arrowsTo = new ArrayList<>();
     }
 
-    public MyNode(String name, double x, double y, Long nodeId, boolean starting, boolean ending) {
-        this(x, y, NODE_RADIUS, nodeId);
+    public MyNode(String name, double x, double y, Long ID, boolean starting, boolean ending) {
+        this(x, y, NODE_RADIUS, ID);
         this.name = name;
         this.starting = starting;
         this.ending = ending;
@@ -140,17 +140,34 @@ public class MyNode extends Group implements Serializable {
     }
 
     @Override
+    public void erase(Board board) {
+        Iterator<Arrow> iterator = this.getAllArrows().iterator();
+        while (iterator.hasNext()) {
+            Arrow arrow1 = iterator.next();
+            if (arrow1.getFrom() == this) {
+                arrow1.getTo().removeArrow(arrow1);
+            } else {
+                arrow1.getFrom().removeArrow(arrow1);
+            }
+            board.getArrows().remove(arrow1);
+            board.getMainPane().getChildren().remove(arrow1);
+            iterator.remove();
+        }
+        board.getNodes().remove(this);
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof MyNode myNode)) return false;
 
-        return getNodeId().equals(myNode.getNodeId());
+        return getID().equals(myNode.getID());
     }
 
     @Override
     public String toString() {
         return "MyNode{" +
-                "nodeId=" + nodeId +
+                "nodeId=" + super.getID() +
                 ", name='" + name + '\'' +
                 ", arrowsFrom=" + arrowsFrom +
                 ", arrowsTo=" + arrowsTo +
@@ -158,4 +175,5 @@ public class MyNode extends Group implements Serializable {
                 ", ending=" + ending +
                 '}';
     }
+
 }

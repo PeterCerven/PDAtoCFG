@@ -31,7 +31,10 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 import static com.example.bakalar.logic.MainController.NODE_RADIUS;
 import static com.example.bakalar.logic.utility.ErrorPopUp.showErrorDialog;
@@ -123,31 +126,7 @@ public class Board implements Serializable {
     }
 
 
-    // adding and removing objects
-
-    public void removeObject(Node node) {
-        if (node instanceof Arrow arrow) {
-            arrows.remove(arrow);
-            arrow.getFrom().removeArrow(arrow);
-            arrow.getTo().removeArrow(arrow);
-        } else if (node instanceof MyNode myNode) {
-            Iterator<Arrow> iterator = myNode.getAllArrows().iterator();
-            while (iterator.hasNext()) {
-                Arrow arrow1 = iterator.next();
-                if (arrow1.getFrom() == myNode) {
-                    arrow1.getTo().removeArrow(arrow1);
-                } else {
-                    arrow1.getFrom().removeArrow(arrow1);
-                }
-                arrows.remove(arrow1);
-                mainPane.getChildren().remove(arrow1);
-                iterator.remove();
-            }
-            nodes.remove(myNode);
-        }
-        mainPane.getChildren().remove(node);
-        updateAllDescribePDA();
-    }
+    // adding objects
 
     public void createArrow(MyNode from, MyNode to, TransitionInputs transitionInputs) throws MyCustomException {
         if (transitionInputs == null) {
@@ -175,12 +154,8 @@ public class Board implements Serializable {
             } else {
                 arrow = new LineArrow(from, to, this, transitions, this.idCounter);
             }
-            this.makeCurveDraggable((LineArrow) arrow);
         }
-        to.addArrow(arrow, "to");
-        from.addArrow(arrow, "from");
-        this.addObject(arrow);
-        this.makeErasable(arrow);
+        addArrowToBoard(from, to, arrow);
     }
 
 
@@ -203,17 +178,14 @@ public class Board implements Serializable {
 
     public MyNode createMyNode(double x, double y) {
         MyNode myNode = new MyNode(x, y, NODE_RADIUS, idCounter);
-        this.makeDraggable(myNode);
-        this.enableArrowCreation(myNode);
-        this.cursorChange(myNode);
-        this.addObject(myNode);
+        addNodeToBoard(myNode);
         return myNode;
     }
 
     private void createArrow(MyNode node) {
         if (btnBeh.getSelectedNode() != null) {
             saveCurrentStateToHistory();
-            createMyArrow(btnBeh.getSelectedNode().getNodeId(), node.getNodeId(), null);
+            createMyArrow(btnBeh.getSelectedNode().getID(), node.getID(), null);
             this.selectNode(btnBeh.getSelectedNode(), false);
             btnBeh.setSelectedNode(null);
 
@@ -234,6 +206,21 @@ public class Board implements Serializable {
     }
 
     // utility functions
+
+    private void addArrowToBoard(MyNode from, MyNode to, Arrow arrow) {
+        to.addArrow(arrow, "to");
+        from.addArrow(arrow, "from");
+        if (arrow instanceof LineArrow) this.makeCurveDraggable((LineArrow) arrow);
+        this.addObject(arrow);
+        this.makeArrowErasable(arrow);
+    }
+
+    private void addNodeToBoard(MyNode myNode) {
+        this.makeDraggable(myNode);
+        this.cursorChange(myNode);
+        this.enableArrowCreation(myNode);
+        this.addObject(myNode);
+    }
 
     private Arrow sameArrowExists(MyNode from, MyNode to) {
         for (Arrow arrow : arrows) {
@@ -275,7 +262,7 @@ public class Board implements Serializable {
 
     private MyNode findNodeById(Long nodeId) throws MyCustomException {
         for (MyNode node : nodes) {
-            if (node.getNodeId().equals(nodeId)) {
+            if (node.getID().equals(nodeId)) {
                 return node;
             }
         }
@@ -470,7 +457,6 @@ public class Board implements Serializable {
         });
     }
 
-
     public void enableArrowCreation(MyNode node) {
         node.setOnMouseClicked(event -> {
             if (btnBeh.getCurrentState().equals(ButtonState.ARROW) && event.getButton() == MouseButton.PRIMARY) {
@@ -480,9 +466,35 @@ public class Board implements Serializable {
                 canClick = true;
             } else if (btnBeh.getCurrentState().equals(ButtonState.ERASE) && event.getButton() == MouseButton.PRIMARY) {
                 saveCurrentStateToHistory();
-                this.removeObject(node);
+                node.erase(this);
+                mainPane.getChildren().remove(node);
+                updateAllDescribePDA();
             }
+
         });
+    }
+
+    public void makeArrowErasable(Arrow arrow) {
+        if (arrow instanceof LineArrow lineArrow) {
+            lineArrow.getControlIndicator().setOnMouseClicked(event -> {
+                if (btnBeh.getCurrentState().equals(ButtonState.ERASE) && event.getButton() == MouseButton.PRIMARY) {
+                    saveCurrentStateToHistory();
+                    lineArrow.erase(this);
+                    mainPane.getChildren().remove(lineArrow);
+                    updateAllDescribePDA();
+                }
+            });
+        } else if (arrow instanceof SelfLoopArrow selfLoopArrow) {
+            selfLoopArrow.getArc().setOnMouseClicked(event -> {
+                if (btnBeh.getCurrentState().equals(ButtonState.ERASE) && event.getButton() == MouseButton.PRIMARY) {
+                    saveCurrentStateToHistory();
+                    arrow.erase(this);
+                    mainPane.getChildren().remove(arrow);
+                    updateAllDescribePDA();
+                }
+            });
+        }
+
     }
 
     public void cursorChange(MyNode myNode) {
@@ -497,14 +509,6 @@ public class Board implements Serializable {
         myNode.setOnMouseExited(e -> myNode.setCursor(Cursor.DEFAULT));
     }
 
-    public void makeErasable(Node node) {
-        node.setOnMouseClicked(event -> {
-            if (btnBeh.getCurrentState().equals(ButtonState.ERASE) && event.getButton() == MouseButton.PRIMARY) {
-                saveCurrentStateToHistory();
-                this.removeObject(node);
-            }
-        });
-    }
 
     // history
 
@@ -546,23 +550,14 @@ public class Board implements Serializable {
 
     private void createSelfLoopArrowFromHistory(MyNode from, MyNode to, TransitionInputs transitionInputs) throws MyCustomException {
         if (checkArrowForDuplicate(from, to, transitionInputs)) return;
-        Arrow arrow;
-        arrow = new SelfLoopArrow(from, to, this, List.of(transitionInputs), this.idCounter);
-        from.addArrow(arrow, "from");
-        to.addArrow(arrow, "to");
-        this.makeErasable(arrow);
-        this.addObject(arrow);
+        Arrow arrow = new SelfLoopArrow(from, to, this, List.of(transitionInputs), this.idCounter);
+        addArrowToBoard(from, to, arrow);
     }
 
     private void createLineArrowFromHistory(MyNode from, MyNode to, TransitionInputs transitionInputs, Double controlPointChangeX, Double controlPointChangeY) throws MyCustomException {
         if (checkArrowForDuplicate(from, to, transitionInputs)) return;
-        LineArrow arrow;
-        arrow = new LineArrow(from, to, controlPointChangeX, controlPointChangeY, this, List.of(transitionInputs), this.idCounter);
-        from.addArrow(arrow, "from");
-        to.addArrow(arrow, "to");
-        this.makeErasable(arrow);
-        this.makeCurveDraggable(arrow);
-        this.addObject(arrow);
+        Arrow arrow = new LineArrow(from, to, controlPointChangeX, controlPointChangeY, this, List.of(transitionInputs), this.idCounter);
+        addArrowToBoard(from, to, arrow);
     }
 
     private boolean checkArrowForDuplicate(MyNode from, MyNode to, TransitionInputs transitionInputs) throws MyCustomException {
@@ -583,11 +578,9 @@ public class Board implements Serializable {
         if (starting) {
             setStarting(myNode, true);
         }
-        this.makeDraggable(myNode);
-        this.enableArrowCreation(myNode);
-        this.cursorChange(myNode);
-        this.addObject(myNode);
+        addNodeToBoard(myNode);
     }
+
 
     // testing
 
@@ -599,12 +592,12 @@ public class Board implements Serializable {
         MyNode secondNode = createMyNode(320, 150);
         setEnding(firstNode, true);
 
-        createMyArrow(firstNode.getNodeId(), firstNode.getNodeId(), new TransitionInputs("1", "Z", "XZ"));
-        createMyArrow(firstNode.getNodeId(), firstNode.getNodeId(), new TransitionInputs("1", "X", "XX"));
-        createMyArrow(firstNode.getNodeId(), firstNode.getNodeId(), new TransitionInputs(EPSILON, "X", EPSILON));
-        createMyArrow(firstNode.getNodeId(), secondNode.getNodeId(), new TransitionInputs("0", "X", "X"));
-        createMyArrow(secondNode.getNodeId(), secondNode.getNodeId(), new TransitionInputs("1", "X", EPSILON));
-        createMyArrow(secondNode.getNodeId(), firstNode.getNodeId(), new TransitionInputs("0", "Z", "Z"));
+        createMyArrow(firstNode.getID(), firstNode.getID(), new TransitionInputs("1", "Z", "XZ"));
+        createMyArrow(firstNode.getID(), firstNode.getID(), new TransitionInputs("1", "X", "XX"));
+        createMyArrow(firstNode.getID(), firstNode.getID(), new TransitionInputs(EPSILON, "X", EPSILON));
+        createMyArrow(firstNode.getID(), secondNode.getID(), new TransitionInputs("0", "X", "X"));
+        createMyArrow(secondNode.getID(), secondNode.getID(), new TransitionInputs("1", "X", EPSILON));
+        createMyArrow(secondNode.getID(), firstNode.getID(), new TransitionInputs("0", "Z", "Z"));
     }
 
     // conversion

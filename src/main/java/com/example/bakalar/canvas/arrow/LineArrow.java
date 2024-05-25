@@ -3,7 +3,7 @@ package com.example.bakalar.canvas.arrow;
 import com.example.bakalar.canvas.node.MyNode;
 import com.example.bakalar.logic.Board;
 import javafx.geometry.Point2D;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.QuadCurve;
@@ -103,7 +103,7 @@ public class LineArrow extends Arrow {
         setLinePoints(toEdge);
         updateControlPointPos(this.controlPointChangeX, this.controlPointChangeY);
         updateArrowHead();
-        this.symbolContainers = updateSymbolContainerPosition(this.symbolContainers);
+        this.containerStack = updateStackPanePosition(this.containerStack);
     }
 
     public void moveControlPoint(double controlIndicatorPointX, double controlIndicatorPointY) {
@@ -111,7 +111,7 @@ public class LineArrow extends Arrow {
         this.controlPointChangeY = (startY + endY) / 2.0 - controlIndicatorPointY;
         updateControlPointPos(this.controlPointChangeX, this.controlPointChangeY);
         updateArrowHead();
-        this.symbolContainers = updateSymbolContainerPosition(this.symbolContainers);
+        this.containerStack = updateStackPanePosition(this.containerStack);
     }
 
     private void updateControlPointPos(double controlIndicatorPointX, double controlIndicatorPointY) {
@@ -141,7 +141,7 @@ public class LineArrow extends Arrow {
     }
 
     @Override
-    public VBox updateSymbolContainerPosition(VBox symbolContainers) {
+    public StackPane updateStackPanePosition(StackPane containerStack) {
         double startX = line.getStartX();
         double startY = line.getStartY();
         double endX = line.getEndX();
@@ -151,20 +151,20 @@ public class LineArrow extends Arrow {
         double midX = highestPoint.getX();
         double midY = highestPoint.getY();
 
-        double offsetX = -symbolContainers.getWidth() / 2.0;
-        double offsetY = -symbolContainers.getHeight() - 4;
+        double offsetX = -containerStack.getWidth() / 2.0;
+        double offsetY = -containerStack.getHeight() - 4;
 
-        symbolContainers.setLayoutX(midX + offsetX);
-        symbolContainers.setLayoutY(midY + offsetY);
+        containerStack.setLayoutX(midX + offsetX);
+        containerStack.setLayoutY(midY + offsetY);
 
         double angle = Math.toDegrees(Math.atan2(endY - startY, endX - startX));
         if (angle > 90 && angle < 270 || angle < -90 && angle > -180) {
             angle += 180;
         }
-        Rotate rotate = new Rotate(angle, symbolContainers.getWidth() / 2.0, symbolContainers.getHeight());
-        symbolContainers.getTransforms().clear();
-        symbolContainers.getTransforms().add(rotate);
-        return symbolContainers;
+        Rotate rotate = new Rotate(angle, containerStack.getWidth() / 2.0, containerStack.getHeight());
+        containerStack.getTransforms().clear();
+        containerStack.getTransforms().add(rotate);
+        return containerStack;
     }
 
     private Point2D findHighestPoint(double startX, double startY, double controlX, double controlY, double endX, double endY, double t) {
@@ -179,6 +179,12 @@ public class LineArrow extends Arrow {
         return new Point2D(controlX, controlY);
     }
 
+    @Override
+    public void erase(Board board) {
+        board.getArrows().remove(this);
+        this.getFrom().removeArrow(this);
+        this.getTo().removeArrow(this);
+    }
 
     @Override
     public void move(boolean toEdge) {
@@ -192,9 +198,6 @@ public class LineArrow extends Arrow {
         line.setMouseTransparent(true);
         line.setFill(Color.TRANSPARENT);
         line.setStroke(Color.BLACK);
-        line.addEventFilter(javafx.scene.input.MouseEvent.MOUSE_PRESSED, event -> {
-            System.out.println("pressed line");
-        });
         return line;
     }
 
@@ -202,7 +205,7 @@ public class LineArrow extends Arrow {
         resetLine();
         updateControlPointPos(this.controlPointChangeX, this.controlPointChangeY);
         updateArrowHead();
-        this.symbolContainers = updateSymbolContainerPosition(this.symbolContainers);
+        this.containerStack = updateStackPanePosition(this.containerStack);
     }
 
     private void resetLine() {

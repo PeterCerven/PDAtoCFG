@@ -1,12 +1,16 @@
 package com.example.bakalar.canvas.arrow;
 
+import com.example.bakalar.canvas.MyObject;
 import com.example.bakalar.canvas.node.MyNode;
 import com.example.bakalar.logic.Board;
+import com.example.bakalar.logic.utility.ButtonState;
 import javafx.geometry.Point2D;
-import javafx.scene.Group;
+import javafx.geometry.Pos;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
@@ -15,7 +19,6 @@ import javafx.scene.text.Text;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,37 +26,45 @@ import static com.example.bakalar.logic.MainController.NODE_RADIUS;
 
 @Getter
 @Setter
-public abstract class Arrow extends Group implements Serializable {
+public abstract class Arrow extends MyObject {
     public static final int ARROW_HEAD_SZIE = NODE_RADIUS / 2;
     protected MyNode from;
     protected MyNode to;
     protected List<TransitionInputs> transitions;
+    protected StackPane containerStack;
     protected VBox symbolContainers;
     protected Polygon arrowHead;
     protected Board board;
     protected Long fromId;
     protected Long toId;
-    protected Long arrowId;
 
 
-    public Arrow(MyNode from, MyNode to, Board board, List<TransitionInputs> transitionInputs, Long arrowId) {
-        super();
+    public Arrow(MyNode from, MyNode to, Board board, List<TransitionInputs> transitionInputs, Long ID) {
+        super(ID);
         this.transitions = new ArrayList<>();
         this.from = from;
         this.to = to;
-        this.arrowId = arrowId;
-        this.fromId = from.getNodeId();
-        this.toId = to.getNodeId();
+        this.fromId = from.getID();
+        this.toId = to.getID();
         this.board = board;
 
+        this.containerStack = new StackPane();
+
         this.symbolContainers = new VBox();
-        symbolContainers.setViewOrder(1);
+        VBox.setVgrow(symbolContainers, Priority.ALWAYS);
+        symbolContainers.setAlignment(Pos.BOTTOM_CENTER);
+
+
+        containerStack.getChildren().add(symbolContainers);
+        containerStack.setAlignment(Pos.BOTTOM_CENTER);
+        StackPane.setAlignment(symbolContainers, Pos.BOTTOM_CENTER);
+        symbolContainers.setViewOrder(2);
         this.setViewOrder(1);
         this.arrowHead = createArrowHead();
         for (TransitionInputs transition : transitionInputs) {
             addSymbolContainer(transition);
         }
-        this.getChildren().addAll(arrowHead, symbolContainers);
+        this.getChildren().addAll(arrowHead, containerStack);
     }
 
 
@@ -68,6 +79,7 @@ public abstract class Arrow extends Group implements Serializable {
 
     public void addSymbolContainer(TransitionInputs transitionInputs) {
         HBox container = new HBox(NODE_RADIUS / 5.0);
+        container.setAlignment(Pos.BOTTOM_CENTER);
         Text readSymbol = new Text(transitionInputs.getRead());
         readSymbol.setFont(new Font(15));
         Text popSymbol = new Text(transitionInputs.getPop());
@@ -92,11 +104,24 @@ public abstract class Arrow extends Group implements Serializable {
                     this.board.updateAllDescribePDA();
                 }
             }
+            if (event.getButton() == MouseButton.PRIMARY && board.getBtnBeh().getCurrentState().equals(ButtonState.ERASE)) {
+                board.saveCurrentStateToHistory();
+                this.transitions.remove(transitionInputs);
+                this.symbolContainers.getChildren().remove(container);
+                if (symbolContainers.getChildren().isEmpty()) {
+                    board.getArrows().remove(this);
+                    this.getFrom().removeArrow(this);
+                    this.getTo().removeArrow(this);
+                }
+                symbolContainers.setMaxHeight(symbolContainers.getHeight() - 20);
+                this.updateStackPanePosition(this.containerStack);
+                this.board.updateAllDescribePDA();
+            }
         });
         container.layoutBoundsProperty().addListener((observable, oldValue, newValue) -> {
             container.setLayoutX(newValue.getWidth());
             container.setLayoutX(newValue.getHeight());
-            this.symbolContainers = updateSymbolContainerPosition(this.symbolContainers);
+            this.containerStack = updateStackPanePosition(this.containerStack);
         });
         this.transitions.add(transitionInputs);
         this.symbolContainers.getChildren().add(container);
@@ -115,7 +140,7 @@ public abstract class Arrow extends Group implements Serializable {
 
     public abstract void updateObjects(boolean toEdge);
 
-    public abstract VBox updateSymbolContainerPosition(VBox symbolContainers);
+    public abstract StackPane updateStackPanePosition(StackPane containerStack);
 
 
     protected Point2D getNodeEdgePoint(MyNode node, double targetX, double targetY) {
@@ -162,6 +187,7 @@ public abstract class Arrow extends Group implements Serializable {
         return false;
     }
 
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -169,14 +195,14 @@ public abstract class Arrow extends Group implements Serializable {
 
         if (getFromId() != null ? !getFromId().equals(arrow.getFromId()) : arrow.getFromId() != null) return false;
         if (getToId() != null ? !getToId().equals(arrow.getToId()) : arrow.getToId() != null) return false;
-        return getArrowId() != null ? getArrowId().equals(arrow.getArrowId()) : arrow.getArrowId() == null;
+        return getID() != null ? getID().equals(arrow.getID()) : arrow.getID() == null;
     }
 
     @Override
     public int hashCode() {
         int result = getFromId() != null ? getFromId().hashCode() : 0;
         result = 31 * result + (getToId() != null ? getToId().hashCode() : 0);
-        result = 31 * result + (getArrowId() != null ? getArrowId().hashCode() : 0);
+        result = 31 * result + (getID() != null ? getID().hashCode() : 0);
         return result;
     }
 
