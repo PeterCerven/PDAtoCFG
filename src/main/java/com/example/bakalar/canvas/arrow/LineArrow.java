@@ -152,7 +152,7 @@ public class LineArrow extends Arrow {
         double midY = highestPoint.getY();
 
         double offsetX = -symbolContainers.getWidth() / 2.0;
-        double offsetY = -(symbolContainers.getChildren().size() * 20) - 8;
+        double offsetY = -(symbolContainers.getChildren().size() * (NODE_RADIUS / 1.8)) - (NODE_RADIUS / 4.0);
 
         symbolContainers.setLayoutX(midX + offsetX);
         symbolContainers.setLayoutY(midY + offsetY);
@@ -194,7 +194,7 @@ public class LineArrow extends Arrow {
     private QuadCurve createLine() {
         QuadCurve line = new QuadCurve();
         line.setViewOrder(1);
-        line.setStrokeWidth(2);
+        line.setStrokeWidth(NODE_RADIUS /  13.0);
         line.setMouseTransparent(true);
         line.setFill(Color.TRANSPARENT);
         line.setStroke(Color.BLACK);

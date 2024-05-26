@@ -17,12 +17,8 @@ import java.util.List;
 
 
 public class MainController {
-
-    private static final double SCALE_DELTA = 1.04;
     @FXML
     private AnchorPane mainPane;
-    @FXML
-    private ScrollPane myScrollPane;
     @FXML
     private Button nodeBtn;
     @FXML
@@ -79,13 +75,13 @@ public class MainController {
             if (sliderInput.getText().isEmpty()) {
                 return;
             }
-            if (Integer.parseInt(sliderInput.getText()) > 120) {
-                slider.setValue(120);
-                sliderInput.setText("120");
+            if (Integer.parseInt(sliderInput.getText()) > 60) {
+                slider.setValue(60);
+                sliderInput.setText("60");
             }
-            if (sliderInput.getText().length() > 1 && Integer.parseInt(sliderInput.getText()) < 20) {
-                slider.setValue(20);
-                sliderInput.setText("20");
+            if (sliderInput.getText().length() > 1 && Integer.parseInt(sliderInput.getText()) < 25) {
+                slider.setValue(25);
+                sliderInput.setText("25");
             }
             int value = Integer.parseInt(sliderInput.getText());
             slider.setValue(value);
@@ -119,7 +115,6 @@ public class MainController {
     // Buttons actions
 
     public void changeSize() {
-        System.out.println((int) Math.round(slider.getValue()));
         board.updateBoardSize((int) Math.round(slider.getValue()));
     }
 
@@ -152,18 +147,6 @@ public class MainController {
         board.convertPDA();
     }
 
-    // test
-
-    public void testBoard() {
-        board.testBoard();
-    }
-
-    // slider actions
-
-    public void sliderAction() {
-//        board.changeSpeed(slider.getValue());
-        sliderInput.setText(String.valueOf((int) slider.getValue()));
-    }
 
     // menu action
     public void closeApp() {

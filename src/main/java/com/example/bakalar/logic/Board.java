@@ -49,7 +49,7 @@ public class Board implements Serializable {
     public static final String STARTING_Z = "Z";
     public static final String STARTING_S = "S";
     private static final double DRAG_THRESHOLD = 20;
-    public static int NODE_RADIUS = 40;
+    public static int NODE_RADIUS = 35;
     private List<MyNode> nodes;
     private List<Arrow> arrows;
     private MyNode startNode;
@@ -455,7 +455,6 @@ public class Board implements Serializable {
             if (btnBeh.getCurrentState().equals(ButtonState.SELECT)) {
                 node.updateArrows(true);
                 dragging = false;
-                System.out.println("released");
                 if (wasButtonPressed) {
                     btnBeh.toggleButtonState(btnBeh.getPreviousState());
                     wasButtonPressed = false;

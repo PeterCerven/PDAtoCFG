@@ -139,7 +139,7 @@
                         </HBox>
                         <HBox prefHeight="84.0" prefWidth="313.0">
                            <children>
-                              <Slider fx:id="slider" majorTickUnit="10.0" max="120.0" min="30.0" minorTickCount="2" prefHeight="54.0" prefWidth="238.0" showTickLabels="true" showTickMarks="true" snapToTicks="true" value="34.0">
+                              <Slider fx:id="slider" majorTickUnit="5.0" max="60.0" min="25.0" minorTickCount="1" prefHeight="54.0" prefWidth="238.0" showTickLabels="true" showTickMarks="true" snapToTicks="true" value="35.0">
                                  <padding>
                                     <Insets left="20.0" right="20.0" />
                                  </padding>
@@ -147,7 +147,7 @@
                                     <Cursor fx:constant="HAND" />
                                  </cursor>
                               </Slider>
-                              <TextField fx:id="sliderInput" alignment="CENTER" prefHeight="31.0" prefWidth="78.0" text="40">
+                              <TextField fx:id="sliderInput" alignment="CENTER" prefHeight="31.0" prefWidth="78.0" text="35">
                                  <HBox.margin>
                                     <Insets right="10.0" top="10.0" />
                                  </HBox.margin>

@@ -28,7 +28,6 @@ import static com.example.bakalar.logic.Board.NODE_RADIUS;
 @Getter
 @Setter
 public abstract class Arrow extends MyObject {
-    public static final int ARROW_HEAD_SZIE = NODE_RADIUS / 2;
     protected MyNode from;
     protected MyNode to;
     protected List<TransitionInputs> transitions;
@@ -78,11 +77,11 @@ public abstract class Arrow extends MyObject {
         HBox container = new HBox(NODE_RADIUS / 5.0);
         container.setAlignment(Pos.BOTTOM_CENTER);
         Text readSymbol = new Text(transitionInputs.getRead());
-        readSymbol.setFont(new Font("Arial",15));
+        readSymbol.setFont(new Font("Arial",NODE_RADIUS / 2.0));
         Text popSymbol = new Text(transitionInputs.getPop());
-        popSymbol.setFont(new Font("Arial", 15));
+        popSymbol.setFont(new Font("Arial", NODE_RADIUS / 2.0));
         Text pushSymbol = new Text(transitionInputs.getPush());
-        pushSymbol.setFont(new Font("Arial",15));
+        pushSymbol.setFont(new Font("Arial",NODE_RADIUS / 2.0));
         container.getChildren().addAll(readSymbol, popSymbol, pushSymbol);
         container.setOnMouseEntered(e -> {
             if (board.getBtnBeh().getCurrentState().equals(ButtonState.ERASE)) {
@@ -167,11 +166,11 @@ public abstract class Arrow extends MyObject {
         double cos = Math.cos(angle);
 
         //point1
-        double x1 = (-1.0 / 2.0 * cos + Math.sqrt(3) / 2 * sin) * ARROW_HEAD_SZIE + endX;
-        double y1 = (-1.0 / 2.0 * sin - Math.sqrt(3) / 2 * cos) * ARROW_HEAD_SZIE + endY;
+        double x1 = (-1.0 / 2.0 * cos + Math.sqrt(3) / 2 * sin) * (NODE_RADIUS  / 2.0) + endX;
+        double y1 = (-1.0 / 2.0 * sin - Math.sqrt(3) / 2 * cos) * (NODE_RADIUS  / 2.0) + endY;
         //point2
-        double x2 = (1.0 / 2.0 * cos + Math.sqrt(3) / 2 * sin) * ARROW_HEAD_SZIE + endX;
-        double y2 = (1.0 / 2.0 * sin - Math.sqrt(3) / 2 * cos) * ARROW_HEAD_SZIE + endY;
+        double x2 = (1.0 / 2.0 * cos + Math.sqrt(3) / 2 * sin) * (NODE_RADIUS  / 2.0) + endX;
+        double y2 = (1.0 / 2.0 * sin - Math.sqrt(3) / 2 * cos) * (NODE_RADIUS  / 2.0) + endY;
         return new ArrowHeadPoints(endX, endY, x1, y1, x2, y2);
     }
 

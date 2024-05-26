@@ -41,7 +41,7 @@ public class SelfLoopArrow extends Arrow {
         arc.setType(ArcType.OPEN);
         arc.setLength(ARC_LENGTH);
         arc.setStartAngle(ARC_START_ANGLE);
-        arc.setStrokeWidth(2);
+        arc.setStrokeWidth(NODE_RADIUS / 13.0);
         arc.setOnMouseEntered(e -> {
             if (board.getBtnBeh().getCurrentState() == ButtonState.ERASE) {
                 arc.setCursor(Cursor.HAND);

@@ -41,6 +41,7 @@ public class HistoryLogic {
         List<NodeModel> nodeHistories = createNodeHistory(nodes);
         appState.setNodeModels(nodeHistories);
         appState.setArrowModels(arrowHistories);
+        appState.setNodeRadius(Board.NODE_RADIUS);
         return appState;
     }
 
