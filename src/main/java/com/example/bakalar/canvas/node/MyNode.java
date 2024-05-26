@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import static com.example.bakalar.logic.MainController.NODE_RADIUS;
+import static com.example.bakalar.logic.Board.NODE_RADIUS;
 
 @Getter
 @Setter

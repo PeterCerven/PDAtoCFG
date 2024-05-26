@@ -12,7 +12,7 @@ import lombok.Getter;
 
 import java.util.List;
 
-import static com.example.bakalar.logic.MainController.NODE_RADIUS;
+import static com.example.bakalar.logic.Board.NODE_RADIUS;
 
 @Getter
 public class LineArrow extends Arrow {
@@ -152,7 +152,7 @@ public class LineArrow extends Arrow {
         double midY = highestPoint.getY();
 
         double offsetX = -symbolContainers.getWidth() / 2.0;
-        double offsetY = -(symbolContainers.getChildren().size() * 20) - 4;
+        double offsetY = -(symbolContainers.getChildren().size() * 20) - 8;
 
         symbolContainers.setLayoutX(midX + offsetX);
         symbolContainers.setLayoutY(midY + offsetY);

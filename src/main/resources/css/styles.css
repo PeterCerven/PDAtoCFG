@@ -61,19 +61,20 @@
     -fx-border-color: #0b270c;
 }
 
-/*VBox {*/
-/*    -fx-spacing: 10px;*/
-/*    -fx-background-color: red;*/
-/*}*/
+.slider .track, .slider .filled-track {
+    -fx-pref-height: 10px;
+}
 
-/*HBox {*/
-/*    -fx-spacing: 10px;*/
-/*    -fx-background-color: blue;*/
-/*}*/
+.slider .thumb {
+    -fx-background-color: green;
+    -fx-pref-width: 20px;
+    -fx-pref-height: 20px;
+}
 
-/*StackPane {*/
-/*    -fx-background-color: yellow;*/
-/*}*/
+.slider .axis {
+    -fx-tick-label-font-size: 12px;
+    -fx-tick-label-font-family: monospace;
+}
 
 
 

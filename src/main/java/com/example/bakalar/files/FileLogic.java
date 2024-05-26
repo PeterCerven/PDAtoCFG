@@ -1,13 +1,7 @@
 package com.example.bakalar.files;
 
-import com.example.bakalar.canvas.arrow.Arrow;
-import com.example.bakalar.canvas.arrow.LineArrow;
-import com.example.bakalar.canvas.arrow.TransitionInputs;
-import com.example.bakalar.canvas.node.MyNode;
 import com.example.bakalar.logic.conversion.CFGRule;
 import com.example.bakalar.logic.history.AppState;
-import com.example.bakalar.logic.history.ArrowModel;
-import com.example.bakalar.logic.history.NodeModel;
 import com.example.bakalar.logic.utility.ErrorPopUp;
 import com.example.bakalar.logic.utility.sorters.RuleSorter;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -17,7 +11,6 @@ import javafx.stage.Stage;
 import java.io.File;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.List;
 
 import static com.example.bakalar.logic.utility.ErrorPopUp.showErrorDialog;
@@ -26,53 +19,23 @@ public class FileLogic {
 
 
     public FileLogic() {
+
     }
 
-    public void saveToJson(List<MyNode> nodes, List<Arrow> arrows, int nodeCounter, Long idCounter, Stage primaryStage) {
+    public void saveToJson(AppState appState, Stage primaryStage) {
         File file = showSaveFileDialog(primaryStage);
         if (file != null) {
             file = file.getName().endsWith(".pda") ? file : new File(file.getAbsolutePath() + ".pda");
-            List<NodeModel> myNodeModels = nodes.stream().map(node -> {
-                NodeModel myNodeModel = new NodeModel();
-                myNodeModel.setNodeId(node.getID());
-                myNodeModel.setX(node.getAbsoluteCentrePosX());
-                myNodeModel.setY(node.getAbsoluteCentrePosY());
-                myNodeModel.setName(node.getName());
-                myNodeModel.setStarting(node.isStarting());
-                myNodeModel.setEnding(node.isEnding());
-                return myNodeModel;
-            }).toList();
-
-            List<ArrowModel> arrowModels = new ArrayList<>();
-            for (Arrow arrow : arrows) {
-                for (TransitionInputs inputs : arrow.getTransitions()) {
-                    ArrowModel arrowModel = new ArrowModel();
-                    arrowModel.setArrowId(arrow.getID());
-                    arrowModel.setFromNodeId(arrow.getFrom().getID());
-                    arrowModel.setToNodeId(arrow.getTo().getID());
-                    arrowModel.setTransition(inputs);
-                    arrowModels.add(arrowModel);
-                    if (arrow instanceof LineArrow lineArrow) {
-                        arrowModel.setLineArrow(true);
-                        arrowModel.setControlPointChangeX(lineArrow.getControlPointChangeX());
-                        arrowModel.setControlPointChangeY(lineArrow.getControlPointChangeY());
-                    }
-                }
+            try {
+                ObjectMapper mapper = new ObjectMapper();
+                mapper.writeValue(new File(file.getAbsolutePath()), appState);
+            } catch (Exception e) {
+                showErrorDialog("Error pri ukladaní súboru");
             }
-
-            saveToJson(myNodeModels, arrowModels, nodeCounter, idCounter, file.getAbsolutePath());
         }
     }
 
-    private void saveToJson(List<NodeModel> nodes, List<ArrowModel> arrows, int nodeCounter, Long idCounter, String filePath) {
-        try {
-            ObjectMapper mapper = new ObjectMapper();
-            AppState state = new AppState(nodes, arrows, nodeCounter, idCounter);
-            mapper.writeValue(new File(filePath), state);
-        } catch (Exception e) {
-            showErrorDialog("Error pri ukladaní súboru");
-        }
-    }
+
 
 
     public AppState loadFromJson(Stage stage) {

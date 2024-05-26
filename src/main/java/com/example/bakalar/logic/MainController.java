@@ -2,18 +2,11 @@ package com.example.bakalar.logic;
 
 import com.example.bakalar.instructions.HelpUser;
 import com.example.bakalar.logic.history.HistoryLogic;
-import com.example.bakalar.logic.utility.ButtonBehaviour;
-import com.example.bakalar.logic.utility.ButtonState;
-import com.example.bakalar.logic.utility.DescribePDA;
-import com.example.bakalar.logic.utility.ErrorPopUp;
+import com.example.bakalar.logic.utility.*;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.TextField;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
+import javafx.scene.control.*;
+import javafx.scene.input.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -25,9 +18,11 @@ import java.util.List;
 
 public class MainController {
 
-    public static final int NODE_RADIUS = 34;
+    private static final double SCALE_DELTA = 1.04;
     @FXML
     private AnchorPane mainPane;
+    @FXML
+    private ScrollPane myScrollPane;
     @FXML
     private Button nodeBtn;
     @FXML
@@ -52,6 +47,10 @@ public class MainController {
     private TextField describeEndStates;
     @FXML
     private VBox transFunctions;
+    @FXML
+    private Slider slider;
+    @FXML
+    private TextField sliderInput;
     private Board board;
     @Setter
     private Stage stage;
@@ -68,8 +67,36 @@ public class MainController {
         List<TextField> describePDAFields = List.of(describeStates, describeAlphabet, describeStackAlphabet, describeEndStates);
         DescribePDA describePDA = new DescribePDA(describePDAFields, transFunctions);
         HistoryLogic historyLogic = new HistoryLogic(undoBtn, reUndoBtn);
-        board = new Board(mainPane, describePDA, historyLogic, stage, btnBeh);
+        setSlider();
+        board = new Board(mainPane, describePDA, historyLogic, stage, btnBeh, slider, sliderInput);
         helpUser = new HelpUser();
+    }
+
+    private void setSlider() {
+        TextFormatter<Integer> formatter = new TextFormatter<>(new SliderFilter());
+        sliderInput.setTextFormatter(formatter);
+        sliderInput.setOnKeyTyped(e -> {
+            if (sliderInput.getText().isEmpty()) {
+                return;
+            }
+            if (Integer.parseInt(sliderInput.getText()) > 120) {
+                slider.setValue(120);
+                sliderInput.setText("120");
+            }
+            if (sliderInput.getText().length() > 1 && Integer.parseInt(sliderInput.getText()) < 20) {
+                slider.setValue(20);
+                sliderInput.setText("20");
+            }
+            int value = Integer.parseInt(sliderInput.getText());
+            slider.setValue(value);
+        });
+
+        slider.valueChangingProperty().addListener((obs, wasChanging, isNowChanging) -> {
+            if (!isNowChanging) {
+                Integer value = (int) Math.round(slider.getValue());
+                sliderInput.setText(value + "");
+            }
+        });
     }
 
     public void setMainScene(Scene mainScene) {
@@ -77,6 +104,7 @@ public class MainController {
         mainScene.setOnMouseClicked(this::mouseAction);
         mainScene.setOnKeyPressed(this::arrowCreation);
     }
+
 
     // Objects creation
 
@@ -89,6 +117,11 @@ public class MainController {
 
 
     // Buttons actions
+
+    public void changeSize() {
+        System.out.println((int) Math.round(slider.getValue()));
+        board.updateBoardSize((int) Math.round(slider.getValue()));
+    }
 
     public void drawNodeOn() {
         btnBeh.toggleButtonState(ButtonState.NODE);
@@ -125,6 +158,13 @@ public class MainController {
         board.testBoard();
     }
 
+    // slider actions
+
+    public void sliderAction() {
+//        board.changeSpeed(slider.getValue());
+        sliderInput.setText(String.valueOf((int) slider.getValue()));
+    }
+
     // menu action
     public void closeApp() {
         stage.close();
@@ -138,7 +178,7 @@ public class MainController {
         board.loadStateFromFile();
     }
 
-    public void about(){
+    public void about() {
         helpUser.showAbout(stage);
     }
 
@@ -165,11 +205,10 @@ public class MainController {
 
     public void arrowCreation(KeyEvent event) {
         // shift
-        if (event.getCode() == KeyCode.SHIFT){
+        if (event.getCode() == KeyCode.SHIFT) {
             btnBeh.toggleButtonState(ButtonState.ARROW);
         }
     }
-
 
 
 }

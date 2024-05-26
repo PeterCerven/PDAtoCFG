@@ -36,7 +36,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import static com.example.bakalar.logic.MainController.NODE_RADIUS;
 import static com.example.bakalar.logic.utility.ErrorPopUp.showErrorDialog;
 import static com.example.bakalar.logic.utility.StageUtils.setStageIcon;
 
@@ -50,6 +49,7 @@ public class Board implements Serializable {
     public static final String STARTING_Z = "Z";
     public static final String STARTING_S = "S";
     private static final double DRAG_THRESHOLD = 20;
+    public static int NODE_RADIUS = 40;
     private List<MyNode> nodes;
     private List<Arrow> arrows;
     private MyNode startNode;
@@ -69,10 +69,12 @@ public class Board implements Serializable {
     private ConversionLogic conversionLogic;
     private boolean wasButtonPressed;
     private boolean canClick;
+    private Slider slider;
+    private TextField sliderInput;
 
 
     public Board(AnchorPane mainPane, DescribePDA describePDA, HistoryLogic historyLogic,
-                 Stage stage, ButtonBehaviour btnBeh) {
+                 Stage stage, ButtonBehaviour btnBeh, Slider slider, TextField sliderInput) {
         this.nodes = new ArrayList<>();
         this.describePDA = describePDA;
         this.arrows = new ArrayList<>();
@@ -91,12 +93,15 @@ public class Board implements Serializable {
         this.btnBeh = btnBeh;
         this.conversionLogic = new ConversionLogic();
         this.canClick = true;
+        this.slider = slider;
+        this.sliderInput = sliderInput;
     }
 
     // file operations
 
     public void saveCurrentStateToFile() {
-        fileLogic.saveToJson(nodes, arrows, nodeCounter, idCounter, stage);
+        AppState appState = createAppState();
+        fileLogic.saveToJson(appState, stage);
     }
 
     public void loadStateFromFile() {
@@ -515,6 +520,51 @@ public class Board implements Serializable {
 
     // history
 
+    public AppState createAppState() {
+        AppState appState = new AppState();
+        List<NodeModel> myNodeModels = nodes.stream().map(node -> {
+            NodeModel myNodeModel = new NodeModel();
+            myNodeModel.setNodeId(node.getID());
+            myNodeModel.setX(node.getAbsoluteCentrePosX());
+            myNodeModel.setY(node.getAbsoluteCentrePosY());
+            myNodeModel.setName(node.getName());
+            myNodeModel.setStarting(node.isStarting());
+            myNodeModel.setEnding(node.isEnding());
+            return myNodeModel;
+        }).toList();
+
+        List<ArrowModel> arrowModels = new ArrayList<>();
+        for (Arrow arrow : arrows) {
+            for (TransitionInputs inputs : arrow.getTransitions()) {
+                ArrowModel arrowModel = new ArrowModel();
+                arrowModel.setArrowId(arrow.getID());
+                arrowModel.setFromNodeId(arrow.getFrom().getID());
+                arrowModel.setToNodeId(arrow.getTo().getID());
+                arrowModel.setTransition(inputs);
+                arrowModels.add(arrowModel);
+                if (arrow instanceof LineArrow lineArrow) {
+                    arrowModel.setLineArrow(true);
+                    arrowModel.setControlPointChangeX(lineArrow.getControlPointChangeX());
+                    arrowModel.setControlPointChangeY(lineArrow.getControlPointChangeY());
+                }
+            }
+        }
+
+        appState.setNodeModels(myNodeModels);
+        appState.setArrowModels(arrowModels);
+        appState.setNodeCounter(nodeCounter);
+        appState.setIdCounter(idCounter);
+        appState.setNodeRadius(NODE_RADIUS);
+        return appState;
+    }
+
+
+    public void updateBoardSize(Integer value) {
+        NODE_RADIUS = value;
+        AppState appState = createAppState();
+        createBoardFromAppState(appState);
+    }
+
     public void saveCurrentStateToHistory() {
         historyLogic.saveCurrentState(nodeCounter, arrows, nodes);
     }
@@ -532,11 +582,11 @@ public class Board implements Serializable {
     public void createBoardFromAppState(AppState appState) {
         try {
             clearBoard(false);
-            for (NodeModel myNodeModel : appState.getNodes()) {
+            for (NodeModel myNodeModel : appState.getNodeModels()) {
                 createMyNodeFromHistory(myNodeModel.getName(), myNodeModel.getX(), myNodeModel.getY(), myNodeModel.getNodeId(),
                         myNodeModel.isStarting(), myNodeModel.isEnding());
             }
-            for (ArrowModel arrowModel : appState.getArrows()) {
+            for (ArrowModel arrowModel : appState.getArrowModels()) {
                 MyNode from = findNodeById(arrowModel.getFromNodeId());
                 MyNode to = findNodeById(arrowModel.getToNodeId());
                 if (arrowModel.isLineArrow()) {
@@ -546,6 +596,9 @@ public class Board implements Serializable {
                 }
             }
             this.nodeCounter = appState.getNodeCounter();
+            NODE_RADIUS = appState.getNodeRadius();
+            sliderInput.setText(NODE_RADIUS + "");
+            slider.setValue(NODE_RADIUS);
         } catch (MyCustomException e) {
             showErrorDialog(e.getMessage());
         }
@@ -612,4 +665,5 @@ public class Board implements Serializable {
             showErrorDialog(e.getMessage());
         }
     }
+
 }

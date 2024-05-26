@@ -6,6 +6,7 @@ import com.example.bakalar.logic.Board;
 import com.example.bakalar.logic.utility.ButtonState;
 import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
+import javafx.scene.Cursor;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
@@ -22,7 +23,7 @@ import lombok.Setter;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.example.bakalar.logic.MainController.NODE_RADIUS;
+import static com.example.bakalar.logic.Board.NODE_RADIUS;
 
 @Getter
 @Setter
@@ -77,12 +78,18 @@ public abstract class Arrow extends MyObject {
         HBox container = new HBox(NODE_RADIUS / 5.0);
         container.setAlignment(Pos.BOTTOM_CENTER);
         Text readSymbol = new Text(transitionInputs.getRead());
-        readSymbol.setFont(new Font(15));
+        readSymbol.setFont(new Font("Arial",15));
         Text popSymbol = new Text(transitionInputs.getPop());
-        popSymbol.setFont(new Font(15));
+        popSymbol.setFont(new Font("Arial", 15));
         Text pushSymbol = new Text(transitionInputs.getPush());
-        pushSymbol.setFont(new Font(15));
+        pushSymbol.setFont(new Font("Arial",15));
         container.getChildren().addAll(readSymbol, popSymbol, pushSymbol);
+        container.setOnMouseEntered(e -> {
+            if (board.getBtnBeh().getCurrentState().equals(ButtonState.ERASE)) {
+                container.setCursor(Cursor.HAND);
+            }
+        });
+        container.setOnMouseExited(e -> container.setCursor(Cursor.DEFAULT));
         container.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
             if (event.getButton() == MouseButton.SECONDARY) {
                 TransitionInputs newTransitionInputs = board.createArrowTransition(transitionInputs.getRead(), transitionInputs.getPop(), transitionInputs.getPush());

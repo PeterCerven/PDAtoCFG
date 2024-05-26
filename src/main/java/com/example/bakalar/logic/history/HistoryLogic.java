@@ -39,8 +39,8 @@ public class HistoryLogic {
         appState.setNodeCounter(nodeCounter);
         List<ArrowModel> arrowHistories = createArrowHistory(arrows);
         List<NodeModel> nodeHistories = createNodeHistory(nodes);
-        appState.setNodes(nodeHistories);
-        appState.setArrows(arrowHistories);
+        appState.setNodeModels(nodeHistories);
+        appState.setArrowModels(arrowHistories);
         return appState;
     }
 
