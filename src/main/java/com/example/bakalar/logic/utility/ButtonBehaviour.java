@@ -14,7 +14,7 @@ import java.util.Objects;
 public class ButtonBehaviour {
     private static final String ARROW_ICON_PATH = "/icons/Arrow.png";
     private static final String ERASER_ICON_PATH = "/icons/Eraser.png";
-    private static final String NODE_ICON_PATH = "/icons/Node.png";
+    public static final String NODE_ICON_PATH = "/icons/Node.png";
     private static final String ERASE_ALL_ICON_PATH = "/icons/EraseAll.png";
     private static final String UNDO_ICON_PATH = "/icons/Undo.png";
     private static final String REDO_ICON_PATH = "/icons/Redo.png";

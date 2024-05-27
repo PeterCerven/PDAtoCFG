@@ -5,7 +5,10 @@ import com.example.bakalar.logic.history.HistoryLogic;
 import com.example.bakalar.logic.utility.*;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Slider;
+import javafx.scene.control.TextField;
+import javafx.scene.control.TextFormatter;
 import javafx.scene.input.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
@@ -17,6 +20,8 @@ import java.util.List;
 
 
 public class MainController {
+    private static final KeyCombination CTRL_Z = new KeyCodeCombination(KeyCode.Z, KeyCombination.CONTROL_DOWN);
+    private static final KeyCombination CTRL_SHIFT_Z = new KeyCodeCombination(KeyCode.Z, KeyCombination.CONTROL_DOWN, KeyCombination.SHIFT_DOWN);
     @FXML
     private AnchorPane mainPane;
     @FXML
@@ -68,6 +73,10 @@ public class MainController {
         helpUser = new HelpUser();
 
         mainPane.setOnMouseClicked(this::createNode);
+        stage.setOnCloseRequest(event -> {
+            event.consume();
+            board.showExitConfirmation(stage);
+        });
     }
 
     private void setSlider() {
@@ -98,7 +107,7 @@ public class MainController {
     }
 
     public void setMainScene(Scene mainScene) {
-        mainScene.setOnKeyPressed(this::arrowCreation);
+        mainScene.setOnKeyPressed(this::keyPress);
         mainScene.setOnMouseClicked(this::mouseAction);
         mainPane.setOnMouseClicked(this::createNode);
     }
@@ -149,7 +158,7 @@ public class MainController {
 
     // menu action
     public void closeApp() {
-        stage.close();
+        board.showExitConfirmation(stage);
     }
 
     public void saveToFile() {
@@ -180,13 +189,17 @@ public class MainController {
         }
     }
 
-    public void arrowCreation(KeyEvent event) {
-        // shift
-        if (event.getCode() == KeyCode.SHIFT) {
-            btnBeh.toggleButtonState(ButtonState.ARROW);
-        }
-        if (event.getCode() == KeyCode.ESCAPE) {
-            btnBeh.resetToSelect();
+    public void keyPress(KeyEvent event) {
+        if (CTRL_Z.match(event)) {
+            board.undo();
+        } else if (CTRL_SHIFT_Z.match(event)) {
+            board.redo();
+        } else if (event.getCode() == KeyCode.ESCAPE) {
+            if (btnBeh.getCurrentState() == ButtonState.SELECT) {
+                board.showExitConfirmation(stage);
+            } else {
+                btnBeh.resetToSelect();
+            }
         }
     }
 

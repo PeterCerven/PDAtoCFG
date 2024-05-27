@@ -23,6 +23,7 @@ import javafx.geometry.Insets;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
@@ -37,6 +38,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import static com.example.bakalar.logic.utility.ButtonBehaviour.NODE_ICON_PATH;
 import static com.example.bakalar.logic.utility.ErrorPopUp.showErrorDialog;
 import static com.example.bakalar.logic.utility.StageUtils.setStageIcon;
 
@@ -183,10 +185,9 @@ public class Board implements Serializable {
         updateAllDescribePDA();
     }
 
-    public MyNode createMyNode(double x, double y) {
+    public void createMyNode(double x, double y) {
         MyNode myNode = new MyNode(x, y, NODE_RADIUS, idCounter);
         addNodeToBoard(myNode);
-        return myNode;
     }
 
     private void createArrow(MyNode node) {
@@ -647,23 +648,35 @@ public class Board implements Serializable {
     }
 
 
-    // testing
+    // exit
 
-//    public void testBoard() {
-//        saveCurrentStateToHistory();
-//        clearBoard(true);
-//        MyNode firstNode = createMyNode(120, 150);
-//        setStarting(firstNode, true);
-//        MyNode secondNode = createMyNode(320, 150);
-//        setEnding(firstNode, true);
-//
-//        createMyArrow(firstNode.getID(), firstNode.getID(), new TransitionInputs("1", "Z", "XZ"));
-//        createMyArrow(firstNode.getID(), firstNode.getID(), new TransitionInputs("1", "X", "XX"));
-//        createMyArrow(firstNode.getID(), firstNode.getID(), new TransitionInputs(EPSILON, "X", EPSILON));
-//        createMyArrow(firstNode.getID(), secondNode.getID(), new TransitionInputs("0", "X", "X"));
-//        createMyArrow(secondNode.getID(), secondNode.getID(), new TransitionInputs("1", "X", EPSILON));
-//        createMyArrow(secondNode.getID(), firstNode.getID(), new TransitionInputs("0", "Z", "Z"));
-//    }
+    public void showExitConfirmation(Stage stage) {
+        ButtonType buttonTypeOk = new ButtonType("Áno");
+        ButtonType buttonTypeCancel = new ButtonType("Zrušiť");
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION, null, buttonTypeOk, buttonTypeCancel);
+
+        alert.setTitle("Potvrdenie");
+        alert.setHeaderText("Naozaj chcete ukončiť aplikáciu?");
+
+        Stage alertStage = (Stage) alert.getDialogPane().getScene().getWindow();
+        alertStage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream(NODE_ICON_PATH))));
+
+        alert.getDialogPane().sceneProperty().addListener((obs, oldScene, newScene) -> {
+            if (newScene != null) {
+                newScene.windowProperty().addListener((observable, oldWindow, newWindow) -> {
+                    if (newWindow != null) {
+                        newWindow.setOnShown(windowEvent -> alert.getDialogPane().lookupButton(buttonTypeOk).requestFocus());
+                    }
+                });
+            }
+        });
+
+        alert.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.OK) {
+                stage.close();
+            }
+        });
+    }
 
     // conversion
 
