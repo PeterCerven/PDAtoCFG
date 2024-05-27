@@ -5,10 +5,7 @@ import com.example.bakalar.logic.history.HistoryLogic;
 import com.example.bakalar.logic.utility.*;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Slider;
-import javafx.scene.control.TextField;
-import javafx.scene.control.TextFormatter;
+import javafx.scene.control.*;
 import javafx.scene.input.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
@@ -55,6 +52,8 @@ public class MainController {
     private Stage stage;
     private ButtonBehaviour btnBeh;
     private HelpUser helpUser;
+    @FXML
+    private MenuItem gifControls;
 
     @FXML
     private void initialize() {
@@ -69,6 +68,7 @@ public class MainController {
         setSlider();
         board = new Board(mainPane, describePDA, historyLogic, stage, btnBeh, slider, sliderInput);
         helpUser = new HelpUser();
+        helpUser.preLoadImages(gifControls);
 
         mainPane.setOnMouseClicked(this::createNode);
     }
