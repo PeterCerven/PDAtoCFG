@@ -16,15 +16,18 @@ import static com.example.bakalar.logic.Board.NODE_RADIUS;
 @Getter
 public class SelfLoopArrow extends Arrow {
 
-    public static double ARC_WIDTH = NODE_RADIUS / 2.0;
-    public static double ARC_HEIGHT = (NODE_RADIUS / 2.0) * 3;
-    public static double ARC_START_ANGLE = 20;
-    public static int ARC_LENGTH = 140;
+    public double arcWidth;
+    public double arcHeight;
+    public double ARC_START_ANGLE = 20;
+    public static int ARC_LENGTH = 150;
     private Arc arc;
 
 
     public SelfLoopArrow(MyNode from, MyNode to, Board board, List<TransitionInputs> transitionInputs, Long arrowId) {
         super(from, to, board, transitionInputs, arrowId);
+
+        this.arcWidth = NODE_RADIUS / 2.0;
+        this.arcHeight = (NODE_RADIUS / 2.0) * 3;
 
         createArc();
         this.getChildren().add(arc);
@@ -47,8 +50,8 @@ public class SelfLoopArrow extends Arrow {
     public void updateObjects(boolean toEdge) {
         arc.setCenterX(from.getAbsoluteCentrePosX());
         arc.setCenterY(from.getAbsoluteCentrePosY());
-        arc.setRadiusX(from.getCircle().getRadius() - ARC_WIDTH);
-        arc.setRadiusY(from.getCircle().getRadius() + ARC_HEIGHT);
+        arc.setRadiusX(from.getCircle().getRadius() - arcWidth);
+        arc.setRadiusY(from.getCircle().getRadius() + arcHeight);
 
         updateArrowHead();
         this.symbolContainers = updateStackPanePosition(this.symbolContainers);
@@ -57,10 +60,10 @@ public class SelfLoopArrow extends Arrow {
     @Override
     public VBox updateStackPanePosition(VBox symbolContainers) {
         double midX = from.getAbsoluteCentrePosX();
-        double midY = from.getAbsoluteCentrePosY() - (from.getCircle().getRadius() + ARC_HEIGHT);
+        double midY = from.getAbsoluteCentrePosY() - (from.getCircle().getRadius() + arcHeight);
 
         double offsetX = -symbolContainers.getWidth() / 2.0;
-        double offsetY = -(symbolContainers.getChildren().size() * 20);
+        double offsetY = -(symbolContainers.getChildren().size() * (NODE_RADIUS / 1.8)) - (NODE_RADIUS / 8.0);
 
         symbolContainers.setLayoutX(midX + offsetX);
         symbolContainers.setLayoutY(midY + offsetY);
@@ -74,7 +77,7 @@ public class SelfLoopArrow extends Arrow {
         double startX = arc.getCenterX() + arc.getRadiusX() * Math.cos(startAngleRadians);
         double startY = arc.getCenterY() + arc.getRadiusY() * Math.sin(startAngleRadians);
 
-        double arrowHeadLength = 4;
+        double arrowHeadLength = NODE_RADIUS / 5.0;
         double arrowHeadAngle = Math.toRadians(30);
 
         double angleToNode = Math.atan2(from.getAbsoluteCentrePosY() - startY, from.getAbsoluteCentrePosX() - startX);
