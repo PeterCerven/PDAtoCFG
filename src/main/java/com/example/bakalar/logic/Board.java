@@ -395,8 +395,12 @@ public class Board implements Serializable {
                     startY = event.getSceneY() - arrow.getControlIndicator().getTranslateY();
                 }
             }
+        });
+
+        arrow.setOnMouseClicked(event -> {
             if (event.getButton() == MouseButton.SECONDARY) {
                 arrow.resetControlPoint();
+                event.consume();
             }
         });
 
@@ -645,21 +649,21 @@ public class Board implements Serializable {
 
     // testing
 
-    public void testBoard() {
-        saveCurrentStateToHistory();
-        clearBoard(true);
-        MyNode firstNode = createMyNode(120, 150);
-        setStarting(firstNode, true);
-        MyNode secondNode = createMyNode(320, 150);
-        setEnding(firstNode, true);
-
-        createMyArrow(firstNode.getID(), firstNode.getID(), new TransitionInputs("1", "Z", "XZ"));
-        createMyArrow(firstNode.getID(), firstNode.getID(), new TransitionInputs("1", "X", "XX"));
-        createMyArrow(firstNode.getID(), firstNode.getID(), new TransitionInputs(EPSILON, "X", EPSILON));
-        createMyArrow(firstNode.getID(), secondNode.getID(), new TransitionInputs("0", "X", "X"));
-        createMyArrow(secondNode.getID(), secondNode.getID(), new TransitionInputs("1", "X", EPSILON));
-        createMyArrow(secondNode.getID(), firstNode.getID(), new TransitionInputs("0", "Z", "Z"));
-    }
+//    public void testBoard() {
+//        saveCurrentStateToHistory();
+//        clearBoard(true);
+//        MyNode firstNode = createMyNode(120, 150);
+//        setStarting(firstNode, true);
+//        MyNode secondNode = createMyNode(320, 150);
+//        setEnding(firstNode, true);
+//
+//        createMyArrow(firstNode.getID(), firstNode.getID(), new TransitionInputs("1", "Z", "XZ"));
+//        createMyArrow(firstNode.getID(), firstNode.getID(), new TransitionInputs("1", "X", "XX"));
+//        createMyArrow(firstNode.getID(), firstNode.getID(), new TransitionInputs(EPSILON, "X", EPSILON));
+//        createMyArrow(firstNode.getID(), secondNode.getID(), new TransitionInputs("0", "X", "X"));
+//        createMyArrow(secondNode.getID(), secondNode.getID(), new TransitionInputs("1", "X", EPSILON));
+//        createMyArrow(secondNode.getID(), firstNode.getID(), new TransitionInputs("0", "Z", "Z"));
+//    }
 
     // conversion
 

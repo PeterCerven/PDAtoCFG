@@ -98,9 +98,8 @@ public class MainController {
     }
 
     public void setMainScene(Scene mainScene) {
-        mainScene.setOnKeyPressed(this::keyAction);
         mainScene.setOnKeyPressed(this::arrowCreation);
-        mainPane.setOnMouseClicked(this::mouseAction);
+        mainScene.setOnMouseClicked(this::mouseAction);
         mainPane.setOnMouseClicked(this::createNode);
     }
 
@@ -174,11 +173,6 @@ public class MainController {
     }
 
     // key actions
-    public void keyAction(KeyEvent event) {
-        if (event.getCode() == KeyCode.ESCAPE) {
-            btnBeh.resetToSelect();
-        }
-    }
 
     public void mouseAction(MouseEvent event) {
         if (event.getButton() == MouseButton.SECONDARY) {
@@ -190,6 +184,9 @@ public class MainController {
         // shift
         if (event.getCode() == KeyCode.SHIFT) {
             btnBeh.toggleButtonState(ButtonState.ARROW);
+        }
+        if (event.getCode() == KeyCode.ESCAPE) {
+            btnBeh.resetToSelect();
         }
     }
 

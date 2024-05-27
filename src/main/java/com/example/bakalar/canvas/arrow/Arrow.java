@@ -104,6 +104,7 @@ public abstract class Arrow extends MyObject {
                     pushSymbol.setText(newTransitionInputs.getPush());
                     this.board.updateAllDescribePDA();
                 }
+                event.consume();
             }
             if (event.getButton() == MouseButton.PRIMARY && board.getBtnBeh().getCurrentState().equals(ButtonState.ERASE)) {
                 board.saveCurrentStateToHistory();
