@@ -13,7 +13,6 @@ import javafx.scene.input.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import lombok.Setter;
 
 import java.io.FileNotFoundException;
 import java.util.List;
@@ -53,7 +52,6 @@ public class MainController {
     @FXML
     private TextField sliderInput;
     private Board board;
-    @Setter
     private Stage stage;
     private ButtonBehaviour btnBeh;
     private HelpUser helpUser;
@@ -73,11 +71,8 @@ public class MainController {
         helpUser = new HelpUser();
 
         mainPane.setOnMouseClicked(this::createNode);
-        stage.setOnCloseRequest(event -> {
-            event.consume();
-            board.showExitConfirmation(stage);
-        });
     }
+
 
     private void setSlider() {
         TextFormatter<Integer> formatter = new TextFormatter<>(new SliderFilter());
@@ -103,6 +98,15 @@ public class MainController {
                 Integer value = (int) Math.round(slider.getValue());
                 sliderInput.setText(value + "");
             }
+        });
+    }
+
+
+    public void setStage(Stage stage) {
+        this.stage = stage;
+        stage.setOnCloseRequest(event -> {
+            event.consume();
+            board.showExitConfirmation(stage);
         });
     }
 

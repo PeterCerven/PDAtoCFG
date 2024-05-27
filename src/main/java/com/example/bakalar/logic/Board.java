@@ -651,25 +651,16 @@ public class Board implements Serializable {
     // exit
 
     public void showExitConfirmation(Stage stage) {
-        ButtonType buttonTypeOk = new ButtonType("Áno");
-        ButtonType buttonTypeCancel = new ButtonType("Zrušiť");
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION, null, buttonTypeOk, buttonTypeCancel);
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+
 
         alert.setTitle("Potvrdenie");
         alert.setHeaderText("Naozaj chcete ukončiť aplikáciu?");
+        alert.setContentText(null);
+
 
         Stage alertStage = (Stage) alert.getDialogPane().getScene().getWindow();
         alertStage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream(NODE_ICON_PATH))));
-
-        alert.getDialogPane().sceneProperty().addListener((obs, oldScene, newScene) -> {
-            if (newScene != null) {
-                newScene.windowProperty().addListener((observable, oldWindow, newWindow) -> {
-                    if (newWindow != null) {
-                        newWindow.setOnShown(windowEvent -> alert.getDialogPane().lookupButton(buttonTypeOk).requestFocus());
-                    }
-                });
-            }
-        });
 
         alert.showAndWait().ifPresent(response -> {
             if (response == ButtonType.OK) {
