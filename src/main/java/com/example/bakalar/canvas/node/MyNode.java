@@ -33,6 +33,7 @@ public class MyNode extends MyObject {
         super(ID);
         circle = createCircle(x, y, radius);
         nameText = createNameText();
+        this.setStyle("-fx-cursor: hand;");
 
         endNode = new EndNode(x, y, radius);
         endNode.setVisible(false);

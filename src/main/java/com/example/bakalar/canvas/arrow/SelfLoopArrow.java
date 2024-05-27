@@ -2,8 +2,6 @@ package com.example.bakalar.canvas.arrow;
 
 import com.example.bakalar.canvas.node.MyNode;
 import com.example.bakalar.logic.Board;
-import com.example.bakalar.logic.utility.ButtonState;
-import javafx.scene.Cursor;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Arc;
@@ -42,12 +40,7 @@ public class SelfLoopArrow extends Arrow {
         arc.setLength(ARC_LENGTH);
         arc.setStartAngle(ARC_START_ANGLE);
         arc.setStrokeWidth(NODE_RADIUS / 13.0);
-        arc.setOnMouseEntered(e -> {
-            if (board.getBtnBeh().getCurrentState() == ButtonState.ERASE) {
-                arc.setCursor(Cursor.HAND);
-            }
-        });
-        arc.setOnMouseExited(e -> arc.setCursor(Cursor.DEFAULT));
+        arc.setStyle("-fx-cursor: hand;");
     }
 
     @Override

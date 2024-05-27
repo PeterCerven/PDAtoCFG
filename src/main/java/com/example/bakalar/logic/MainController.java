@@ -66,6 +66,8 @@ public class MainController {
         setSlider();
         board = new Board(mainPane, describePDA, historyLogic, stage, btnBeh, slider, sliderInput);
         helpUser = new HelpUser();
+
+        mainPane.setOnMouseClicked(this::createNode);
     }
 
     private void setSlider() {
@@ -97,18 +99,16 @@ public class MainController {
 
     public void setMainScene(Scene mainScene) {
         mainScene.setOnKeyPressed(this::keyAction);
-        mainScene.setOnMouseClicked(this::mouseAction);
         mainScene.setOnKeyPressed(this::arrowCreation);
+        mainPane.setOnMouseClicked(this::mouseAction);
+        mainPane.setOnMouseClicked(this::createNode);
     }
 
 
     // Objects creation
 
     public void createNode(MouseEvent event) {
-        if (btnBeh.getCurrentState().equals(ButtonState.NODE) && event.getButton() == MouseButton.PRIMARY) {
-            board.saveCurrentStateToHistory();
-            board.createMyNode(event.getX(), event.getY());
-        }
+        board.createNode(event);
     }
 
 

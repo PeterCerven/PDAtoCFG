@@ -88,7 +88,6 @@ public abstract class Arrow extends MyObject {
                 container.setCursor(Cursor.HAND);
             }
         });
-        container.setOnMouseExited(e -> container.setCursor(Cursor.DEFAULT));
         container.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
             if (event.getButton() == MouseButton.SECONDARY) {
                 TransitionInputs newTransitionInputs = board.createArrowTransition(transitionInputs.getRead(), transitionInputs.getPop(), transitionInputs.getPush());

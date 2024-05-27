@@ -24,6 +24,7 @@ import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
@@ -71,6 +72,7 @@ public class Board implements Serializable {
     private boolean canClick;
     private Slider slider;
     private TextField sliderInput;
+    private boolean preventNodeCreation;
 
 
     public Board(AnchorPane mainPane, DescribePDA describePDA, HistoryLogic historyLogic,
@@ -222,7 +224,6 @@ public class Board implements Serializable {
 
     private void addNodeToBoard(MyNode myNode) {
         this.makeDraggable(myNode);
-        this.cursorChange(myNode);
         this.enableArrowCreation(myNode);
         this.addObject(myNode);
     }
@@ -382,7 +383,8 @@ public class Board implements Serializable {
 
     public void makeCurveDraggable(LineArrow arrow) {
         arrow.getControlIndicator().setOnMousePressed(event -> {
-            if (!btnBeh.getCurrentState().equals(ButtonState.SELECT) && !btnBeh.getCurrentState().equals(ButtonState.ERASE)) {
+            if (!btnBeh.getCurrentState().equals(ButtonState.SELECT) && !btnBeh.getCurrentState().equals(ButtonState.ERASE)
+                    && event.getButton() == MouseButton.PRIMARY) {
                 btnBeh.setPreviousState(btnBeh.getCurrentState());
                 btnBeh.resetToSelect();
                 wasButtonPressed = true;
@@ -391,9 +393,10 @@ public class Board implements Serializable {
                 if (event.getButton() == MouseButton.PRIMARY) {
                     startX = event.getSceneX() - arrow.getControlIndicator().getTranslateX();
                     startY = event.getSceneY() - arrow.getControlIndicator().getTranslateY();
-                } else if (event.getButton() == MouseButton.SECONDARY) {
-                    arrow.resetControlPoint();
                 }
+            }
+            if (event.getButton() == MouseButton.SECONDARY) {
+                arrow.resetControlPoint();
             }
         });
 
@@ -401,6 +404,7 @@ public class Board implements Serializable {
             if (btnBeh.getCurrentState().equals(ButtonState.SELECT)) {
                 if (!dragging) {
                     dragging = true;
+                    arrow.getControlIndicator().cursorProperty().setValue(Cursor.MOVE);
                     this.saveCurrentStateToHistory();
                 }
                 arrow.moveControlPoint(e.getSceneX() - startX, e.getSceneY() - startY);
@@ -409,6 +413,7 @@ public class Board implements Serializable {
 
         arrow.getControlIndicator().setOnMouseReleased(e -> {
             if (btnBeh.getCurrentState().equals(ButtonState.SELECT)) {
+                arrow.getControlIndicator().cursorProperty().setValue(Cursor.HAND);
                 dragging = false;
                 if (wasButtonPressed) {
                     btnBeh.toggleButtonState(btnBeh.getPreviousState());
@@ -418,6 +423,14 @@ public class Board implements Serializable {
         });
 
 
+    }
+
+    public void createNode(MouseEvent event) {
+        if (btnBeh.getCurrentState().equals(ButtonState.NODE) && event.getButton() == MouseButton.PRIMARY && !preventNodeCreation) {
+            saveCurrentStateToHistory();
+            createMyNode(event.getX(), event.getY());
+        }
+        preventNodeCreation = false;
     }
 
     public void makeDraggable(MyNode node) {
@@ -444,6 +457,7 @@ public class Board implements Serializable {
             if (btnBeh.getCurrentState().equals(ButtonState.SELECT)) {
                 if (!dragging) {
                     dragging = true;
+                    node.cursorProperty().setValue(Cursor.MOVE);
                     this.saveCurrentStateToHistory();
                 }
                 node.move(e.getSceneX() - startX, e.getSceneY() - startY);
@@ -453,8 +467,12 @@ public class Board implements Serializable {
 
         node.setOnMouseReleased(event -> {
             if (btnBeh.getCurrentState().equals(ButtonState.SELECT)) {
+                if (dragging) {
+                    preventNodeCreation = true;
+                }
                 node.updateArrows(true);
                 dragging = false;
+                node.cursorProperty().setValue(Cursor.HAND);
                 if (wasButtonPressed) {
                     btnBeh.toggleButtonState(btnBeh.getPreviousState());
                     wasButtonPressed = false;
@@ -502,18 +520,6 @@ public class Board implements Serializable {
             });
         }
 
-    }
-
-    public void cursorChange(MyNode myNode) {
-        myNode.setOnMouseEntered(e -> {
-            if (btnBeh.getCurrentState().equals(ButtonState.SELECT) ||
-                    btnBeh.getCurrentState().equals(ButtonState.ERASE) ||
-                    btnBeh.getCurrentState().equals(ButtonState.ARROW)) {
-                myNode.setCursor(Cursor.HAND);
-            }
-
-        });
-        myNode.setOnMouseExited(e -> myNode.setCursor(Cursor.DEFAULT));
     }
 
 

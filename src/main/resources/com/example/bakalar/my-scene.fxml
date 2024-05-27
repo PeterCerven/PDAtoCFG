@@ -75,7 +75,7 @@
   <center>
     <ScrollPane fx:id="myScrollPane" prefHeight="655.0" prefWidth="1021.0" BorderPane.alignment="CENTER">
       <content>
-        <AnchorPane fx:id="mainPane" minHeight="0.0" minWidth="0.0" onMouseClicked="#createNode" prefHeight="2000.0" prefWidth="3000.0" />
+        <AnchorPane fx:id="mainPane" minHeight="0.0" minWidth="0.0" prefHeight="2000.0" prefWidth="3000.0" />
       </content>
       <BorderPane.margin>
         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
