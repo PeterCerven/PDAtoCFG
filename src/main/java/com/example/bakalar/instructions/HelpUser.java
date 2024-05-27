@@ -8,6 +8,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
@@ -30,9 +31,9 @@ public class HelpUser {
     );
 
     private static final List<String> comments = List.of(
-            "Comment for NodesEdit",
-            "Comment for ArrowsEdit",
-            "Comment for EraserEdit"
+            "Vytváranie a presúvanie stavov. Zmena názvu stavu a jeho typu na koncový alebo začiatočný.",
+            "Vytváranie prechodov medzi stavmi. Zmena symbolov prechodu. Zmena trajektórie prechodu.",
+            "Mazanie prvkov z plochy. Mazanie stavov, prechodov aj prechodových symbolov."
     );
 
     private static final List<String> labels = List.of(
@@ -83,11 +84,13 @@ public class HelpUser {
         root.setStyle("-fx-alignment: center; -fx-padding: 10;");
         imageView = new ImageView();
         imageView.setPreserveRatio(true);
-        imageView.setFitWidth(800);
+        imageView.setFitWidth(1152);
         commentLabel = new Label();
         commentLabel.setWrapText(true);
         counterLabel = new Label();
         imageLabel = new Label();
+        imageLabel.setStyle("-fx-font-weight: bold;");
+        imageLabel.setFont(new Font(32));
         updateContent();
 
         HBox navigationBox = getNavigationBox();
@@ -100,11 +103,12 @@ public class HelpUser {
         root.setCenter(contentBox);
         root.setBottom(navigationBox);
 
-        Scene scene = new Scene(root, 900, 600);
+        Scene scene = new Scene(root, 1200, 800);
         String conversionStyle = Objects.requireNonNull(getClass().getResource("/css/conversion.css")).toExternalForm();
         String mainStyle = Objects.requireNonNull(getClass().getResource("/css/styles.css")).toExternalForm();
         scene.getStylesheets().addAll(conversionStyle, mainStyle);
         instructionStage.setScene(scene);
+        instructionStage.setResizable(false);
         setStageIcon(instructionStage);
         instructionStage.show();
     }
