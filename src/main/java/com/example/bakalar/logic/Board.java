@@ -592,6 +592,9 @@ public class Board implements Serializable {
     public void createBoardFromAppState(AppState appState) {
         try {
             clearBoard(false);
+            NODE_RADIUS = appState.getNodeRadius();
+            sliderInput.setText(NODE_RADIUS + "");
+            slider.setValue(NODE_RADIUS);
             for (NodeModel myNodeModel : appState.getNodeModels()) {
                 createMyNodeFromHistory(myNodeModel.getName(), myNodeModel.getX(), myNodeModel.getY(), myNodeModel.getNodeId(),
                         myNodeModel.isStarting(), myNodeModel.isEnding());
@@ -606,9 +609,6 @@ public class Board implements Serializable {
                 }
             }
             this.nodeCounter = appState.getNodeCounter();
-            NODE_RADIUS = appState.getNodeRadius();
-            sliderInput.setText(NODE_RADIUS + "");
-            slider.setValue(NODE_RADIUS);
         } catch (MyCustomException e) {
             showErrorDialog(e.getMessage());
         }
