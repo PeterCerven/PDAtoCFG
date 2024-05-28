@@ -100,7 +100,7 @@
           <Menu mnemonicParsing="false" style="-fx-font-size: 14px;" text="Pomoc">
             <items>
               <MenuItem mnemonicParsing="false" onAction="#about" text="O Aplikácii" />
-              <MenuItem mnemonicParsing="false" onAction="#controls" text="Ovládanie" />
+              <MenuItem fx:id="gifControls" mnemonicParsing="false" onAction="#controls" text="Ovládanie" />
             </items>
           </Menu>
         </menus>

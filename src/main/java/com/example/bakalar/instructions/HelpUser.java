@@ -9,6 +9,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
@@ -170,10 +171,13 @@ public class HelpUser {
         Dialog<String> dialog = new Dialog<>();
         dialog.initOwner(stage);
         dialog.setTitle("Informácie o aplikácii");
-        dialog.setHeaderText("Podrobnosti o aplikácii");
-        VBox content = new VBox(new Label("Toto je didaktická abeceda vytvorená ako praktická časť Bakalárskej práce. Téma: \n" +
-                "\"Konštrukcia bezkontextovej gramatiky ekvivalentnej so zásobníkovým automatom akceptujúcim prázdnym zásobníkom\"."),
-                new Label("Verzia: 1.0 2024"), new Label("Autor: Peter Červeň"));
+        dialog.setHeaderText(null);
+        Text text = new Text("Toto je didaktická abeceda vytvorená ako praktická časť Bakalárskej práce. Téma práce:" +
+                " Konštrukcia bezkontextovej gramatiky ekvivalentnej so zásobníkovým automatom akceptujúcim prázdnym zásobníkom\".");
+        text.setWrappingWidth(300);
+        text.setStyle("-fx-font-size: 14px;");
+        VBox content = new VBox(text, new Label("Verzia: 1.0 2024"), new Label("Autor: Peter Červeň"));
+
 
         content.setSpacing(5);
         dialog.getDialogPane().setContent(content);

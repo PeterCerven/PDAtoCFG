@@ -99,7 +99,7 @@ public class ConversionStage {
         scene.getStylesheets().add(styles);
         scene.getStylesheets().add(conversionStyle);
         stage.setScene(scene);
-        stage.setTitle("Detaily prechodových funkcií");
+        stage.setTitle("Krok za krokom konverzia PDA na CFG");
     }
 
     private Button buttonsSetUp(String nextArrowIconPath) {

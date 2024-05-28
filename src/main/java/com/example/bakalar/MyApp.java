@@ -26,7 +26,7 @@ public class MyApp extends Application {
 
 
         setStageIcon(stage);
-        stage.setTitle("Context Free Grammar");
+        stage.setTitle("Konverzia PDA na CFG");
         stage.setScene(scene);
         stage.setMinWidth(700);
         stage.setMinHeight(500);
