@@ -13,7 +13,6 @@ import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,12 +22,12 @@ import static com.example.bakalar.logic.utility.ErrorPopUp.showErrorDialog;
 import static com.example.bakalar.logic.utility.StageUtils.setStageIcon;
 
 public class HelpUser {
-    private static final String NEXT_ARROW_PATH = "src/main/resources/icons/right-arrow.png";
-    private static final String PREVIOUS_ARROW_PATH = "src/main/resources/icons/left-arrow.png";
+    private static final String NEXT_ARROW_PATH = "/icons/right-arrow.png";
+    private static final String PREVIOUS_ARROW_PATH = "/icons/left-arrow.png";
     private static final List<String> imagePaths = List.of(
-            "src/main/resources/gifs/NodesEdit.gif",
-            "src/main/resources/gifs/ArrowsEdit.gif",
-            "src/main/resources/gifs/EraserEdit.gif"
+            "/gifs/NodesEdit.gif",
+            "/gifs/ArrowsEdit.gif",
+            "/gifs/EraserEdit.gif"
     );
 
     private static final List<String> comments = List.of(
@@ -42,20 +41,20 @@ public class HelpUser {
             "Ovládanie prechodov medzi stavmi",
             "Mazanie prvkov z plochy"
     );
-
+    private final List<Image> preloadedImages = new ArrayList<>();
     private int currentIndex = 0;
     private ImageView imageView;
     private Label commentLabel;
     private Label counterLabel;
     private Label imageLabel;
-    private final List<Image> preloadedImages = new ArrayList<>();
 
     public void preLoadImages(MenuItem showTutorialButton) {
         Task<Void> preloadTask = new Task<>() {
             @Override
-            protected Void call() throws Exception {
+            protected Void call() {
                 for (String path : imagePaths) {
-                    preloadedImages.add(new Image(new FileInputStream(path)));
+                    Image image = new Image(Objects.requireNonNull(getClass().getResourceAsStream(path)));
+                    preloadedImages.add(image);
                 }
                 return null;
             }
@@ -67,7 +66,7 @@ public class HelpUser {
 
             @Override
             protected void failed() {
-                showErrorDialog("Nepodarilo sa načítať návod");
+                showErrorDialog("Načítanie návodu zlyhalo");
             }
         };
 
@@ -97,7 +96,6 @@ public class HelpUser {
         HBox navigationBox = getNavigationBox();
 
 
-
         VBox contentBox = new VBox(10, imageLabel, imageView, commentLabel);
         contentBox.setStyle("-fx-alignment: center; -fx-padding: 10;");
 
@@ -114,20 +112,11 @@ public class HelpUser {
         instructionStage.show();
     }
 
-    private HBox getNavigationBox() throws FileNotFoundException {
-        Button previousButton = new Button();
-        ImageView previousArrowView  = new ImageView(new Image(new FileInputStream(PREVIOUS_ARROW_PATH)));
-        previousArrowView.setFitWidth(30);
-        previousArrowView.setFitHeight(30);
-        previousButton.setGraphic(previousArrowView);
+    private HBox getNavigationBox() {
+        Button previousButton =  createArrowButton(PREVIOUS_ARROW_PATH);
         previousButton.setOnAction(e -> showPrevious());
 
-
-        Button nextButton = new Button();
-        ImageView nextArrowView = new ImageView(new Image(new FileInputStream(NEXT_ARROW_PATH)));
-        nextArrowView.setFitWidth(30);
-        nextArrowView.setFitHeight(30);
-        nextButton.setGraphic(nextArrowView);
+        Button nextButton = createArrowButton(NEXT_ARROW_PATH);
         nextButton.setOnAction(e -> showNext());
 
         HBox navigationBox = new HBox(10, previousButton, nextButton, counterLabel);
@@ -135,7 +124,17 @@ public class HelpUser {
         return navigationBox;
     }
 
-    private void updateContent() throws FileNotFoundException {
+    private Button createArrowButton(String arrowPath) {
+        Button button = new Button();
+        Image previousArrowImage = new Image(Objects.requireNonNull(getClass().getResourceAsStream(arrowPath)));
+        ImageView previousArrowView = new ImageView(previousArrowImage);
+        previousArrowView.setFitWidth(30);
+        previousArrowView.setFitHeight(30);
+        button.setGraphic(previousArrowView);
+        return button;
+    }
+
+    private void updateContent() {
         if (currentIndex >= 0 && currentIndex < imagePaths.size()) {
             Image image = preloadedImages.get(currentIndex);
             imageView.setImage(image);
@@ -148,22 +147,14 @@ public class HelpUser {
     private void showPrevious() {
         if (currentIndex > 0) {
             currentIndex--;
-            try {
-                updateContent();
-            } catch (FileNotFoundException e) {
-                showErrorDialog("Nepodarilo sa načítať návod");
-            }
+            updateContent();
         }
     }
 
     private void showNext() {
         if (currentIndex < imagePaths.size() - 1) {
             currentIndex++;
-            try {
-                updateContent();
-            } catch (FileNotFoundException e) {
-                showErrorDialog("Nepodarilo sa načítať návod");
-            }
+            updateContent();
         }
     }
 
