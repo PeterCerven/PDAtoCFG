@@ -8,16 +8,31 @@ PDAtoCFG je didaktická, desktopová aplikácia vytvorená ako súčasť bakalá
 - **Ukladanie súborov:** Používateľ si môže stav aplikácie alebo pravidlá gramatiky uložiť do súboru.
 
 ## Inštalácia
-Aplikáciu PDAtoCFG je možné nainštalovať pomocou priloženého inštalačného súboru `PDAtoCFG.exe` ak je na operačnom systéme windows alebo môže použiť "Jar file", ak má nainštalovanú niektorú verziu javy [java download](https://www.java.com/download/ie_manual.jsp).
-Link na stiahnutie aplikácie je k dispozícii tu [release](https://github.com/PeterCerven/PDAtoCFG/releases/tag/v1.0).
+Link na stiahnutie aplikácie je k dispozícii [tu](https://github.com/PeterCerven/PDAtoCFG/releases/tag/v1.0).
+Aplikáciu PDAtoCFG je možné nainštalovať pomocou priloženého inštalačného súboru `PDAtoCFG.exe` ak je na operačnom systéme windows alebo môže použiť "Jar file", ak má nainštalovanú verziu [javy 19 a vyššiu](https://www.oracle.com/java/technologies/downloads/). Tiež je potrebné mať naištalovanú rovankú verziu [JavaFX](https://openjfx.io/).
+Pre spustenie "Jar aplikácie" je nutné napísať príkaz v konzole:
 
-## Ako používať
+```bash
+java --module-path JAVAFX_PATH --add-modules javafx.controls,javafx.fxml -jar JAR_FILE_PATH 
+```
+
+## Používanie
 Aplikácie obsahuje v lište: __menu -> pomoc -> ovládanie__ používateľskú príručku. Používateľovi sa otvorí okno, kde bude demonštrované použitie a funkcie aplikácie. Aplikácia tiež disponuje niekoľkými klávesovými skratkami a funkciami po kliknutí myšou, ktoré uľahčujú použivanie aplikácie.
 - __pravé tlačidlo myši__ zruší výber módu tlačidla späť na mód "SELECT"
 - __ctrl + Z spraví__ operáciu "späť".
 - __ctrl + shift + Z__ operácia "vráť späť".
 - __esc__ zruší výber módu tlačidla späť na mód "SELECT" alebo ak už mód "SELECT" bol aktivny, inicializuje zatvorenie aplikácie.
 
+<div align="center">
+    <h3>Používanie módu stav</h3>
+    <img src="src/main/resources/gifs/NodesEdit.gif" width="700" alt="Nodes">
+    <br><br>
+    <h3>Používanie módu prechod</h3>
+    <img src="src/main/resources/gifs/ArrowsEdit.gif" width="700" alt="Arrows">
+    <br><br>
+    <h3>Používanie môdu mazanie</h3>
+    <img src="src/main/resources/gifs/EraserEdit.gif" width="700" alt="Eraser">
+</div>
 
 ## Kontakt
 Ak máte otázky alebo potrebujete pomoc, neváhajte ma kontaktovať na peter.cerven33@gmail.com.
