@@ -1,6 +1,5 @@
 package com.example.bakalar.instructions;
 
-import javafx.concurrent.Task;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -14,11 +13,9 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import static com.example.bakalar.logic.utility.ErrorPopUp.showErrorDialog;
 import static com.example.bakalar.logic.utility.StageUtils.setStageIcon;
 
 public class HelpUser {
@@ -41,39 +38,11 @@ public class HelpUser {
             "Ovládanie prechodov medzi stavmi",
             "Mazanie prvkov z plochy"
     );
-    private final List<Image> preloadedImages = new ArrayList<>();
     private int currentIndex = 0;
     private ImageView imageView;
     private Label commentLabel;
     private Label counterLabel;
     private Label imageLabel;
-
-    public void preLoadImages(MenuItem showTutorialButton) {
-        Task<Void> preloadTask = new Task<>() {
-            @Override
-            protected Void call() {
-                for (String path : imagePaths) {
-                    Image image = new Image(Objects.requireNonNull(getClass().getResourceAsStream(path)));
-                    preloadedImages.add(image);
-                }
-                return null;
-            }
-
-            @Override
-            protected void succeeded() {
-                showTutorialButton.setDisable(false);
-            }
-
-            @Override
-            protected void failed() {
-                showErrorDialog("Načítanie návodu zlyhalo");
-            }
-        };
-
-        Thread preloadThread = new Thread(preloadTask);
-        preloadThread.setDaemon(true);
-        preloadThread.start();
-    }
 
 
     public void tutorial() throws FileNotFoundException {
@@ -84,14 +53,14 @@ public class HelpUser {
         root.setStyle("-fx-alignment: center; -fx-padding: 10;");
         imageView = new ImageView();
         imageView.setPreserveRatio(true);
-        imageView.setFitWidth(1152);
+        imageView.setFitWidth(800);
         commentLabel = new Label();
         commentLabel.setWrapText(true);
         counterLabel = new Label();
         imageLabel = new Label();
         imageLabel.setStyle("-fx-font-weight: bold;");
         imageLabel.setFont(new Font(32));
-        updateContent();
+        updateContent(imagePaths.get(currentIndex));
 
         HBox navigationBox = getNavigationBox();
 
@@ -102,7 +71,7 @@ public class HelpUser {
         root.setCenter(contentBox);
         root.setBottom(navigationBox);
 
-        Scene scene = new Scene(root, 1200, 800);
+        Scene scene = new Scene(root, 900, 600);
         String conversionStyle = Objects.requireNonNull(getClass().getResource("/css/conversion.css")).toExternalForm();
         String mainStyle = Objects.requireNonNull(getClass().getResource("/css/styles.css")).toExternalForm();
         scene.getStylesheets().addAll(conversionStyle, mainStyle);
@@ -134,9 +103,9 @@ public class HelpUser {
         return button;
     }
 
-    private void updateContent() {
+    private void updateContent(String path) {
         if (currentIndex >= 0 && currentIndex < imagePaths.size()) {
-            Image image = preloadedImages.get(currentIndex);
+            Image image = new Image(Objects.requireNonNull(getClass().getResourceAsStream(path)));
             imageView.setImage(image);
             commentLabel.setText(comments.get(currentIndex));
             counterLabel.setText((currentIndex + 1) + " / " + imagePaths.size());
@@ -147,14 +116,14 @@ public class HelpUser {
     private void showPrevious() {
         if (currentIndex > 0) {
             currentIndex--;
-            updateContent();
+            updateContent(imagePaths.get(currentIndex));
         }
     }
 
     private void showNext() {
         if (currentIndex < imagePaths.size() - 1) {
             currentIndex++;
-            updateContent();
+            updateContent(imagePaths.get(currentIndex));
         }
     }
 

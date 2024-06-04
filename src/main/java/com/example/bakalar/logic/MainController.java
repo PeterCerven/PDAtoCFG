@@ -68,7 +68,6 @@ public class MainController {
         setSlider();
         board = new Board(mainPane, describePDA, historyLogic, stage, btnBeh, slider, sliderInput);
         helpUser = new HelpUser();
-        helpUser.preLoadImages(gifControls);
 
         mainPane.setOnMouseClicked(this::createNode);
     }
@@ -181,6 +180,7 @@ public class MainController {
         try {
             helpUser.tutorial();
         } catch (FileNotFoundException e) {
+            System.out.println(e.fillInStackTrace());
             ErrorPopUp.showErrorDialog("Nepodarilo sa načítať návod");
         }
     }

@@ -170,11 +170,6 @@
                 <Button fx:id="eraseBtn" mnemonicParsing="false" onAction="#eraseFunctionOn" prefHeight="40.0" prefWidth="60.0" />
                 <Button fx:id="undoBtn" mnemonicParsing="false" onAction="#buttonUndo" prefHeight="40.0" prefWidth="60.0" />
                 <Button fx:id="reUndoBtn" mnemonicParsing="false" onAction="#buttonRedo" prefHeight="40.0" prefWidth="60.0" />
-<!--                <Button fx:id="testBtn" mnemonicParsing="false" onAction="#testBoard" prefHeight="40.0" prefWidth="73.0" text="TEST">-->
-<!--                  <font>-->
-<!--                    <Font size="19.0" />-->
-<!--                  </font>-->
-<!--                </Button>-->
               </children>
             </HBox>
             <Button fx:id="conversionBtn" mnemonicParsing="false" onAction="#convertPDA" prefHeight="38.0" prefWidth="150.0" text="Konvertuj" GridPane.columnIndex="2">
