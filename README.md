@@ -4,7 +4,7 @@ PDAtoCFG je didaktická, desktopová aplikácia vytvorená ako súčasť bakalá
 
 ## Funkcie
 - **Interaktívny zásobníkový automat:** Aplikácia obsahuje používateľskú interakciu pri vytváraní automatu.
-- **Konverzia automatu na gramatiku:** Hlavnou náplňou aplikácie je náučne ukázať pouźívateľovi, ako taká konverzia prechádza pomocou niekoľkých krokov.
+- **Konverzia automatu na gramatiku:** Hlavnou náplňou aplikácie je náučne ukázať používateľovi, ako taká konverzia prechádza pomocou niekoľkých krokov.
 - **Ukladanie súborov:** Používateľ si môže stav aplikácie alebo pravidlá gramatiky uložiť do súboru.
 
 ## Inštalácia
