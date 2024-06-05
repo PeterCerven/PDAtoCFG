@@ -30,7 +30,7 @@ Aplikácie obsahuje v lište: __menu -> pomoc -> ovládanie__ používateľskú 
     <h3>Používanie módu prechod</h3>
     <img src="src/main/resources/gifs/ArrowsEdit.gif" width="700" alt="Arrows">
     <br><br>
-    <h3>Používanie môdu mazanie</h3>
+    <h3>Používanie módu mazanie</h3>
     <img src="src/main/resources/gifs/EraserEdit.gif" width="700" alt="Eraser">
 </div>
 
