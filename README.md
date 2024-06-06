@@ -9,12 +9,7 @@ PDAtoCFG je didaktická, desktopová aplikácia vytvorená ako súčasť bakalá
 
 ## Inštalácia
 Link na stiahnutie aplikácie je k dispozícii [tu](https://github.com/PeterCerven/PDAtoCFG/releases/tag/v1.0).
-Aplikáciu PDAtoCFG je možné nainštalovať pomocou priloženého inštalačného súboru `PDAtoCFG.exe` ak je na operačnom systéme windows alebo môže použiť "Jar file", ak má nainštalovanú verziu [javy 19 a vyššiu](https://www.oracle.com/java/technologies/downloads/). Tiež je potrebné mať naištalovanú rovankú verziu [JavaFX](https://openjfx.io/).
-Pre spustenie "Jar aplikácie" je nutné napísať príkaz v konzole:
-
-```bash
-java --module-path JAVAFX_PATH --add-modules javafx.controls,javafx.fxml -jar JAR_FILE_PATH 
-```
+Aplikáciu PDAtoCFG je možné nainštalovať pomocou priloženého inštalačného súboru `PDAtoCFG.exe` ak je používateľ na operačnom systéme windows alebo môže použiť súbor Jar, ak má nainštalovanú verziu [javy 19 a vyššiu](https://www.oracle.com/java/technologies/downloads/). Pre spustenie aplikácie dvojklik na ikonku aplikácie.
 
 ## Používanie
 Aplikácie obsahuje v lište: __menu -> pomoc -> ovládanie__ používateľskú príručku. Používateľovi sa otvorí okno, kde bude demonštrované použitie a funkcie aplikácie. Aplikácia tiež disponuje niekoľkými klávesovými skratkami a funkciami po kliknutí myšou, ktoré uľahčujú použivanie aplikácie.
