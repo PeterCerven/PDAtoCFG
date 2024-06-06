@@ -235,7 +235,8 @@ public class ConversionLogic {
 
     private List<CFGRule> terminalMove(Transition transition) {
         RuleStepLogic ruleStepLogic = new RuleStepLogic(transition);
-        SpecialNonTerminal leftSide = new SpecialNonTerminal(transition.getCurrentState(), transition.getSymbolToPop(), transition.getNextState());
+        SpecialNonTerminal leftSide = new SpecialNonTerminal(transition.getCurrentState(), transition.getSymbolToPop(),
+                transition.getNextState());
         MySymbol terminal = new MySymbol(transition.getInputSymbolToRead().getName());
         List<SpecialNonTerminal> rightSide = new ArrayList<>();
         ruleStepLogic.createTerminalSteps();
