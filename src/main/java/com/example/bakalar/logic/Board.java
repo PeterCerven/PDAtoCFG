@@ -326,16 +326,22 @@ public class Board implements Serializable {
 
         Platform.runLater(input1::requestFocus);
 
-        Optional<ButtonType> result = dialog.showAndWait();
+        while (true) {
+            Optional<ButtonType> result = dialog.showAndWait();
 
-        if (result.isPresent() && result.get() == ButtonType.OK) {
-            String newRead = input1.getText().isBlank() ? EPSILON : input1.getText().trim();
-            String newPop = input2.getText().isBlank() ? EPSILON : input2.getText().trim();
-            String newPush = input3.getText().isBlank() ? EPSILON : input3.getText().trim();
-
-            return new TransitionInputs(newRead, newPop, newPush);
+            if (result.isPresent() && result.get() == ButtonType.OK) {
+                String newRead = input1.getText().isBlank() ? EPSILON : input1.getText().trim();
+                String newPush = input3.getText().isBlank() ? EPSILON : input3.getText().trim();
+                String newPop = input2.getText();
+                if (newPop.isBlank()) {
+                    showErrorDialog("Políčko Pop nesmie byť prázdne");
+                } else {
+                    return new TransitionInputs(newRead, newPop, newPush);
+                }
+            } else {
+                return null;
+            }
         }
-        return null;
     }
 
     public void showDialog(MyNode node) {
