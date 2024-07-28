@@ -1,16 +1,16 @@
 package com.example.bakalar.logic.conversion.window;
 
 import com.example.bakalar.logic.conversion.CFGRule;
-import com.example.bakalar.logic.conversion.ConversionLogic;
 import com.example.bakalar.logic.utility.DescribeCFG;
 import com.example.bakalar.logic.utility.MySymbol;
 import com.example.bakalar.logic.utility.SpecialNonTerminal;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.*;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import lombok.Getter;
 
@@ -22,6 +22,7 @@ public class InformationWindow {
     private final DescribeCFG describeCFG;
     private final BorderPane informationPane;
     private final Button downloadBtn;
+    private final Button reduceBtn;
     public InformationWindow() {
         describeCFG = new DescribeCFG();
         VBox nonTerminals = describeCFG.getNonTerminals();
@@ -41,9 +42,15 @@ public class InformationWindow {
         downloadBtn.setAlignment(Pos.BOTTOM_RIGHT);
         downloadBtn.setFont(new Font(22));
 
+        reduceBtn = new Button("Zredukuj gramatiku");
+        reduceBtn.setAlignment(Pos.BOTTOM_LEFT);
+        reduceBtn.setFont(new Font(22));
+
+        Region spacer = new Region();
+
         HBox hBox = new HBox();
-        hBox.getChildren().add(downloadBtn);
-        hBox.setAlignment(Pos.BOTTOM_RIGHT);
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+        hBox.getChildren().addAll(reduceBtn, spacer, downloadBtn);
 
         ScrollPane ruleBoxScrollPane = new ScrollPane();
         ruleBoxScrollPane.setFitToWidth(true);
