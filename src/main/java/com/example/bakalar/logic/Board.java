@@ -156,12 +156,12 @@ public class Board implements Serializable {
         }
         List<TransitionInputs> transitions = List.of(transitionInputs);
         if (from == to) {
-            arrow = new SelfLoopArrow(from, to, this, transitions, this.idCounter);
+            arrow = new SelfLoopArrow(from, to, this, transitions);
         } else {
             if (oppositeExists(from, to)) {
-                arrow = new LineArrow(from, to, 30, this, transitions, this.idCounter);
+                arrow = new LineArrow(from, to, 30, this, transitions);
             } else {
-                arrow = new LineArrow(from, to, this, transitions, this.idCounter);
+                arrow = new LineArrow(from, to, this, transitions);
             }
         }
         addArrowToBoard(from, to, arrow);
@@ -569,8 +569,6 @@ public class Board implements Serializable {
 
         appState.setNodeModels(myNodeModels);
         appState.setArrowModels(arrowModels);
-        appState.setNodeCounter(nodeCounter);
-        appState.setIdCounter(idCounter);
         appState.setNodeRadius(NODE_RADIUS);
         return appState;
     }
@@ -583,16 +581,16 @@ public class Board implements Serializable {
     }
 
     public void saveCurrentStateToHistory() {
-        historyLogic.saveCurrentState(nodeCounter, arrows, nodes);
+        historyLogic.saveCurrentState(arrows, nodes);
     }
 
     public void redo() {
-        AppState appState = historyLogic.redo(nodeCounter, arrows, nodes);
+        AppState appState = historyLogic.redo(arrows, nodes);
         createBoardFromAppState(appState);
     }
 
     public void undo() {
-        AppState appState = historyLogic.undo(nodeCounter, arrows, nodes);
+        AppState appState = historyLogic.undo(arrows, nodes);
         createBoardFromAppState(appState);
     }
 
@@ -615,7 +613,6 @@ public class Board implements Serializable {
                     createSelfLoopArrowFromHistory(from, to, arrowModel.getTransition());
                 }
             }
-            this.nodeCounter = appState.getNodeCounter();
         } catch (MyCustomException e) {
             showErrorDialog(e.getMessage());
         }
@@ -623,13 +620,13 @@ public class Board implements Serializable {
 
     private void createSelfLoopArrowFromHistory(MyNode from, MyNode to, TransitionInputs transitionInputs) throws MyCustomException {
         if (checkArrowForDuplicate(from, to, transitionInputs)) return;
-        Arrow arrow = new SelfLoopArrow(from, to, this, List.of(transitionInputs), this.idCounter);
+        Arrow arrow = new SelfLoopArrow(from, to, this, List.of(transitionInputs));
         addArrowToBoard(from, to, arrow);
     }
 
     private void createLineArrowFromHistory(MyNode from, MyNode to, TransitionInputs transitionInputs, Double controlPointChangeX, Double controlPointChangeY) throws MyCustomException {
         if (checkArrowForDuplicate(from, to, transitionInputs)) return;
-        Arrow arrow = new LineArrow(from, to, controlPointChangeX, controlPointChangeY, this, List.of(transitionInputs), this.idCounter);
+        Arrow arrow = new LineArrow(from, to, controlPointChangeX, controlPointChangeY, this, List.of(transitionInputs));
         addArrowToBoard(from, to, arrow);
     }
 

@@ -28,8 +28,8 @@ public class LineArrow extends Arrow {
     private double endX;
     private double endY;
 
-    public LineArrow(MyNode from, MyNode to, Board board, List<TransitionInputs> transitionInputs, Long arrowId) {
-        super(from, to, board, transitionInputs, arrowId);
+    public LineArrow(MyNode from, MyNode to, Board board, List<TransitionInputs> transitionInputs) {
+        super(from, to, board, transitionInputs);
 
         this.line = createLine();
         resetLine();
@@ -42,16 +42,16 @@ public class LineArrow extends Arrow {
 
 
 
-    public LineArrow(MyNode from, MyNode to, double change, Board board, List<TransitionInputs> transitionInputs, Long arrowId) {
-        this(from, to, board, transitionInputs, arrowId);
+    public LineArrow(MyNode from, MyNode to, double change, Board board, List<TransitionInputs> transitionInputs) {
+        this(from, to, board, transitionInputs);
         Point2D thirdPoint = getThirdPoint(change);
         this.controlPointChangeX = thirdPoint.getX() - (startX + endX) / 2.0;
         this.controlPointChangeY = thirdPoint.getY() - (startY + endY) / 2.0;
         this.updateObjects(true);
     }
 
-    public LineArrow(MyNode from, MyNode to, double controlPointChangeX, double controlPointChangeY, Board board, List<TransitionInputs> transitionInputs, Long arrowId) {
-        this(from, to, board, transitionInputs, arrowId);
+    public LineArrow(MyNode from, MyNode to, double controlPointChangeX, double controlPointChangeY, Board board, List<TransitionInputs> transitionInputs) {
+        this(from, to, board, transitionInputs);
         this.controlPointChangeX = controlPointChangeX;
         this.controlPointChangeY = controlPointChangeY;
         this.updateObjects(true);

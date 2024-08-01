@@ -34,9 +34,8 @@ public class HistoryLogic {
         this.redoStack = new Stack<>();
     }
 
-    public AppState createHistory(int nodeCounter, List<Arrow> arrows, List<MyNode> nodes) {
+    public AppState createHistory(List<Arrow> arrows, List<MyNode> nodes) {
         AppState appState = new AppState();
-        appState.setNodeCounter(nodeCounter);
         List<ArrowModel> arrowHistories = createArrowHistory(arrows);
         List<NodeModel> nodeHistories = createNodeHistory(nodes);
         appState.setNodeModels(nodeHistories);
@@ -70,8 +69,8 @@ public class HistoryLogic {
 
     }
 
-    public void saveCurrentState(int nodeCounter, List<Arrow> arrows, List<MyNode> nodes) {
-        AppState myHistory = this.createHistory(nodeCounter, arrows, nodes);
+    public void saveCurrentState(List<Arrow> arrows, List<MyNode> nodes) {
+        AppState myHistory = this.createHistory(arrows, nodes);
         manageStack(undoStack);
         undoStack.push(myHistory);
         redoStack.clear();
@@ -79,18 +78,18 @@ public class HistoryLogic {
         this.redoButton.setDisable(this.redoStack.isEmpty());
     }
 
-    public AppState undo(int nodeCounter, List<Arrow> arrows, List<MyNode> nodes) {
-        return historyOperation(undoStack, redoStack, nodeCounter,  arrows, nodes);
+    public AppState undo(List<Arrow> arrows, List<MyNode> nodes) {
+        return historyOperation(undoStack, redoStack,  arrows, nodes);
     }
 
-    public AppState redo(int nodeCounter, List<Arrow> arrows, List<MyNode> nodes) {
-        return historyOperation(redoStack, undoStack, nodeCounter,  arrows, nodes);
+    public AppState redo(List<Arrow> arrows, List<MyNode> nodes) {
+        return historyOperation(redoStack, undoStack, arrows, nodes);
     }
 
-    private AppState historyOperation(Stack<AppState> redoStack, Stack<AppState> undoStack, int nodeCounter,
+    private AppState historyOperation(Stack<AppState> redoStack, Stack<AppState> undoStack,
                                       List<Arrow> arrows, List<MyNode> nodes) {
         if (!redoStack.isEmpty()) {
-            undoStack.push(this.createHistory(nodeCounter,  arrows, nodes));
+            undoStack.push(this.createHistory(arrows, nodes));
             manageStack(undoStack);
             AppState nextState = redoStack.pop();
             this.undoButton.setDisable(this.undoStack.isEmpty());

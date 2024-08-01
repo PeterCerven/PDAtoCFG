@@ -23,8 +23,8 @@ public class SelfLoopArrow extends Arrow {
     private Arc arc;
 
 
-    public SelfLoopArrow(MyNode from, MyNode to, Board board, List<TransitionInputs> transitionInputs, Long arrowId) {
-        super(from, to, board, transitionInputs, arrowId);
+    public SelfLoopArrow(MyNode from, MyNode to, Board board, List<TransitionInputs> transitionInputs) {
+        super(from, to, board, transitionInputs);
 
         this.arcWidth = NODE_RADIUS / 2.0;
         this.arcHeight = (NODE_RADIUS / 2.0) * 3;

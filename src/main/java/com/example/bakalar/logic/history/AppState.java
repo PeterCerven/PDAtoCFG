@@ -11,8 +11,6 @@ import java.util.List;
 public class AppState implements Serializable {
     private List<NodeModel> nodeModels;
     private List<ArrowModel> arrowModels;
-    private int nodeCounter;
-    private Long idCounter;
     private int nodeRadius;
 
     public AppState() {

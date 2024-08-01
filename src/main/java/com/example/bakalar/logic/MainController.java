@@ -18,6 +18,7 @@ import java.util.List;
 public class MainController {
     private static final KeyCombination CTRL_Z = new KeyCodeCombination(KeyCode.Z, KeyCombination.CONTROL_DOWN);
     private static final KeyCombination CTRL_SHIFT_Z = new KeyCodeCombination(KeyCode.Z, KeyCombination.CONTROL_DOWN, KeyCombination.SHIFT_DOWN);
+    public Button testBtn;
     @FXML
     private AnchorPane mainPane;
     @FXML
