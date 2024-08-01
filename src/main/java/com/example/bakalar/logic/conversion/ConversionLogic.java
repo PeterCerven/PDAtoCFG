@@ -8,7 +8,9 @@ import com.example.bakalar.logic.conversion.window.InformationWindow;
 import com.example.bakalar.logic.conversion.window.StepsWindow;
 import com.example.bakalar.logic.conversion.window.WindowType;
 import com.example.bakalar.logic.transitions.Transition;
+import com.example.bakalar.logic.utility.DescribeCFG;
 import com.example.bakalar.logic.utility.MySymbol;
+import com.example.bakalar.logic.utility.NonTerminal;
 import com.example.bakalar.logic.utility.SpecialNonTerminal;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -33,19 +35,25 @@ import static com.example.bakalar.logic.Board.*;
 import static com.example.bakalar.logic.utility.ErrorPopUp.showErrorDialog;
 
 public class ConversionLogic {
-    private List<MyNode> nodes;
     private final StepsWindow stepsWindow;
     private final InformationWindow informationWindow;
     private final ConversionStage conversionStage;
+    private final FileLogic fileLogic;
+    private final SimplifyLogic simplifyLogic;
+    private List<MyNode> nodes;
     private boolean showSteps = false;
     private List<RulesWindows> rulesWindows;
     private int currentIndex;
+    private DescribeCFG describeCFG;
 
 
-    public ConversionLogic() {
+    public ConversionLogic(FileLogic fileLogic) {
         this.conversionStage = new ConversionStage();
         this.stepsWindow = new StepsWindow();
         this.informationWindow = new InformationWindow();
+        this.fileLogic = fileLogic;
+        this.simplifyLogic = new SimplifyLogic();
+        this.describeCFG = informationWindow.getDescribeCFG();
     }
 
     public void convertPDA(List<Transition> transitions, List<MyNode> nodes, MyNode startNode) throws MyCustomException {
@@ -66,8 +74,8 @@ public class ConversionLogic {
         showTransitionStage();
     }
 
-    private Set<SpecialNonTerminal> getAllNonTerminals() {
-        Set<SpecialNonTerminal> nonTerminals = new HashSet<>();
+    private Set<NonTerminal> getAllNonTerminals() {
+        Set<NonTerminal> nonTerminals = new HashSet<>();
         for (RulesWindows ruleWindow : rulesWindows) {
             for (CFGRule rule : ruleWindow.getRules()) {
                 if (rule.getLeftSide() != null)
@@ -113,15 +121,18 @@ public class ConversionLogic {
         });
 
         Button downloadButton = informationWindow.getDownloadBtn();
+        Button reduceButton = informationWindow.getReduceBtn();
         Button prevButton = conversionStage.getPreviousButton();
         Button nextButton = conversionStage.getNextButton();
         Button showStepsButton = stepsWindow.getShowStepsButton();
 
-        FileLogic fileLogic = new FileLogic();
         downloadButton.setOnAction(e -> fileLogic.saveToTextFile(getAllRules(), conversionStage.getStage()));
+        reduceButton.setOnAction(e -> informationWindow.swapCFGtoReduceAndBack(getAllNonTerminals(), getAllTerminals(),
+                getAllRules(), STARTING_S, simplifyLogic));
         prevButton.setOnAction(e -> updateWindow(-1));
         nextButton.setOnAction(e -> updateWindow(1));
         showStepsButton.setOnAction(e -> steps());
+        describeCFG.updateAllDescribeCFG(getAllNonTerminals(), getAllTerminals(), getAllRules(), new MySymbol(STARTING_S));
         updateWindow(0);
         conversionStage.getStage().show();
     }
@@ -385,8 +396,7 @@ public class ConversionLogic {
                 labelText.setText("Bezkontextová gramatika");
                 conversionStage.getTransitionLabel().getChildren().add(labelText);
                 conversionStage.getHelpingLabelComment().setText("Pravidlá bezkontextovej gramatiky.");
-                conversionStage.getRootPane().setCenter(informationWindow.getInformationPane(this.getAllNonTerminals(),
-                        this.getAllTerminals(), this.getAllRules(), STARTING_S));
+                conversionStage.getRootPane().setCenter(informationWindow.getInformationPane());
                 return;
             }
             default -> {

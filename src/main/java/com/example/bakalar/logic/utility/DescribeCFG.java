@@ -25,7 +25,7 @@ public class DescribeCFG {
         this.startSymbol = new TextField();
         this.rulesContainer = new VBox();
     }
-    public void updateAllDescribeCFG(Set<SpecialNonTerminal> allNonTerminals, Set<MySymbol> allTerminals, List<CFGRule> rules, String startingS) {
+    public void updateAllDescribeCFG(Set<NonTerminal> allNonTerminals, Set<MySymbol> allTerminals, List<CFGRule> rules, MySymbol startingS) {
         updateNonTerminals(allNonTerminals);
         updateTerminals(allTerminals);
         updateStartSymbol(startingS);
@@ -42,8 +42,8 @@ public class DescribeCFG {
                 .forEach(rulesContainer.getChildren()::add);
     }
 
-    private void updateStartSymbol(String startingS) {
-        startSymbol.setText("Začiatočný symbol -> " + startingS);
+    private void updateStartSymbol(MySymbol startingS) {
+        startSymbol.setText("Začiatočný symbol = " + startingS);
     }
 
     private void updateTerminals(Set<MySymbol> terminals) {
@@ -58,11 +58,11 @@ public class DescribeCFG {
         this.terminals.setText(text.toString());
     }
 
-    private void updateNonTerminals(Set<SpecialNonTerminal> nonTerminals) {
+    private void updateNonTerminals(Set<NonTerminal> nonTerminals) {
         this.nonTerminals.getChildren().clear();
         nonTerminals.stream()
                 .sorted(new SpecialNonTerminalSorter())
-                .map(SpecialNonTerminal::toString)
+                .map(NonTerminal::toString)
                 .map(TextField::new)
                 .forEach(textField -> {
                     textField.setEditable(false);

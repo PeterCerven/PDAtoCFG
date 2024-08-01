@@ -14,10 +14,18 @@ public abstract class MyObject extends Group implements Serializable, Erasable {
     @Serial
     private static final long serialVersionUID = 1L;
     protected Long ID;
+    public static Long IDCounter = 0L;
 
+
+    public MyObject() {
+        this.ID = IDCounter++;
+    }
 
     public MyObject(Long ID) {
         this.ID = ID;
+        if (IDCounter <= ID) {
+            IDCounter = ID + 1;
+        }
     }
 
     @Override

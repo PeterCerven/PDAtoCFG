@@ -54,6 +54,7 @@
 
 .box-label {
     -fx-font-size: 23px;
+    -fx-font-weight: bold;
 }
 
 .button:pressed {

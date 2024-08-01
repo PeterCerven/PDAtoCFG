@@ -29,8 +29,23 @@ public class MyNode extends MyObject {
     private StartNodeArrow startNodeArrow;
     private boolean selected;
 
-    public MyNode(double x, double y, double radius, Long ID) {
+    public MyNode(double x, double y, double radius) {
+        super();
+        initialization(x, y, radius);
+    }
+
+    public MyNode(String name, double x, double y, boolean starting, boolean ending, Long ID) {
         super(ID);
+        initialization(x, y, NODE_RADIUS);
+        this.name = name;
+        this.starting = starting;
+        this.ending = ending;
+        this.setName(name);
+        setStarting(starting);
+        setEnding(ending);
+    }
+
+    private void initialization(double x, double y, double radius) {
         circle = createCircle(x, y, radius);
         nameText = createNameText();
         this.setStyle("-fx-cursor: hand;");
@@ -46,15 +61,6 @@ public class MyNode extends MyObject {
         this.arrowsTo = new ArrayList<>();
     }
 
-    public MyNode(String name, double x, double y, Long ID, boolean starting, boolean ending) {
-        this(x, y, NODE_RADIUS, ID);
-        this.name = name;
-        this.starting = starting;
-        this.ending = ending;
-        this.setName(name);
-        setStarting(starting);
-        setEnding(ending);
-    }
 
     private Circle createCircle(double x, double y, double radius) {
         Circle c = new Circle(x, y, radius, Color.WHITE);

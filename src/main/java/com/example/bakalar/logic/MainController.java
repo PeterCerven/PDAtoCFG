@@ -207,5 +207,11 @@ public class MainController {
         }
     }
 
+    // test
+
+    public void testBoard() {
+        board.testBoard();
+    }
+
 
 }

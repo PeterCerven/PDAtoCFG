@@ -38,8 +38,8 @@ public abstract class Arrow extends MyObject {
     protected Long toId;
 
 
-    public Arrow(MyNode from, MyNode to, Board board, List<TransitionInputs> transitionInputs, Long ID) {
-        super(ID);
+    public Arrow(MyNode from, MyNode to, Board board, List<TransitionInputs> transitionInputs) {
+        super();
         this.transitions = new ArrayList<>();
         this.from = from;
         this.to = to;

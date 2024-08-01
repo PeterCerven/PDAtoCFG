@@ -2,6 +2,7 @@ package com.example.bakalar.logic.conversion;
 
 import com.example.bakalar.logic.transitions.Transition;
 import com.example.bakalar.logic.utility.MySymbol;
+import com.example.bakalar.logic.utility.NonTerminal;
 import com.example.bakalar.logic.utility.SpecialNonTerminal;
 import javafx.scene.paint.Color;
 import lombok.Getter;
@@ -30,7 +31,6 @@ public class RuleStepLogic {
         Transition newTransition = new Transition(transition.getCurrentState().getName(), transition.getInputSymbolToRead().getName(), transition.getSymbolToPop().getName(),
                 transition.getNextState().getName(), transition.getSymbolsToPushAsString());
         stepRules.add(new StepRule(templateRule.copyLeftSide(), templateRule.copyTerminal(), templateRule.copyRightSide(), newTransition, helpingComment));
-
     }
 
     public RuleStepLogic(Transition transition) {
@@ -90,35 +90,35 @@ public class RuleStepLogic {
     // starting step
     public void createStartingSteps(String startingSymbol, String startingStackSymbol, String startingStateSymbol, String stateSymbol) {
         StepRule firstStep = new StepRule(transition);
-        firstStep.setMySymbolLeftSide(new MySymbol("_"));
+        firstStep.setLeftSide(new NonTerminal("_"));
         firstStep.setRightSide(new ArrayList<>());
         firstStep.getRightSide().add(new SpecialNonTerminal("_", "_", "_"));
         firstStep.setHelpingComment("Počet pravidiel závisí od počtu stavov zásobníkového automatu.");
         stepRules.add(firstStep);
 
         StepRule secondStep = new StepRule(transition);
-        secondStep.setMySymbolLeftSide(new MySymbol(startingSymbol, Color.RED));
+        secondStep.setLeftSide(new NonTerminal(startingSymbol, Color.RED));
         secondStep.setRightSide(new ArrayList<>());
         secondStep.getRightSide().add(new SpecialNonTerminal("_", "_", "_"));
         secondStep.setHelpingComment("Pridávame začiatočný symbol S.");
         stepRules.add(secondStep);
 
         StepRule thirdStep = new StepRule(transition);
-        thirdStep.setMySymbolLeftSide(new MySymbol(startingSymbol));
+        thirdStep.setLeftSide(new NonTerminal(startingSymbol));
         thirdStep.setRightSide(new ArrayList<>());
         thirdStep.getRightSide().add(new SpecialNonTerminal(new MySymbol(startingStateSymbol, Color.RED), new MySymbol("_"), "_"));
         thirdStep.setHelpingComment("Pridávame začiatočný stav automatu.");
         stepRules.add(thirdStep);
 
         StepRule fourthStep = new StepRule(transition);
-        fourthStep.setMySymbolLeftSide(new MySymbol(startingSymbol));
+        fourthStep.setLeftSide(new NonTerminal(startingSymbol));
         fourthStep.setRightSide(new ArrayList<>());
         fourthStep.getRightSide().add(new SpecialNonTerminal(new MySymbol(startingStateSymbol), new MySymbol(startingStackSymbol, Color.RED), "_"));
         fourthStep.setHelpingComment("Pridávame začiatočný symbol zásobníka.");
         stepRules.add(fourthStep);
 
         StepRule fifthStep = new StepRule(transition);
-        fifthStep.setMySymbolLeftSide(new MySymbol(startingSymbol));
+        fifthStep.setLeftSide(new NonTerminal(startingSymbol));
         fifthStep.setRightSide(new ArrayList<>());
         fifthStep.getRightSide().add(new SpecialNonTerminal(new MySymbol(startingStateSymbol), new MySymbol(startingStackSymbol), new MySymbol(stateSymbol, Color.RED)));
         fifthStep.setHelpingComment("Postupne pridávame všetky možné stavy zásobníkového automatu.");
@@ -195,7 +195,7 @@ public class RuleStepLogic {
         // rule step
         templateRule.resetFontColor();
         templateRule.getRightSide().get(0).setStateSymbolFrom(name);
-        templateRule.getRightSide().get(templateRule.getRightSide().size() - 1).setStateSymbolTo(templateRule.getLeftSide().getStateSymbolTo());
+        templateRule.getRightSide().get(templateRule.getRightSide().size() - 1).setStateSymbolTo(((SpecialNonTerminal) templateRule.getLeftSide()).getStateSymbolTo());
         String helpingComment = "Na začiatok pravej strany pravidla pridáme symbol stavu do ktorého prechádzame.";
         stepRules.add(new StepRule(templateRule.copyLeftSide(), templateRule.copyTerminal(), templateRule.copyRightSide(), newTransition, helpingComment));
 
@@ -242,7 +242,7 @@ public class RuleStepLogic {
         templateRule.resetFontColor();
         leftSide.getStateSymbolTo().setColor(Color.RED);
         templateRule.setLeftSide(leftSide);
-        templateRule.getRightSide().get(templateRule.getRightSide().size() - 1).setStateSymbolTo(templateRule.getLeftSide().getStateSymbolTo());
+        templateRule.getRightSide().get(templateRule.getRightSide().size() - 1).setStateSymbolTo(leftSide.getStateSymbolTo());
         String helpingComment = "Na koniec pravej strany pravidla pridáme symbol stavu, ktorý sa nachádza na poslednom mieste v neterminále naľavo.";
         stepRules.add(new StepRule(templateRule.copyLeftSide(), templateRule.copyTerminal(), templateRule.copyRightSide(), newTransition, helpingComment));
     }

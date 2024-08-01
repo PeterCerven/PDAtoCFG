@@ -95,7 +95,7 @@ public class Board implements Serializable {
         this.stage = stage;
         this.dragging = false;
         this.btnBeh = btnBeh;
-        this.conversionLogic = new ConversionLogic();
+        this.conversionLogic = new ConversionLogic(fileLogic);
         this.canClick = true;
         this.slider = slider;
         this.sliderInput = sliderInput;
@@ -185,9 +185,10 @@ public class Board implements Serializable {
         updateAllDescribePDA();
     }
 
-    public void createMyNode(double x, double y) {
-        MyNode myNode = new MyNode(x, y, NODE_RADIUS, idCounter);
+    public MyNode createMyNode(double x, double y) {
+        MyNode myNode = new MyNode(x, y, NODE_RADIUS);
         addNodeToBoard(myNode);
+        return myNode;
     }
 
     private void createArrow(MyNode node) {
@@ -602,8 +603,8 @@ public class Board implements Serializable {
             sliderInput.setText(NODE_RADIUS + "");
             slider.setValue(NODE_RADIUS);
             for (NodeModel myNodeModel : appState.getNodeModels()) {
-                createMyNodeFromHistory(myNodeModel.getName(), myNodeModel.getX(), myNodeModel.getY(), myNodeModel.getNodeId(),
-                        myNodeModel.isStarting(), myNodeModel.isEnding());
+                createMyNodeFromHistory(myNodeModel.getName(), myNodeModel.getX(), myNodeModel.getY(),
+                        myNodeModel.isStarting(), myNodeModel.isEnding(), myNodeModel.getNodeId());
             }
             for (ArrowModel arrowModel : appState.getArrowModels()) {
                 MyNode from = findNodeById(arrowModel.getFromNodeId());
@@ -645,8 +646,8 @@ public class Board implements Serializable {
         return false;
     }
 
-    public void createMyNodeFromHistory(String name, double x, double y, Long nodeId, boolean starting, boolean ending) {
-        MyNode myNode = new MyNode(name, x, y, nodeId, starting, ending);
+    public void createMyNodeFromHistory(String name, double x, double y, boolean starting, boolean ending, Long ID) {
+        MyNode myNode = new MyNode(name, x, y, starting, ending, ID);
         if (starting) {
             setStarting(myNode, true);
         }
@@ -683,6 +684,24 @@ public class Board implements Serializable {
         } catch (MyCustomException e) {
             showErrorDialog(e.getMessage());
         }
+    }
+
+    // testing
+
+    public void testBoard() {
+        saveCurrentStateToHistory();
+        clearBoard(true);
+        MyNode firstNode = createMyNode(120, 150);
+        setStarting(firstNode, true);
+        MyNode secondNode = createMyNode(320, 150);
+        setEnding(firstNode, true);
+
+        createMyArrow(firstNode.getID(), firstNode.getID(), new TransitionInputs("1", "Z", "XZ"));
+        createMyArrow(firstNode.getID(), firstNode.getID(), new TransitionInputs("1", "X", "XX"));
+        createMyArrow(firstNode.getID(), firstNode.getID(), new TransitionInputs(EPSILON, "X", EPSILON));
+        createMyArrow(firstNode.getID(), secondNode.getID(), new TransitionInputs("0", "X", "X"));
+        createMyArrow(secondNode.getID(), secondNode.getID(), new TransitionInputs("1", "X", EPSILON));
+        createMyArrow(secondNode.getID(), firstNode.getID(), new TransitionInputs("0", "Z", "Z"));
     }
 
 }

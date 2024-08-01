@@ -1,6 +1,7 @@
 package com.example.bakalar.logic.utility.sorters;
 
 import com.example.bakalar.logic.conversion.CFGRule;
+import com.example.bakalar.logic.utility.SpecialNonTerminal;
 
 import java.util.Comparator;
 
@@ -13,22 +14,22 @@ public class RuleSorter implements Comparator<CFGRule> {
     @Override
     public int compare(CFGRule o1, CFGRule o2) {
         // starting
-        if (o1.getMySymbolLeftSide() != null && o2.getMySymbolLeftSide() != null) {
+        if (!(o1.getLeftSide() instanceof SpecialNonTerminal) && !(o2.getLeftSide() instanceof SpecialNonTerminal)) {
             return o1.getRightSide().get(0).getStateSymbolTo().getName()
                     .compareTo(o2.getRightSide().get(0).getStateSymbolTo().getName());
         }
-        if (o1.getMySymbolLeftSide() != null) {
+        if (!(o1.getLeftSide() instanceof SpecialNonTerminal so1)) {
             return -1;
         }
-        if (o2.getMySymbolLeftSide() != null) {
+        if (!(o2.getLeftSide() instanceof SpecialNonTerminal so2)) {
             return 1;
         }
 
         // normal
         //
-        if (!o1.getLeftSide().getStateSymbolFrom().getName().equals(o2.getLeftSide().getStateSymbolFrom().getName())) {
-            return o1.getLeftSide().getStateSymbolFrom().getName()
-                    .compareTo(o2.getLeftSide().getStateSymbolFrom().getName());
+        if (!so1.getStateSymbolFrom().getName().equals(so2.getStateSymbolFrom().getName())) {
+            return so1.getStateSymbolFrom().getName()
+                    .compareTo(so2.getStateSymbolFrom().getName());
         }
         if (!o1.getRightSide().isEmpty() && !o2.getRightSide().isEmpty()) {
             if (!o1.getRightSide().get(0).getStateSymbolFrom().getName().equals(o2.getRightSide().get(0).getStateSymbolFrom().getName())) {
@@ -42,13 +43,13 @@ public class RuleSorter implements Comparator<CFGRule> {
         if (!o1.getTerminal().getName().equals(o2.getTerminal().getName())) {
             return o1.getTerminal().getName().compareTo(o2.getTerminal().getName());
         }
-        if (!o1.getLeftSide().getStackSymbol().getName().equals(o2.getLeftSide().getStackSymbol().getName())) {
-            return o1.getLeftSide().getStackSymbol().getName()
-                    .compareTo(o2.getLeftSide().getStackSymbol().getName());
+        if (!so1.getStackSymbol().getName().equals(so2.getStackSymbol().getName())) {
+            return so1.getStackSymbol().getName()
+                    .compareTo(so2.getStackSymbol().getName());
         }
-        if (!o1.getLeftSide().getStateSymbolTo().getName().equals(o2.getLeftSide().getStateSymbolTo().getName())) {
-            return o1.getLeftSide().getStateSymbolTo().getName()
-                    .compareTo(o2.getLeftSide().getStateSymbolTo().getName());
+        if (!so1.getStateSymbolTo().getName().equals(so2.getStateSymbolTo().getName())) {
+            return so1.getStateSymbolTo().getName()
+                    .compareTo(so2.getStateSymbolTo().getName());
         }
         for (int i = 0; i < o1.getRightSide().size(); i++) {
             if (!o1.getRightSide().get(i).getStackSymbol().getName().equals(o2.getRightSide().get(i).getStackSymbol().getName())) {
