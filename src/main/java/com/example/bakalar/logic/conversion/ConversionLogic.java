@@ -8,10 +8,8 @@ import com.example.bakalar.logic.conversion.window.InformationWindow;
 import com.example.bakalar.logic.conversion.window.StepsWindow;
 import com.example.bakalar.logic.conversion.window.WindowType;
 import com.example.bakalar.logic.transitions.Transition;
-import com.example.bakalar.logic.utility.DescribeCFG;
-import com.example.bakalar.logic.utility.MySymbol;
+import com.example.bakalar.logic.utility.*;
 import com.example.bakalar.logic.utility.NonTerminal;
-import com.example.bakalar.logic.utility.SpecialNonTerminal;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -176,7 +174,7 @@ public class ConversionLogic {
 
 
         // left side
-        SpecialNonTerminal leftSide = new SpecialNonTerminal(transition.getCurrentState(), transition.getSymbolToPop(),
+        NonTerminal leftSide = new SpecialNonTerminal(transition.getCurrentState(), transition.getSymbolToPop(),
                 statesPos[posCounter]);
 
         // steps for left side
@@ -193,7 +191,7 @@ public class ConversionLogic {
         posCounter++;
 
         // terminal
-        List<SpecialNonTerminal> rightSide = new ArrayList<>();
+        List<NonTerminal> rightSide = new ArrayList<>();
         MySymbol terminal = new MySymbol("");
         if (!transition.getInputSymbolToRead().getName().equals(EPSILON)) {
             terminal = new MySymbol(transition.getInputSymbolToRead().getName());
@@ -246,10 +244,10 @@ public class ConversionLogic {
 
     private List<CFGRule> terminalMove(Transition transition) {
         RuleStepLogic ruleStepLogic = new RuleStepLogic(transition);
-        SpecialNonTerminal leftSide = new SpecialNonTerminal(transition.getCurrentState(), transition.getSymbolToPop(),
+        NonTerminal leftSide = new SpecialNonTerminal(transition.getCurrentState(), transition.getSymbolToPop(),
                 transition.getNextState());
         MySymbol terminal = new MySymbol(transition.getInputSymbolToRead().getName());
-        List<SpecialNonTerminal> rightSide = new ArrayList<>();
+        List<NonTerminal> rightSide = new ArrayList<>();
         ruleStepLogic.createTerminalSteps();
         CFGRule cfgRule = new CFGRule(leftSide, terminal, rightSide, transition);
         cfgRule.setSteps(ruleStepLogic.getStepRules());
@@ -273,7 +271,7 @@ public class ConversionLogic {
         MySymbol startStackSymbol = new MySymbol(STARTING_Z);
         for (MySymbol stateSymbol : allStateSymbols) {
             RuleStepLogic ruleStepLogic = new RuleStepLogic(transition);
-            List<SpecialNonTerminal> rightSide = new ArrayList<>();
+            List<NonTerminal> rightSide = new ArrayList<>();
             rightSide.add(new SpecialNonTerminal(transition.getCurrentState(), startStackSymbol, stateSymbol));
             ruleStepLogic.createStartingSteps(STARTING_S, STARTING_Z, transition.getCurrentState().getName(), stateSymbol.getName());
             CFGRule cfgRule = new CFGRule(startSymbol, null, rightSide, transition);

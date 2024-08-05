@@ -1,5 +1,6 @@
 package com.example.bakalar.logic.conversion;
 
+import com.example.bakalar.exceptions.MyCustomException;
 import com.example.bakalar.logic.transitions.Transition;
 import com.example.bakalar.logic.utility.MySymbol;
 import com.example.bakalar.logic.utility.NonTerminal;
@@ -179,7 +180,11 @@ public class RuleStepLogic {
         for (int i = 0; i < stackSymbols.size(); i++) {
             MySymbol stackSymbol = stackSymbols.get(i);
             MySymbol newStackSymbol = new MySymbol(stackSymbol.getName(), color);
-            templateRule.getRightSide().get(i).setStackSymbol(newStackSymbol);
+            NonTerminal nonTerminal = templateRule.getRightSide().get(i);
+            if (nonTerminal instanceof  SpecialNonTerminal spt) {
+                spt.setStackSymbol(newStackSymbol);
+            }
+
         }
         String helpingComment = "Počet Neterminálnych symbolov na pravej strane pravidla, závisí od počtu nových symbolov na zásobníku.";
         stepRules.add(new StepRule(templateRule.copyLeftSide(), templateRule.copyTerminal(), templateRule.copyRightSide(), newTransition, helpingComment));
@@ -194,8 +199,16 @@ public class RuleStepLogic {
 
         // rule step
         templateRule.resetFontColor();
-        templateRule.getRightSide().get(0).setStateSymbolFrom(name);
-        templateRule.getRightSide().get(templateRule.getRightSide().size() - 1).setStateSymbolTo(((SpecialNonTerminal) templateRule.getLeftSide()).getStateSymbolTo());
+        NonTerminal firstNonTerminal = templateRule.getRightSide().get(0);
+        if (firstNonTerminal instanceof  SpecialNonTerminal spt) {
+            spt.setStateSymbolTo(name);
+        }
+        NonTerminal rightSideNonTerminal = templateRule.getRightSide().get(templateRule.getRightSide().size() - 1);
+        NonTerminal leftSide = templateRule.getLeftSide();
+        if (rightSideNonTerminal instanceof SpecialNonTerminal spt && leftSide instanceof SpecialNonTerminal spt2) {
+            spt.setStateSymbolTo(spt2.getStateSymbolTo());
+        }
+
         String helpingComment = "Na začiatok pravej strany pravidla pridáme symbol stavu do ktorého prechádzame.";
         stepRules.add(new StepRule(templateRule.copyLeftSide(), templateRule.copyTerminal(), templateRule.copyRightSide(), newTransition, helpingComment));
 
@@ -210,7 +223,9 @@ public class RuleStepLogic {
         templateRule.resetFontColor();
         templateRule.setLeftSide(leftSide);
         for (MySymbol tableOption : tableOptions) {
-            templateRule.getRightSide().get(tableOption.getIndex()).setStateSymbolTo(tableOption);
+            if (templateRule.copyRightSide().get(tableOption.getIndex()) instanceof SpecialNonTerminal spt) {
+                spt.setStateSymbolTo(tableOption);
+            }
         }
         String helpingComment = "Tu pridáme všetky možnosti ako môžeme prechádzať stavmi.";
         stepRules.add(new StepRule(templateRule.copyLeftSide(), templateRule.copyTerminal(), templateRule.copyRightSide(), newTransition, helpingComment));
@@ -226,7 +241,9 @@ public class RuleStepLogic {
         templateRule.resetFontColor();
         for (MySymbol tableOption : tableOptions) {
             tableOption.setColor(Color.RED);
-            templateRule.getRightSide().get(tableOption.getIndex() + 1).setStateSymbolFrom(tableOption);
+            if (templateRule.getRightSide().get(tableOption.getIndex() + 1) instanceof  SpecialNonTerminal spt) {
+                spt.setStateSymbolFrom(tableOption);
+            }
         }
         String helpingComment = "Zkopírujeme koncoví stav predošlého neterminálu na začiatok ďalšieho neterminálu.";
         stepRules.add(new StepRule(templateRule.copyLeftSide(), templateRule.copyTerminal(), templateRule.copyRightSide(), newTransition, helpingComment));
@@ -242,7 +259,9 @@ public class RuleStepLogic {
         templateRule.resetFontColor();
         leftSide.getStateSymbolTo().setColor(Color.RED);
         templateRule.setLeftSide(leftSide);
-        templateRule.getRightSide().get(templateRule.getRightSide().size() - 1).setStateSymbolTo(leftSide.getStateSymbolTo());
+        if (templateRule.getRightSide().get(templateRule.getRightSide().size() - 1) instanceof  SpecialNonTerminal spt) {
+            spt.setStateSymbolTo(leftSide.getStateSymbolTo());
+        }
         String helpingComment = "Na koniec pravej strany pravidla pridáme symbol stavu, ktorý sa nachádza na poslednom mieste v neterminále naľavo.";
         stepRules.add(new StepRule(templateRule.copyLeftSide(), templateRule.copyTerminal(), templateRule.copyRightSide(), newTransition, helpingComment));
     }

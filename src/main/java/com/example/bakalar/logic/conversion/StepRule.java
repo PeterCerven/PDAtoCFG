@@ -3,7 +3,7 @@ package com.example.bakalar.logic.conversion;
 import com.example.bakalar.logic.transitions.Transition;
 import com.example.bakalar.logic.utility.MySymbol;
 import com.example.bakalar.logic.utility.NonTerminal;
-import com.example.bakalar.logic.utility.SpecialNonTerminal;
+import com.example.bakalar.logic.utility.NonTerminal;
 import javafx.scene.text.Text;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,11 +16,11 @@ import java.util.List;
 public class StepRule {
     private NonTerminal leftSide;
     private MySymbol terminal;
-    private List<SpecialNonTerminal> rightSide;
+    private List<NonTerminal> rightSide;
     private Transition transition;
     private String helpingComment;
 
-    public StepRule(NonTerminal leftSide, MySymbol terminal, List<SpecialNonTerminal> rightSide, Transition transition, String helpingComment) {
+    public StepRule(NonTerminal leftSide, MySymbol terminal, List<NonTerminal> rightSide, Transition transition, String helpingComment) {
         this.leftSide = leftSide;
         this.terminal = terminal;
         this.rightSide = rightSide;
@@ -45,8 +45,8 @@ public class StepRule {
         if (terminal != null) {
             texts.add(new CustomText(terminal, fontSize));
         }
-        for (SpecialNonTerminal specialNonTerminal : rightSide) {
-            texts.addAll(specialNonTerminal.createText(fontSize));
+        for (NonTerminal NonTerminal : rightSide) {
+            texts.addAll(NonTerminal.createText(fontSize));
         }
         return texts;
     }

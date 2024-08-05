@@ -3,7 +3,6 @@ package com.example.bakalar.logic.conversion;
 import com.example.bakalar.logic.transitions.Transition;
 import com.example.bakalar.logic.utility.MySymbol;
 import com.example.bakalar.logic.utility.NonTerminal;
-import com.example.bakalar.logic.utility.SpecialNonTerminal;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -16,7 +15,7 @@ import java.util.stream.Collectors;
 public class CFGRule {
     private NonTerminal leftSide;
     private MySymbol terminal;
-    private List<SpecialNonTerminal> rightSide;
+    private List<NonTerminal> rightSide;
     private List<StepRule> steps;
     private Transition transition;
 
@@ -25,7 +24,7 @@ public class CFGRule {
         this.rightSide = new ArrayList<>();
     }
 
-    public CFGRule(SpecialNonTerminal leftSide, MySymbol terminal, List<SpecialNonTerminal> rightSide, Transition transition) {
+    public CFGRule(NonTerminal leftSide, MySymbol terminal, List<NonTerminal> rightSide, Transition transition) {
         this.leftSide = leftSide;
         this.terminal = terminal;
         this.rightSide = rightSide;
@@ -33,7 +32,7 @@ public class CFGRule {
         this.transition = transition;
     }
 
-    public CFGRule(MySymbol mySymbolLeftSide, MySymbol terminal, List<SpecialNonTerminal> rightSide, Transition transition) {
+    public CFGRule(MySymbol mySymbolLeftSide, MySymbol terminal, List<NonTerminal> rightSide, Transition transition) {
         this.leftSide = new NonTerminal(mySymbolLeftSide);
         this.terminal = terminal;
         this.rightSide = rightSide;
@@ -41,24 +40,33 @@ public class CFGRule {
         this.transition = transition;
     }
 
+    public CFGRule getDeepCopy() {
+        CFGRule rule = new CFGRule();
+        rule.setLeftSide(this.copyLeftSide());
+        rule.setTerminal(this.copyTerminal() );
+        rule.setRightSide(this.copyRightSide());
+        rule.setTransition(this.getTransition());
+        return rule;
+    }
+
     public NonTerminal copyLeftSide() {
         return leftSide.getDeepCopy();
 
     }
 
-    public List<SpecialNonTerminal> copyRightSide() {
-        List<SpecialNonTerminal> copy = new ArrayList<>();
-        for (SpecialNonTerminal specialNonTerminal : rightSide) {
-            copy.add(new SpecialNonTerminal(
-                    specialNonTerminal.getStateSymbolFrom(), specialNonTerminal.getStateSymbolFrom().getColor(),
-                    specialNonTerminal.getStackSymbol(), specialNonTerminal.getStackSymbol().getColor(),
-                    specialNonTerminal.getStateSymbolTo(), specialNonTerminal.getStateSymbolTo().getColor()));
+    public List<NonTerminal> copyRightSide() {
+        List<NonTerminal> copy = new ArrayList<>();
+        for (NonTerminal nonTerminal : rightSide) {
+            copy.add(nonTerminal.getDeepCopy());
         }
         return copy;
     }
 
     public MySymbol copyTerminal() {
-        return new MySymbol(terminal.getName(), terminal.getColor());
+        if (terminal == null) {
+            return null;
+        }
+        return new MySymbol(terminal.getName() , terminal.getColor());
     }
 
     public void resetFontColor() {
@@ -66,15 +74,13 @@ public class CFGRule {
         if (terminal != null) {
             terminal.setColor(MySymbol.DEFAULT_COLOR);
         }
-        for (SpecialNonTerminal specialNonTerminal : rightSide) {
-            specialNonTerminal.getStateSymbolFrom().setColor(MySymbol.DEFAULT_COLOR);
-            specialNonTerminal.getStackSymbol().setColor(MySymbol.DEFAULT_COLOR);
-            specialNonTerminal.getStateSymbolTo().setColor(MySymbol.DEFAULT_COLOR);
+        for (NonTerminal nonTerminal : rightSide) {
+            nonTerminal.resetColor();
         }
     }
 
     @Override
     public String toString() {
-        return leftSide + " -> " + (terminal == null ? "" : terminal) + rightSide.stream().map(SpecialNonTerminal::toString).collect(Collectors.joining());
+        return leftSide + " -> " + (terminal == null ? "" : terminal) + rightSide.stream().map(NonTerminal::toString).collect(Collectors.joining());
     }
 }

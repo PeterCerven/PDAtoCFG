@@ -16,6 +16,7 @@ public class SpecialNonTerminal extends NonTerminal {
     private MySymbol stateSymbolFrom;
     private MySymbol stackSymbol;
     private MySymbol stateSymbolTo;
+    private String letterName;
 
     public SpecialNonTerminal() {
         super();
