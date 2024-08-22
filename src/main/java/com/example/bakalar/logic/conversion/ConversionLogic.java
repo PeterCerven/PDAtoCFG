@@ -3,6 +3,8 @@ package com.example.bakalar.logic.conversion;
 import com.example.bakalar.canvas.node.MyNode;
 import com.example.bakalar.exceptions.MyCustomException;
 import com.example.bakalar.files.FileLogic;
+import com.example.bakalar.logic.conversion.simplify.GrammarComponents;
+import com.example.bakalar.logic.conversion.simplify.SimplifyLogic;
 import com.example.bakalar.logic.conversion.window.ConversionStage;
 import com.example.bakalar.logic.conversion.window.InformationWindow;
 import com.example.bakalar.logic.conversion.window.StepsWindow;
@@ -42,7 +44,7 @@ public class ConversionLogic {
     private boolean showSteps = false;
     private List<RulesWindows> rulesWindows;
     private int currentIndex;
-    private DescribeCFG describeCFG;
+    private final DescribeCFG describeCFG;
 
 
     public ConversionLogic(FileLogic fileLogic) {
@@ -77,8 +79,8 @@ public class ConversionLogic {
         for (RulesWindows ruleWindow : rulesWindows) {
             for (CFGRule rule : ruleWindow.getRules()) {
                 if (rule.getLeftSide() != null)
-                    nonTerminals.add(rule.getLeftSide());
-                nonTerminals.addAll(rule.getRightSide());
+                    nonTerminals.add(rule.getLeftSide().getDeepCopy());
+                nonTerminals.addAll(rule.getRightSide().stream().map(NonTerminal::getDeepCopy).toList());
             }
         }
         return nonTerminals;
@@ -96,7 +98,7 @@ public class ConversionLogic {
         Set<MySymbol> terminals = new HashSet<>();
         for (CFGRule rule : getAllRules()) {
             if (rule.getTerminal() != null && !rule.getTerminal().getName().equals(EPSILON)) {
-                terminals.add(rule.getTerminal());
+                terminals.add(rule.getTerminal().getDeepCopy());
             }
         }
         return terminals;
@@ -124,12 +126,15 @@ public class ConversionLogic {
         Button nextButton = conversionStage.getNextButton();
         Button showStepsButton = stepsWindow.getShowStepsButton();
 
+        GrammarComponents gc = new GrammarComponents(getAllRules(), new MySymbol(STARTING_S), getAllTerminals(), getAllNonTerminals());
+
+        reduceButton.setOnAction(e -> informationWindow.swapCFGtoReduceAndBack(simplifyLogic, gc));
         downloadButton.setOnAction(e -> fileLogic.saveToTextFile(getAllRules(), conversionStage.getStage()));
-        reduceButton.setOnAction(e -> informationWindow.swapCFGtoReduceAndBack(getAllNonTerminals(), getAllTerminals(),
-                getAllRules(), STARTING_S, simplifyLogic));
         prevButton.setOnAction(e -> updateWindow(-1));
         nextButton.setOnAction(e -> updateWindow(1));
         showStepsButton.setOnAction(e -> steps());
+
+
         describeCFG.updateAllDescribeCFG(getAllNonTerminals(), getAllTerminals(), getAllRules(), new MySymbol(STARTING_S));
         updateWindow(0);
         conversionStage.getStage().show();

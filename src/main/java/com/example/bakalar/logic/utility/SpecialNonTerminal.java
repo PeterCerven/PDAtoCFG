@@ -16,7 +16,6 @@ public class SpecialNonTerminal extends NonTerminal {
     private MySymbol stateSymbolFrom;
     private MySymbol stackSymbol;
     private MySymbol stateSymbolTo;
-    private String letterName;
 
     public SpecialNonTerminal() {
         super();
@@ -48,6 +47,8 @@ public class SpecialNonTerminal extends NonTerminal {
         this.stackSymbol = stackSymbol == null ? new MySymbol("_") : new MySymbol(stackSymbol, stackColor);
         this.stateSymbolTo = stateSymbolTo == null ? new MySymbol("_") : new MySymbol(stateSymbolTo, toColor);
     }
+
+
 
     @Override
     public NonTerminal getDeepCopy() {

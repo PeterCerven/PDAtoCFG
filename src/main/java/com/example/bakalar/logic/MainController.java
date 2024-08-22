@@ -181,7 +181,6 @@ public class MainController {
         try {
             helpUser.tutorial();
         } catch (FileNotFoundException e) {
-            System.out.println(e.fillInStackTrace());
             ErrorPopUp.showErrorDialog("Nepodarilo sa načítať návod");
         }
     }

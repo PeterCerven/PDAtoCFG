@@ -32,4 +32,6 @@ module com.example.bakalar {
     opens com.example.bakalar.logic.conversion.window to javafx.fxml, lombok;
     exports com.example.bakalar.logic.utility.sorters;
     opens com.example.bakalar.logic.utility.sorters to javafx.fxml, lombok;
+    exports com.example.bakalar.logic.conversion.simplify;
+    opens com.example.bakalar.logic.conversion.simplify to javafx.fxml, lombok;
 }

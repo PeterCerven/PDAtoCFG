@@ -1,10 +1,8 @@
 package com.example.bakalar.logic.conversion.window;
 
-import com.example.bakalar.logic.conversion.CFGRule;
-import com.example.bakalar.logic.conversion.SimplifyLogic;
+import com.example.bakalar.logic.conversion.simplify.GrammarComponents;
+import com.example.bakalar.logic.conversion.simplify.SimplifyLogic;
 import com.example.bakalar.logic.utility.DescribeCFG;
-import com.example.bakalar.logic.utility.MySymbol;
-import com.example.bakalar.logic.utility.NonTerminal;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -15,9 +13,6 @@ import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import lombok.Getter;
-
-import java.util.List;
-import java.util.Set;
 
 @Getter
 public class InformationWindow {
@@ -123,16 +118,16 @@ public class InformationWindow {
         startSymbol.setFont(new Font(18));
     }
 
-    public void swapCFGtoReduceAndBack(Set<NonTerminal> allNonTerminals, Set<MySymbol> allTerminals, List<CFGRule> allRules,
-                                       String startingS, SimplifyLogic simplifyLogic) {
+    public void swapCFGtoReduceAndBack(SimplifyLogic simplifyLogic, GrammarComponents gc) {
         if (isReduced) {
             reduceBtn.setText("Ukáž zredukovanú gramatiku");
             isReduced = false;
+            ruleBoxStepsScrollPane.setContent(null);
             showOriginalCFG();
         } else {
             reduceBtn.setText("Ukáž pôvodnú gramatiku");
             isReduced = true;
-            simplifyLogic.simplify(allNonTerminals, allTerminals, allRules, startingS);
+            simplifyLogic.simplify(gc);
             ruleBoxStepsScrollPane.setContent(describeCFG.getRulesContainer());
             nonTerminalsScrollPane.setContent(describeCFG.getNonTerminals());
             rightPanel.getChildren().clear();
@@ -144,7 +139,6 @@ public class InformationWindow {
     }
 
     private void showOriginalCFG() {
-        ruleBoxStepsScrollPane.setContent(null);
         ruleBoxScrollPane.setContent(describeCFG.getRulesContainer());
         nonTerminalsScrollPane.setContent(describeCFG.getNonTerminals());
         rightPanel.getChildren().clear();

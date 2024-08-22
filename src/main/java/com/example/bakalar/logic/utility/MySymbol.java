@@ -33,6 +33,10 @@ public class MySymbol {
         this.index = index;
     }
 
+    public MySymbol getDeepCopy() {
+        return new MySymbol(this.name, this.color, this.index);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
