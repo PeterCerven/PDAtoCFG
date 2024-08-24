@@ -24,6 +24,8 @@ import static com.example.bakalar.logic.utility.StageUtils.setStageIcon;
 @Getter
 @Setter
 public class ConversionStage {
+    private static final String NEXT_ARROW_ICON_PATH = "/icons/right-arrow.png";
+    private static final String PREVIOUS_ARROW_ICON_PATH = "/icons/left-arrow.png";
     private Stage stage;
     private Scene scene;
     private BorderPane rootPane;
@@ -32,8 +34,6 @@ public class ConversionStage {
     private TextFlow transitionLabel;
     private Label helpingLabelComment;
     private Label transitionIndexLabel;
-    private static final String NEXT_ARROW_ICON_PATH = "/icons/right-arrow.png";
-    private static final String PREVIOUS_ARROW_ICON_PATH = "/icons/left-arrow.png";
 
     public ConversionStage() {
         this.stage = new Stage();

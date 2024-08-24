@@ -43,7 +43,7 @@ public class CFGRule {
     public CFGRule getDeepCopy() {
         CFGRule rule = new CFGRule();
         rule.setLeftSide(this.copyLeftSide());
-        rule.setTerminal(this.copyTerminal() );
+        rule.setTerminal(this.copyTerminal());
         rule.setRightSide(this.copyRightSide());
         rule.setTransition(this.getTransition());
         return rule;
@@ -66,7 +66,7 @@ public class CFGRule {
         if (terminal == null) {
             return null;
         }
-        return new MySymbol(terminal.getName() , terminal.getColor());
+        return new MySymbol(terminal.getName(), terminal.getColor());
     }
 
     public void resetFontColor() {

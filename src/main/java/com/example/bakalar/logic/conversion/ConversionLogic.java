@@ -10,8 +10,10 @@ import com.example.bakalar.logic.conversion.window.InformationWindow;
 import com.example.bakalar.logic.conversion.window.StepsWindow;
 import com.example.bakalar.logic.conversion.window.WindowType;
 import com.example.bakalar.logic.transitions.Transition;
-import com.example.bakalar.logic.utility.*;
+import com.example.bakalar.logic.utility.DescribeCFG;
+import com.example.bakalar.logic.utility.MySymbol;
 import com.example.bakalar.logic.utility.NonTerminal;
+import com.example.bakalar.logic.utility.SpecialNonTerminal;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -40,11 +42,11 @@ public class ConversionLogic {
     private final ConversionStage conversionStage;
     private final FileLogic fileLogic;
     private final SimplifyLogic simplifyLogic;
+    private final DescribeCFG describeCFG;
     private List<MyNode> nodes;
     private boolean showSteps = false;
     private List<RulesWindows> rulesWindows;
     private int currentIndex;
-    private final DescribeCFG describeCFG;
 
 
     public ConversionLogic(FileLogic fileLogic) {
@@ -78,8 +80,7 @@ public class ConversionLogic {
         Set<NonTerminal> nonTerminals = new HashSet<>();
         for (RulesWindows ruleWindow : rulesWindows) {
             for (CFGRule rule : ruleWindow.getRules()) {
-                if (rule.getLeftSide() != null)
-                    nonTerminals.add(rule.getLeftSide().getDeepCopy());
+                nonTerminals.add(rule.getLeftSide().getDeepCopy());
                 nonTerminals.addAll(rule.getRightSide().stream().map(NonTerminal::getDeepCopy).toList());
             }
         }

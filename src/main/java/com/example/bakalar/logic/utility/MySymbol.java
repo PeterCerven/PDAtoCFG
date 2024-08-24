@@ -6,7 +6,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class MySymbol {
+public class MySymbol implements Comparable<MySymbol> {
     public static final Color DEFAULT_COLOR = Color.BLACK;
     private String name;
     private Color color;
@@ -53,5 +53,10 @@ public class MySymbol {
     @Override
     public String toString() {
         return this.name;
+    }
+
+    @Override
+    public int compareTo(MySymbol o) {
+        return this.getName().compareTo(o.getName());
     }
 }

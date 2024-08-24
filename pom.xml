@@ -90,12 +90,6 @@
       <scope>compile</scope>
     </dependency>
 
-    <dependency>
-      <groupId>org.nasdanika.core</groupId>
-      <artifactId>drawio</artifactId>
-      <version>2024.5.1</version>
-    </dependency>
-
   </dependencies>
 
   <build>

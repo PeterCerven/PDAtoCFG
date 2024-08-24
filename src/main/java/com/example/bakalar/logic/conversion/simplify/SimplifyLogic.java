@@ -6,9 +6,7 @@ import com.example.bakalar.logic.utility.NonTerminal;
 import com.example.bakalar.logic.utility.SpecialNonTerminal;
 import lombok.Getter;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Getter
@@ -48,13 +46,14 @@ public class SimplifyLogic {
         char namingLetter = 'A';
         String prohibitedLetters = "SZ";
 
+        Map<SpecialNonTerminal, Character> nameForTerminals = new HashMap<>();
 
         for (NonTerminal nonTerminal : allNonTerminals) {
             if (nonTerminal instanceof SpecialNonTerminal snt) {
-                if (prohibitedLetters.contains(namingLetter + "")) {
-                    continue;
+                if (prohibitedLetters.contains(Character.toString(namingLetter))) {
+                    namingLetter++;
                 }
-                snt.setLetterName(namingLetter++ + "");
+                nameForTerminals.put(snt, namingLetter++);
             }
         }
 
@@ -64,12 +63,9 @@ public class SimplifyLogic {
             List<NonTerminal> newRightSide = new ArrayList<>();
             for (NonTerminal nonTerminal : rule.getRightSide()) {
                 if (nonTerminal instanceof SpecialNonTerminal snt) {
-                    NonTerminal setNonterminal = allNonTerminals.stream()
-                            .filter(nt -> nt.equals(snt))
-                            .findFirst()
-                            .orElse(null);
-                    if (setNonterminal instanceof SpecialNonTerminal snt2) {
-                        newRightSide.add(new NonTerminal(new MySymbol(snt2.getLetterName())));
+                    Character name = nameForTerminals.get(snt);
+                    if (name != null) {
+                        newRightSide.add(new NonTerminal(name.toString()));
                     }
 
                 }
@@ -77,16 +73,47 @@ public class SimplifyLogic {
             }
             // left side
             if (rule.getLeftSide() instanceof SpecialNonTerminal snt) {
-                NonTerminal setNonterminal = allNonTerminals.stream()
-                        .filter(nt -> nt.equals(snt))
-                        .findFirst()
-                        .orElse(null);
-                if (setNonterminal instanceof SpecialNonTerminal snt2) {
-                    rule.setLeftSide(new NonTerminal(new MySymbol(snt2.getLetterName())));
+                Character name = nameForTerminals.get(snt);
+                if (name != null) {
+                    rule.setLeftSide(new NonTerminal(name.toString()));
                 }
             }
         }
         return gc;
+    }
+
+    private GrammarComponents reductionOfCFG(GrammarComponents gc) {
+        removeAllNonTerminalsThatDontDeriveTerminals(gc);
+        return gc;
+    }
+
+    private void removeAllNonTerminalsThatDontDeriveTerminals(GrammarComponents gc) {
+        Set<NonTerminal> allowedNonTerminals = new HashSet<>();
+        List<CFGRule> allRules = gc.getRules();
+        for (CFGRule rule : allRules) {
+            if (rule.getTerminal() != null) {
+                allowedNonTerminals.add(rule.getLeftSide());
+            }
+        }
+        int previousSize = allowedNonTerminals.size();
+        int currentSize = previousSize++;
+        while (previousSize < currentSize) {
+            previousSize = currentSize;
+            HashSet<NonTerminal> toAdd = new HashSet<>();
+            for (CFGRule rule : allRules) {
+                if (rule.getRightSide().stream().anyMatch(allowedNonTerminals::contains)) {
+                    toAdd.add(rule.getLeftSide());
+                }
+            }
+            allowedNonTerminals.addAll(toAdd);
+            currentSize = allowedNonTerminals.size();
+        }
+
+        allRules
+                .removeIf(
+                        rule -> !allowedNonTerminals.contains(rule.getLeftSide())
+                        && !allowedNonTerminals.containsAll(rule.getRightSide())
+                );
     }
 
     private GrammarComponents RemovalOfNullProductions(GrammarComponents gc) {
@@ -94,10 +121,6 @@ public class SimplifyLogic {
     }
 
     private GrammarComponents removalOfUnitProductions(GrammarComponents gc) {
-        return gc;
-    }
-
-    private GrammarComponents reductionOfCFG(GrammarComponents gc) {
         return gc;
     }
 

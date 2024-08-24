@@ -1,8 +1,10 @@
 package com.example.bakalar.logic.conversion.window;
 
+import com.example.bakalar.logic.conversion.CFGRule;
 import com.example.bakalar.logic.conversion.simplify.GrammarComponents;
 import com.example.bakalar.logic.conversion.simplify.SimplifyLogic;
 import com.example.bakalar.logic.utility.DescribeCFG;
+import com.example.bakalar.logic.utility.sorters.RuleSorter;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -128,7 +130,17 @@ public class InformationWindow {
             reduceBtn.setText("Ukáž pôvodnú gramatiku");
             isReduced = true;
             simplifyLogic.simplify(gc);
-            ruleBoxStepsScrollPane.setContent(describeCFG.getRulesContainer());
+            VBox vbox = new VBox();
+            vbox.getChildren().clear();
+            simplifyLogic.getGrammarComponents().get(1).getRules().stream()
+                    .sorted(new RuleSorter())
+                    .map(CFGRule::toString)
+                    .map(TextField::new)
+                    .peek(textField -> textField.setFont(new Font("Arial",18)))
+                    .peek(textField -> textField.setEditable(false))
+                    .forEach(vbox.getChildren()::add);
+            vbox.getChildren().addAll();
+            ruleBoxStepsScrollPane.setContent(vbox);
             nonTerminalsScrollPane.setContent(describeCFG.getNonTerminals());
             rightPanel.getChildren().clear();
             rightPanel.getChildren().add(describeCFG.getStartSymbol());
