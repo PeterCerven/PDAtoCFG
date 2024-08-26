@@ -127,7 +127,7 @@ public class ConversionLogic {
         Button nextButton = conversionStage.getNextButton();
         Button showStepsButton = stepsWindow.getShowStepsButton();
 
-        GrammarComponents gc = new GrammarComponents(getAllRules(), new MySymbol(STARTING_S), getAllTerminals(), getAllNonTerminals());
+        GrammarComponents gc = new GrammarComponents(getAllRules(), new NonTerminal(STARTING_S), getAllTerminals(), getAllNonTerminals());
 
         reduceButton.setOnAction(e -> informationWindow.swapCFGtoReduceAndBack(simplifyLogic, gc));
         downloadButton.setOnAction(e -> fileLogic.saveToTextFile(getAllRules(), conversionStage.getStage()));

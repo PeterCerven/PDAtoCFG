@@ -32,7 +32,7 @@ public class SimplifyLogic {
         for (CFGRule rule : gc.getRules()) {
             rules.add(rule.getDeepCopy());
         }
-        MySymbol startingSymbol = gc.getStartingSymbol().getDeepCopy();
+        NonTerminal startingSymbol = gc.getStartingSymbol().getDeepCopy();
         Set<MySymbol> terminals = gc.getTerminals().stream().map(MySymbol::getDeepCopy).collect(Collectors.toSet());
         Set<NonTerminal> nonTerminals = gc.getNonTerminals().stream().map(NonTerminal::getDeepCopy).collect(Collectors.toSet());
         return new GrammarComponents(rules, startingSymbol, terminals, nonTerminals);
@@ -84,7 +84,36 @@ public class SimplifyLogic {
 
     private GrammarComponents reductionOfCFG(GrammarComponents gc) {
         removeAllNonTerminalsThatDontDeriveTerminals(gc);
+        removeAllRulesThatCannotBeReachedFromStart(gc);
         return gc;
+    }
+
+    private void removeAllRulesThatCannotBeReachedFromStart(GrammarComponents gc) {
+        List<CFGRule> allRules = gc.getRules();
+        NonTerminal startSymbol = gc.getStartingSymbol();
+        Set<NonTerminal> allowedNonTerminals = new HashSet<>();
+        List<CFGRule> newRules = new ArrayList<>();
+        int currentSize = 1;
+        int previousSize = 0;
+
+        allowedNonTerminals.add(startSymbol);
+
+        while (currentSize > previousSize) {
+            previousSize = currentSize;
+            for (CFGRule rule : allRules) {
+                if (allowedNonTerminals.contains(rule.getLeftSide())) {
+                    allowedNonTerminals.addAll(rule.getRightSide());
+                }
+            }
+            currentSize = allowedNonTerminals.size();
+        }
+
+        allRules
+                .removeIf(
+                        rule -> !allowedNonTerminals.contains(rule.getLeftSide())
+                );
+
+
     }
 
     private void removeAllNonTerminalsThatDontDeriveTerminals(GrammarComponents gc) {
@@ -108,12 +137,15 @@ public class SimplifyLogic {
             allowedNonTerminals.addAll(toAdd);
             currentSize = allowedNonTerminals.size();
         }
+        allRules.forEach(System.out::println);
+        System.out.println("--------------------");
 
         allRules
                 .removeIf(
                         rule -> !allowedNonTerminals.contains(rule.getLeftSide())
                         && !allowedNonTerminals.containsAll(rule.getRightSide())
                 );
+        allRules.forEach(System.out::println);
     }
 
     private GrammarComponents RemovalOfNullProductions(GrammarComponents gc) {
