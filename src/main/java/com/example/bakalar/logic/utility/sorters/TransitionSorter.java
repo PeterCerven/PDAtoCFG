@@ -1,6 +1,6 @@
 package com.example.bakalar.logic.utility.sorters;
 
-import com.example.bakalar.logic.transitions.Transition;
+import com.example.bakalar.logic.conversion.Transition;
 
 import java.util.Comparator;
 

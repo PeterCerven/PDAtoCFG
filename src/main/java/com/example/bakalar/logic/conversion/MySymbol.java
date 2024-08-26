@@ -1,4 +1,4 @@
-package com.example.bakalar.logic.utility;
+package com.example.bakalar.logic.conversion;
 
 import javafx.scene.paint.Color;
 import lombok.Getter;

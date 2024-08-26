@@ -13,7 +13,7 @@ import com.example.bakalar.logic.history.AppState;
 import com.example.bakalar.logic.history.ArrowModel;
 import com.example.bakalar.logic.history.HistoryLogic;
 import com.example.bakalar.logic.history.NodeModel;
-import com.example.bakalar.logic.transitions.Transition;
+import com.example.bakalar.logic.conversion.Transition;
 import com.example.bakalar.logic.utility.ButtonBehaviour;
 import com.example.bakalar.logic.utility.ButtonState;
 import com.example.bakalar.logic.utility.DescribePDA;

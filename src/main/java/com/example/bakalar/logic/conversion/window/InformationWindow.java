@@ -132,7 +132,7 @@ public class InformationWindow {
             simplifyLogic.simplify(gc);
             VBox vbox = new VBox();
             vbox.getChildren().clear();
-            simplifyLogic.getGrammarComponents().get(1).getRules().stream()
+            simplifyLogic.getGrammarComponents().get(1).rules().stream()
                     .sorted(new RuleSorter())
                     .map(CFGRule::toString)
                     .map(TextField::new)

@@ -1,9 +1,9 @@
 package com.example.bakalar.logic.utility.sorters;
 
 import com.example.bakalar.logic.conversion.CFGRule;
-import com.example.bakalar.logic.utility.MySymbol;
-import com.example.bakalar.logic.utility.NonTerminal;
-import com.example.bakalar.logic.utility.SpecialNonTerminal;
+import com.example.bakalar.logic.conversion.MySymbol;
+import com.example.bakalar.logic.conversion.NonTerminal;
+import com.example.bakalar.logic.conversion.SpecialNonTerminal;
 
 import java.util.ArrayList;
 import java.util.Comparator;

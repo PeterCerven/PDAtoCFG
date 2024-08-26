@@ -1,10 +1,5 @@
 package com.example.bakalar.logic.conversion;
 
-import com.example.bakalar.exceptions.MyCustomException;
-import com.example.bakalar.logic.transitions.Transition;
-import com.example.bakalar.logic.utility.MySymbol;
-import com.example.bakalar.logic.utility.NonTerminal;
-import com.example.bakalar.logic.utility.SpecialNonTerminal;
 import javafx.scene.paint.Color;
 import lombok.Getter;
 import lombok.Setter;

@@ -3,7 +3,7 @@ package com.example.bakalar.logic.utility;
 import com.example.bakalar.canvas.arrow.Arrow;
 import com.example.bakalar.canvas.arrow.TransitionInputs;
 import com.example.bakalar.canvas.node.MyNode;
-import com.example.bakalar.logic.transitions.Transition;
+import com.example.bakalar.logic.conversion.Transition;
 import com.example.bakalar.logic.utility.sorters.TransitionSorter;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;

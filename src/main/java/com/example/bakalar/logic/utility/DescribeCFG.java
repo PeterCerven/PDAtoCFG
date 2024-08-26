@@ -1,6 +1,8 @@
 package com.example.bakalar.logic.utility;
 
 import com.example.bakalar.logic.conversion.CFGRule;
+import com.example.bakalar.logic.conversion.MySymbol;
+import com.example.bakalar.logic.conversion.NonTerminal;
 import com.example.bakalar.logic.utility.sorters.RuleSorter;
 import com.example.bakalar.logic.utility.sorters.SpecialNonTerminalSorter;
 import javafx.geometry.Pos;
