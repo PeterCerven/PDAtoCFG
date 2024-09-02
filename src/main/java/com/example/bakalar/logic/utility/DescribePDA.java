@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.example.bakalar.logic.Board.*;
+import static com.example.bakalar.logic.MainLogic.*;
 
 public class DescribePDA {
     private final TextField describeStates;

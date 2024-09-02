@@ -1,7 +1,7 @@
 package com.example.bakalar.canvas;
 
-import com.example.bakalar.logic.Board;
+import com.example.bakalar.logic.MainLogic;
 
 public interface Erasable {
-    void erase(Board board);
+    void erase(MainLogic mainLogic);
 }

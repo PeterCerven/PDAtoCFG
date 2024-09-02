@@ -130,10 +130,10 @@ public class RuleStepLogic {
         Transition newTransition = new Transition(transition.getCurrentState().getName(), transition.getInputSymbolToRead().getName(),
                 transition.getSymbolToPop().getName(), transition.getNextState().getName(), transition.getSymbolsToPushAsString());
         if (symbol.equals("current")) {
-            newTransition.setCurrentState(new MySymbol(leftSide.getStateSymbolFrom().getName(), Color.RED));
+            newTransition.setCurrentState(new MySymbol(leftSide.getStateFrom().getName(), Color.RED));
             helpingComment = "Do ľavej strany pravidla pridávame nový symbol súčastného stavu.";
         } else if (symbol.equals("pop")) {
-            newTransition.setSymbolToPop(new MySymbol(leftSide.getStackSymbol().getName(), Color.RED));
+            newTransition.setSymbolToPop(new MySymbol(leftSide.getStack().getName(), Color.RED));
             helpingComment = "Do ľavej strany pravidla pridávame symbol ktorý vyžierame zo zásobníka.";
         }
 
@@ -177,7 +177,7 @@ public class RuleStepLogic {
             MySymbol newStackSymbol = new MySymbol(stackSymbol.getName(), color);
             NonTerminal nonTerminal = templateRule.getRightSide().get(i);
             if (nonTerminal instanceof  SpecialNonTerminal spt) {
-                spt.setStackSymbol(newStackSymbol);
+                spt.setStack(newStackSymbol);
             }
 
         }
@@ -196,12 +196,12 @@ public class RuleStepLogic {
         templateRule.resetFontColor();
         NonTerminal firstNonTerminal = templateRule.getRightSide().get(0);
         if (firstNonTerminal instanceof  SpecialNonTerminal spt) {
-            spt.setStateSymbolTo(name);
+            spt.setStateTo(name);
         }
         NonTerminal rightSideNonTerminal = templateRule.getRightSide().get(templateRule.getRightSide().size() - 1);
         NonTerminal leftSide = templateRule.getLeftSide();
         if (rightSideNonTerminal instanceof SpecialNonTerminal spt && leftSide instanceof SpecialNonTerminal spt2) {
-            spt.setStateSymbolTo(spt2.getStateSymbolTo());
+            spt.setStateTo(spt2.getStateTo());
         }
 
         String helpingComment = "Na začiatok pravej strany pravidla pridáme symbol stavu do ktorého prechádzame.";
@@ -219,7 +219,7 @@ public class RuleStepLogic {
         templateRule.setLeftSide(leftSide);
         for (MySymbol tableOption : tableOptions) {
             if (templateRule.copyRightSide().get(tableOption.getIndex()) instanceof SpecialNonTerminal spt) {
-                spt.setStateSymbolTo(tableOption);
+                spt.setStateTo(tableOption);
             }
         }
         String helpingComment = "Tu pridáme všetky možnosti ako môžeme prechádzať stavmi.";
@@ -237,7 +237,7 @@ public class RuleStepLogic {
         for (MySymbol tableOption : tableOptions) {
             tableOption.setColor(Color.RED);
             if (templateRule.getRightSide().get(tableOption.getIndex() + 1) instanceof  SpecialNonTerminal spt) {
-                spt.setStateSymbolFrom(tableOption);
+                spt.setStateFrom(tableOption);
             }
         }
         String helpingComment = "Zkopírujeme koncoví stav predošlého neterminálu na začiatok ďalšieho neterminálu.";
@@ -252,10 +252,10 @@ public class RuleStepLogic {
 
         // rule step
         templateRule.resetFontColor();
-        leftSide.getStateSymbolTo().setColor(Color.RED);
+        leftSide.getStateTo().setColor(Color.RED);
         templateRule.setLeftSide(leftSide);
         if (templateRule.getRightSide().get(templateRule.getRightSide().size() - 1) instanceof  SpecialNonTerminal spt) {
-            spt.setStateSymbolTo(leftSide.getStateSymbolTo());
+            spt.setStateTo(leftSide.getStateTo());
         }
         String helpingComment = "Na koniec pravej strany pravidla pridáme symbol stavu, ktorý sa nachádza na poslednom mieste v neterminále naľavo.";
         stepRules.add(new StepRule(templateRule.copyLeftSide(), templateRule.copyTerminal(), templateRule.copyRightSide(), newTransition, helpingComment));

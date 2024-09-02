@@ -1,7 +1,7 @@
 package com.example.bakalar.canvas.arrow;
 
 import com.example.bakalar.canvas.node.MyNode;
-import com.example.bakalar.logic.Board;
+import com.example.bakalar.logic.MainLogic;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Arc;
@@ -11,7 +11,7 @@ import lombok.Getter;
 
 import java.util.List;
 
-import static com.example.bakalar.logic.Board.NODE_RADIUS;
+import static com.example.bakalar.logic.MainLogic.NODE_RADIUS;
 
 @Getter
 public class SelfLoopArrow extends Arrow {
@@ -23,8 +23,8 @@ public class SelfLoopArrow extends Arrow {
     private Arc arc;
 
 
-    public SelfLoopArrow(MyNode from, MyNode to, Board board, List<TransitionInputs> transitionInputs) {
-        super(from, to, board, transitionInputs);
+    public SelfLoopArrow(MyNode from, MyNode to, MainLogic mainLogic, List<TransitionInputs> transitionInputs) {
+        super(from, to, mainLogic, transitionInputs);
 
         this.arcWidth = NODE_RADIUS / 2.0;
         this.arcHeight = (NODE_RADIUS / 2.0) * 3;
@@ -48,10 +48,10 @@ public class SelfLoopArrow extends Arrow {
 
     @Override
     public void updateObjects(boolean toEdge) {
-        arc.setCenterX(from.getAbsoluteCentrePosX());
-        arc.setCenterY(from.getAbsoluteCentrePosY());
-        arc.setRadiusX(from.getCircle().getRadius() - arcWidth);
-        arc.setRadiusY(from.getCircle().getRadius() + arcHeight);
+        arc.setCenterX(nodeFrom.getAbsoluteCentrePosX());
+        arc.setCenterY(nodeFrom.getAbsoluteCentrePosY());
+        arc.setRadiusX(nodeFrom.getCircle().getRadius() - arcWidth);
+        arc.setRadiusY(nodeFrom.getCircle().getRadius() + arcHeight);
 
         updateArrowHead();
         this.symbolContainers = updateStackPanePosition(this.symbolContainers);
@@ -59,8 +59,8 @@ public class SelfLoopArrow extends Arrow {
 
     @Override
     public VBox updateStackPanePosition(VBox symbolContainers) {
-        double midX = from.getAbsoluteCentrePosX();
-        double midY = from.getAbsoluteCentrePosY() - (from.getCircle().getRadius() + arcHeight);
+        double midX = nodeFrom.getAbsoluteCentrePosX();
+        double midY = nodeFrom.getAbsoluteCentrePosY() - (nodeFrom.getCircle().getRadius() + arcHeight);
 
         double offsetX = -symbolContainers.getWidth() / 2.0;
         double offsetY = -(symbolContainers.getChildren().size() * (NODE_RADIUS / 1.8)) - (NODE_RADIUS / 8.0);
@@ -80,11 +80,11 @@ public class SelfLoopArrow extends Arrow {
         double arrowHeadLength = NODE_RADIUS / 5.0;
         double arrowHeadAngle = Math.toRadians(30);
 
-        double angleToNode = Math.atan2(from.getAbsoluteCentrePosY() - startY, from.getAbsoluteCentrePosX() - startX);
+        double angleToNode = Math.atan2(nodeFrom.getAbsoluteCentrePosY() - startY, nodeFrom.getAbsoluteCentrePosX() - startX);
 
-        double radius = from.getCircle().getRadius();
-        double intersectX = from.getAbsoluteCentrePosX() + (radius + 2) * Math.cos(angleToNode);
-        double intersectY = from.getAbsoluteCentrePosY() + (radius + 4) * Math.sin(angleToNode);
+        double radius = nodeFrom.getCircle().getRadius();
+        double intersectX = nodeFrom.getAbsoluteCentrePosX() + (radius + 2) * Math.cos(angleToNode);
+        double intersectY = nodeFrom.getAbsoluteCentrePosY() + (radius + 4) * Math.sin(angleToNode);
 
 
         double baseLeftX = intersectX + arrowHeadLength * Math.cos(angleToNode - arrowHeadAngle);
@@ -92,7 +92,6 @@ public class SelfLoopArrow extends Arrow {
         double baseRightX = intersectX + arrowHeadLength * Math.cos(angleToNode + arrowHeadAngle);
         double baseRightY = intersectY + arrowHeadLength * Math.sin(angleToNode + arrowHeadAngle);
 
-        arrowHead = super.getArrowHead();
         arrowHead.setStrokeType(StrokeType.OUTSIDE);
         arrowHead.getPoints().setAll(
                 intersectX, intersectY,
@@ -114,9 +113,9 @@ public class SelfLoopArrow extends Arrow {
     }
 
     @Override
-    public void erase(Board board) {
-        board.getArrows().remove(this);
-        this.getFrom().removeArrow(this);
-        this.getTo().removeArrow(this);
+    public void erase(MainLogic mainLogic) {
+        mainLogic.getArrows().remove(this);
+        super.getNodeFrom().removeArrow(this);
+        super.getNodeTo().removeArrow(this);
     }
 }

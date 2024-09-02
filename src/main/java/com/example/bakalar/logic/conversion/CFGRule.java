@@ -1,12 +1,15 @@
 package com.example.bakalar.logic.conversion;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
+@Builder
 @Getter
 @Setter
 public class CFGRule {
@@ -14,27 +17,24 @@ public class CFGRule {
     private MySymbol terminal;
     private List<NonTerminal> rightSide;
     private List<StepRule> steps;
-    private Transition transition;
 
     public CFGRule() {
         this.steps = new ArrayList<>();
         this.rightSide = new ArrayList<>();
     }
 
-    public CFGRule(NonTerminal leftSide, MySymbol terminal, List<NonTerminal> rightSide, Transition transition) {
+    public CFGRule(NonTerminal leftSide, MySymbol terminal, List<NonTerminal> rightSide) {
         this.leftSide = leftSide;
         this.terminal = terminal;
         this.rightSide = rightSide;
         this.steps = new ArrayList<>();
-        this.transition = transition;
     }
 
-    public CFGRule(MySymbol mySymbolLeftSide, MySymbol terminal, List<NonTerminal> rightSide, Transition transition) {
-        this.leftSide = new NonTerminal(mySymbolLeftSide);
+    public CFGRule(NonTerminal leftSide, MySymbol terminal, List<NonTerminal> rightSide, List<StepRule> steps) {
+        this.leftSide = leftSide;
         this.terminal = terminal;
         this.rightSide = rightSide;
-        this.steps = new ArrayList<>();
-        this.transition = transition;
+        this.steps = steps;
     }
 
     public CFGRule getDeepCopy() {
@@ -42,7 +42,6 @@ public class CFGRule {
         rule.setLeftSide(this.copyLeftSide());
         rule.setTerminal(this.copyTerminal());
         rule.setRightSide(this.copyRightSide());
-        rule.setTransition(this.getTransition());
         return rule;
     }
 
@@ -74,6 +73,22 @@ public class CFGRule {
         for (NonTerminal nonTerminal : rightSide) {
             nonTerminal.resetColor();
         }
+    }
+
+    @Override
+    public final boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof CFGRule cfgRule)) return false;
+
+        return getLeftSide().equals(cfgRule.getLeftSide()) && Objects.equals(getTerminal(), cfgRule.getTerminal()) && getRightSide().equals(cfgRule.getRightSide());
+    }
+
+    @Override
+    public int hashCode() {
+        int result = getLeftSide().hashCode();
+        result = 31 * result + Objects.hashCode(getTerminal());
+        result = 31 * result + getRightSide().hashCode();
+        return result;
     }
 
     @Override

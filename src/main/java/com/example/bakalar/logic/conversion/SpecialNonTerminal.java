@@ -3,82 +3,89 @@ package com.example.bakalar.logic.conversion;
 
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Builder(builderMethodName = "specialNonTerminalBuilder")
 @Getter
 @Setter
 public class SpecialNonTerminal extends NonTerminal {
-    private MySymbol stateSymbolFrom;
-    private MySymbol stackSymbol;
-    private MySymbol stateSymbolTo;
+    private MySymbol stateFrom;
+    private MySymbol stack;
+    private MySymbol stateTo;
 
     public SpecialNonTerminal() {
         super();
-        this.stateSymbolFrom = new MySymbol("_");
-        this.stackSymbol = new MySymbol("_");
-        this.stateSymbolTo = new MySymbol("_");
+        this.stateFrom = new MySymbol("_");
+        this.stack = new MySymbol("_");
+        this.stateTo = new MySymbol("_");
     }
 
-    public SpecialNonTerminal(String stateSymbolFrom, String stackSymbol, String stateSymbolTo) {
-        this.stateSymbolFrom = stateSymbolFrom == null ? new MySymbol("_") : new MySymbol(stateSymbolFrom);
-        this.stackSymbol = stackSymbol == null ? new MySymbol("_") : new MySymbol(stackSymbol);
-        this.stateSymbolTo = stateSymbolTo == null ? new MySymbol("_") : new MySymbol(stateSymbolTo);
+    public SpecialNonTerminal(String stateFrom, String stack, String stateTo) {
+        super();
+        this.stateFrom = stateFrom == null ? new MySymbol("_") : new MySymbol(stateFrom);
+        this.stack = stack == null ? new MySymbol("_") : new MySymbol(stack);
+        this.stateTo = stateTo == null ? new MySymbol("_") : new MySymbol(stateTo);
     }
 
-    public SpecialNonTerminal(MySymbol stateSymbolFrom, MySymbol stackSymbol, String stateSymbolTo) {
-        this.stateSymbolFrom = stateSymbolFrom == null ? new MySymbol("_") : stateSymbolFrom;
-        this.stackSymbol = stackSymbol == null ? new MySymbol("_") : stackSymbol;
-        this.stateSymbolTo = stateSymbolTo == null ? new MySymbol("_") : new MySymbol(stateSymbolTo);
+    public SpecialNonTerminal(MySymbol stateFrom, MySymbol stack, String stateTo) {
+        super();
+        this.stateFrom = stateFrom == null ? new MySymbol("_") : stateFrom;
+        this.stack = stack == null ? new MySymbol("_") : stack;
+        this.stateTo = stateTo == null ? new MySymbol("_") : new MySymbol(stateTo);
     }
 
-    public SpecialNonTerminal(MySymbol stateSymbolFrom, MySymbol stackSymbol, MySymbol stateSymbolTo) {
-        this.stateSymbolFrom = stateSymbolFrom == null ? new MySymbol("_") : stateSymbolFrom;
-        this.stackSymbol = stackSymbol == null ? new MySymbol("_") : stackSymbol;
-        this.stateSymbolTo = stateSymbolTo == null ? new MySymbol("_") : stateSymbolTo;
+    public SpecialNonTerminal(MySymbol stateFrom, MySymbol stack, MySymbol stateTo) {
+        super();
+        this.stateFrom = stateFrom == null ? new MySymbol("_") : stateFrom;
+        this.stack = stack == null ? new MySymbol("_") : stack;
+        this.stateTo = stateTo == null ? new MySymbol("_") : stateTo;
     }
 
-    public SpecialNonTerminal(MySymbol stateSymbolFrom, Color fromColor, MySymbol stackSymbol, Color stackColor, MySymbol stateSymbolTo, Color toColor) {
-        this.stateSymbolFrom = stateSymbolFrom == null ? new MySymbol("_") : new MySymbol(stateSymbolFrom, fromColor);
-        this.stackSymbol = stackSymbol == null ? new MySymbol("_") : new MySymbol(stackSymbol, stackColor);
-        this.stateSymbolTo = stateSymbolTo == null ? new MySymbol("_") : new MySymbol(stateSymbolTo, toColor);
+    public SpecialNonTerminal(String symbol, Color color, MySymbol stateFrom, MySymbol stack, MySymbol stateTo) {
+        super(symbol, color);
+        this.stateFrom = stateFrom;
+        this.stack = stack;
+        this.stateTo = stateTo;
     }
 
-
+    public SpecialNonTerminal(String[] array) {
+    }
 
     @Override
     public NonTerminal getDeepCopy() {
-        return new SpecialNonTerminal(new MySymbol(stateSymbolFrom.getName(), stateSymbolFrom.getColor()),
-                new MySymbol(stackSymbol.getName(), stackSymbol.getColor()),
-                new MySymbol(stateSymbolTo.getName(), stateSymbolTo.getColor()));
+        return new SpecialNonTerminal(new MySymbol(stateFrom.getName(), stateFrom.getColor()),
+                new MySymbol(stack.getName(), stack.getColor()),
+                new MySymbol(stateTo.getName(), stateTo.getColor()));
     }
 
     @Override
     public List<Text> createText(int fontSize) {
         List<Text> texts = new ArrayList<>();
         texts.add(new CustomText("[", fontSize));
-        texts.add(new CustomText(this.getStateSymbolFrom(), fontSize));
+        texts.add(new CustomText(this.getStateFrom(), fontSize));
         texts.add(new CustomText(", ", fontSize));
-        texts.add(new CustomText(this.getStackSymbol(), fontSize));
+        texts.add(new CustomText(this.getStack(), fontSize));
         texts.add(new CustomText(", ", fontSize));
-        texts.add(new CustomText(this.getStateSymbolTo(), fontSize));
+        texts.add(new CustomText(this.getStateTo(), fontSize));
         texts.add(new CustomText("]", fontSize));
         return texts;
     }
 
     @Override
     public void resetColor() {
-        stateSymbolFrom.setColor(MySymbol.DEFAULT_COLOR);
-        stackSymbol.setColor(MySymbol.DEFAULT_COLOR);
-        stateSymbolTo.setColor(MySymbol.DEFAULT_COLOR);
+        stateFrom.setColor(MySymbol.DEFAULT_COLOR);
+        stack.setColor(MySymbol.DEFAULT_COLOR);
+        stateTo.setColor(MySymbol.DEFAULT_COLOR);
     }
 
     @Override
     public String toString() {
-        return "[" + stateSymbolFrom + ", " + stackSymbol + ", " + stateSymbolTo + "]";
+        return "[" + stateFrom + ", " + stack + ", " + stateTo + "]";
     }
 
     @Override
@@ -86,18 +93,18 @@ public class SpecialNonTerminal extends NonTerminal {
         if (this == o) return true;
         if (!(o instanceof SpecialNonTerminal that)) return false;
 
-        if (getStateSymbolFrom() != null ? !getStateSymbolFrom().equals(that.getStateSymbolFrom()) : that.getStateSymbolFrom() != null)
+        if (getStateFrom() != null ? !getStateFrom().equals(that.getStateFrom()) : that.getStateFrom() != null)
             return false;
-        if (getStackSymbol() != null ? !getStackSymbol().equals(that.getStackSymbol()) : that.getStackSymbol() != null)
+        if (getStack() != null ? !getStack().equals(that.getStack()) : that.getStack() != null)
             return false;
-        return getStateSymbolTo() != null ? getStateSymbolTo().equals(that.getStateSymbolTo()) : that.getStateSymbolTo() == null;
+        return getStateTo() != null ? getStateTo().equals(that.getStateTo()) : that.getStateTo() == null;
     }
 
     @Override
     public int hashCode() {
-        int result = getStateSymbolFrom() != null ? getStateSymbolFrom().hashCode() : 0;
-        result = 31 * result + (getStackSymbol() != null ? getStackSymbol().hashCode() : 0);
-        result = 31 * result + (getStateSymbolTo() != null ? getStateSymbolTo().hashCode() : 0);
+        int result = getStateFrom() != null ? getStateFrom().hashCode() : 0;
+        result = 31 * result + (getStack() != null ? getStack().hashCode() : 0);
+        result = 31 * result + (getStateTo() != null ? getStateTo().hashCode() : 0);
         return result;
     }
 }

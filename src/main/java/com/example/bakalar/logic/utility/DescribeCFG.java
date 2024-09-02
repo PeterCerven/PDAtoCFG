@@ -3,6 +3,7 @@ package com.example.bakalar.logic.utility;
 import com.example.bakalar.logic.conversion.CFGRule;
 import com.example.bakalar.logic.conversion.MySymbol;
 import com.example.bakalar.logic.conversion.NonTerminal;
+import com.example.bakalar.logic.conversion.simplify.GrammarComponents;
 import com.example.bakalar.logic.utility.sorters.RuleSorter;
 import com.example.bakalar.logic.utility.sorters.SpecialNonTerminalSorter;
 import javafx.geometry.Pos;
@@ -27,11 +28,11 @@ public class DescribeCFG {
         this.startSymbol = new TextField();
         this.rulesContainer = new VBox();
     }
-    public void updateAllDescribeCFG(Set<NonTerminal> allNonTerminals, Set<MySymbol> allTerminals, List<CFGRule> rules, MySymbol startingS) {
-        updateNonTerminals(allNonTerminals);
-        updateTerminals(allTerminals);
-        updateStartSymbol(startingS);
-        updateRules(rules);
+    public void updateAllDescribeCFG(GrammarComponents gc) {
+        updateNonTerminals(gc.getNonTerminals());
+        updateTerminals(gc.getTerminals());
+        updateStartSymbol(gc.getStartingSymbol());
+        updateRules(gc.getRules());
     }
     private void updateRules(List<CFGRule> rules) {
         rulesContainer.getChildren().clear();
@@ -44,7 +45,7 @@ public class DescribeCFG {
                 .forEach(rulesContainer.getChildren()::add);
     }
 
-    private void updateStartSymbol(MySymbol startingS) {
+    private void updateStartSymbol(NonTerminal startingS) {
         startSymbol.setText("Začiatočný symbol = " + startingS);
     }
 

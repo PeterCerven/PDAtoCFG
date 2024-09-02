@@ -9,22 +9,27 @@ import java.util.*;
 public class GrammarSimplificationService {
 
     public GrammarComponents changeSpecialTerminalsToNonTerminals(GrammarComponents gc) {
-        Set<NonTerminal> allNonTerminals = gc.nonTerminals();
-        List<CFGRule> allRules = gc.rules();
+        Set<NonTerminal> allNonTerminals = gc.getNonTerminals();
+        List<CFGRule> allRules = gc.getRules();
 
         char namingLetter = 'A';
         String prohibitedLetters = "SZ";
 
-        Map<SpecialNonTerminal, Character> nameForTerminals = new HashMap<>();
+        Map<SpecialNonTerminal, NonTerminal> nameForTerminals = new HashMap<>();
+        Set<NonTerminal> newNonTerminals = new HashSet<>();
 
         for (NonTerminal nonTerminal : allNonTerminals) {
             if (nonTerminal instanceof SpecialNonTerminal snt) {
                 if (prohibitedLetters.contains(Character.toString(namingLetter))) {
                     namingLetter++;
                 }
-                nameForTerminals.put(snt, namingLetter++);
+                nameForTerminals.put(snt, new NonTerminal(String.valueOf(namingLetter++)));
+            } else {
+                newNonTerminals.add(nonTerminal);
             }
         }
+        newNonTerminals.addAll(nameForTerminals.values());
+        gc.setNonTerminals(newNonTerminals);
 
         // rules
         for (CFGRule rule : allRules) {
@@ -32,9 +37,9 @@ public class GrammarSimplificationService {
             List<NonTerminal> newRightSide = new ArrayList<>();
             for (NonTerminal nonTerminal : rule.getRightSide()) {
                 if (nonTerminal instanceof SpecialNonTerminal snt) {
-                    Character name = nameForTerminals.get(snt);
-                    if (name != null) {
-                        newRightSide.add(new NonTerminal(name.toString()));
+                    NonTerminal newNonTerminal = nameForTerminals.get(snt);
+                    if (newNonTerminal != null) {
+                        newRightSide.add(newNonTerminal);
                     }
 
                 }
@@ -42,9 +47,9 @@ public class GrammarSimplificationService {
             }
             // left side
             if (rule.getLeftSide() instanceof SpecialNonTerminal snt) {
-                Character name = nameForTerminals.get(snt);
-                if (name != null) {
-                    rule.setLeftSide(new NonTerminal(name.toString()));
+                NonTerminal newNonTerminal = nameForTerminals.get(snt);
+                if (newNonTerminal != null) {
+                    rule.setLeftSide(new NonTerminal(newNonTerminal.toString()));
                 }
             }
         }
@@ -58,8 +63,8 @@ public class GrammarSimplificationService {
     }
 
     private void removeAllRulesThatCannotBeReachedFromStart(GrammarComponents gc) {
-        List<CFGRule> allRules = gc.rules();
-        NonTerminal startSymbol = gc.startingSymbol();
+        List<CFGRule> allRules = gc.getRules();
+        NonTerminal startSymbol = gc.getStartingSymbol();
         Set<NonTerminal> allowedNonTerminals = new HashSet<>();
         int currentSize = 1;
         int previousSize = 0;
@@ -86,7 +91,7 @@ public class GrammarSimplificationService {
 
     private void removeAllNonTerminalsThatDontDeriveTerminals(GrammarComponents gc) {
         Set<NonTerminal> allowedNonTerminals = new HashSet<>();
-        List<CFGRule> allRules = gc.rules();
+        List<CFGRule> allRules = gc.getRules();
         for (CFGRule rule : allRules) {
             if (rule.getTerminal() != null) {
                 allowedNonTerminals.add(rule.getLeftSide());

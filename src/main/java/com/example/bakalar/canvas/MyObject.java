@@ -1,6 +1,6 @@
 package com.example.bakalar.canvas;
 
-import com.example.bakalar.logic.Board;
+import com.example.bakalar.logic.MainLogic;
 import javafx.scene.Group;
 import lombok.Getter;
 import lombok.Setter;
@@ -29,5 +29,5 @@ public abstract class MyObject extends Group implements Serializable, Erasable {
     }
 
     @Override
-    public abstract void erase(Board board);
+    public abstract void erase(MainLogic mainLogic);
 }

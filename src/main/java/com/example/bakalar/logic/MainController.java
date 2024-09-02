@@ -49,7 +49,7 @@ public class MainController {
     private Slider slider;
     @FXML
     private TextField sliderInput;
-    private Board board;
+    private MainLogic mainLogic;
     private Stage stage;
     private ButtonBehaviour btnBeh;
     private HelpUser helpUser;
@@ -67,7 +67,7 @@ public class MainController {
         DescribePDA describePDA = new DescribePDA(describePDAFields, transFunctions);
         HistoryLogic historyLogic = new HistoryLogic(undoBtn, reUndoBtn);
         setSlider();
-        board = new Board(mainPane, describePDA, historyLogic, stage, btnBeh, slider, sliderInput);
+        mainLogic = new MainLogic(mainPane, describePDA, historyLogic, stage, btnBeh, slider, sliderInput);
         helpUser = new HelpUser();
 
         mainPane.setOnMouseClicked(this::createNode);
@@ -106,7 +106,7 @@ public class MainController {
         this.stage = stage;
         stage.setOnCloseRequest(event -> {
             event.consume();
-            board.showExitConfirmation(stage);
+            mainLogic.showExitConfirmation(stage);
         });
     }
 
@@ -120,14 +120,14 @@ public class MainController {
     // Objects creation
 
     public void createNode(MouseEvent event) {
-        board.createNode(event);
+        mainLogic.createNode(event);
     }
 
 
     // Buttons actions
 
     public void changeSize() {
-        board.updateBoardSize((int) Math.round(slider.getValue()));
+        mainLogic.updateBoardSize((int) Math.round(slider.getValue()));
     }
 
     public void drawNodeOn() {
@@ -143,34 +143,34 @@ public class MainController {
     }
 
     public void resetAll() {
-        board.saveCurrentStateToHistory();
-        board.clearBoard(true);
+        mainLogic.saveCurrentStateToHistory();
+        mainLogic.clearBoard(true);
     }
 
     public void buttonRedo() {
-        board.redo();
+        mainLogic.redo();
     }
 
     public void buttonUndo() {
-        board.undo();
+        mainLogic.undo();
     }
 
     public void convertPDA() {
-        board.convertPDA();
+        mainLogic.convertPDA();
     }
 
 
     // menu action
     public void closeApp() {
-        board.showExitConfirmation(stage);
+        mainLogic.showExitConfirmation(stage);
     }
 
     public void saveToFile() {
-        board.saveCurrentStateToFile();
+        mainLogic.saveCurrentStateToFile();
     }
 
     public void loadFromFile() {
-        board.loadStateFromFile();
+        mainLogic.loadStateFromFile();
     }
 
     public void about() {
@@ -195,12 +195,12 @@ public class MainController {
 
     public void keyPress(KeyEvent event) {
         if (CTRL_Z.match(event)) {
-            board.undo();
+            mainLogic.undo();
         } else if (CTRL_SHIFT_Z.match(event)) {
-            board.redo();
+            mainLogic.redo();
         } else if (event.getCode() == KeyCode.ESCAPE) {
             if (btnBeh.getCurrentState() == ButtonState.SELECT) {
-                board.showExitConfirmation(stage);
+                mainLogic.showExitConfirmation(stage);
             } else {
                 btnBeh.resetToSelect();
             }
@@ -210,7 +210,7 @@ public class MainController {
     // test
 
     public void testBoard() {
-        board.testBoard();
+        mainLogic.testBoard();
     }
 
 

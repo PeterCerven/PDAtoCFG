@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-import static com.example.bakalar.logic.Board.STARTING_S;
+import static com.example.bakalar.logic.MainLogic.STARTING_S;
 
 public class RuleSorter implements Comparator<CFGRule> {
     /**
@@ -90,14 +90,14 @@ public class RuleSorter implements Comparator<CFGRule> {
         }
 
         // SpecialNonTerminal Comparison
-        if (!leftSpecial1.getStateSymbolFrom().equals(leftSpecial2.getStateSymbolFrom())) {
-            return leftSpecial1.getStateSymbolFrom()
-                    .compareTo(leftSpecial2.getStateSymbolFrom());
+        if (!leftSpecial1.getStateFrom().equals(leftSpecial2.getStateFrom())) {
+            return leftSpecial1.getStateFrom()
+                    .compareTo(leftSpecial2.getStateFrom());
         }
         if (!rightList1.isEmpty() && !rightList2.isEmpty()) {
-            if (!rightSpecialList1.get(0).getStateSymbolFrom().equals(rightSpecialList2.get(0).getStateSymbolFrom())) {
-                return rightSpecialList1.get(0).getStateSymbolFrom()
-                        .compareTo(rightSpecialList2.get(0).getStateSymbolFrom());
+            if (!rightSpecialList1.get(0).getStateFrom().equals(rightSpecialList2.get(0).getStateFrom())) {
+                return rightSpecialList1.get(0).getStateFrom()
+                        .compareTo(rightSpecialList2.get(0).getStateFrom());
             }
         }
         if (rightSpecialList1.size() != rightSpecialList2.size()) {
@@ -106,24 +106,24 @@ public class RuleSorter implements Comparator<CFGRule> {
         if (!terminal1.equals(terminal2)) {
             return rule1.getTerminal().compareTo(rule2.getTerminal());
         }
-        if (!leftSpecial1.getStackSymbol().equals(leftSpecial2.getStackSymbol())) {
-            return leftSpecial1.getStackSymbol()
-                    .compareTo(leftSpecial2.getStackSymbol());
+        if (!leftSpecial1.getStack().equals(leftSpecial2.getStack())) {
+            return leftSpecial1.getStack()
+                    .compareTo(leftSpecial2.getStack());
         }
-        if (!leftSpecial1.getStateSymbolTo().equals(leftSpecial2.getStateSymbolTo())) {
-            return leftSpecial1.getStateSymbolTo()
-                    .compareTo(leftSpecial2.getStateSymbolTo());
+        if (!leftSpecial1.getStateTo().equals(leftSpecial2.getStateTo())) {
+            return leftSpecial1.getStateTo()
+                    .compareTo(leftSpecial2.getStateTo());
         }
         for (int i = 0; i < rightSpecialList1.size(); i++) {
-            if (!rightSpecialList1.get(i).getStackSymbol().equals(rightSpecialList2.get(i).getStackSymbol())) {
-                return rightSpecialList1.get(i).getStackSymbol()
-                        .compareTo(rightSpecialList2.get(i).getStackSymbol());
+            if (!rightSpecialList1.get(i).getStack().equals(rightSpecialList2.get(i).getStack())) {
+                return rightSpecialList1.get(i).getStack()
+                        .compareTo(rightSpecialList2.get(i).getStack());
             }
         }
         for (int i = 1; i < rightSpecialList1.size(); i++) {
-            if (!rightSpecialList1.get(i).getStateSymbolFrom().equals(rightSpecialList2.get(i).getStateSymbolFrom())) {
-                return rightSpecialList1.get(i).getStateSymbolFrom()
-                        .compareTo(rightSpecialList2.get(i).getStateSymbolFrom());
+            if (!rightSpecialList1.get(i).getStateFrom().equals(rightSpecialList2.get(i).getStateFrom())) {
+                return rightSpecialList1.get(i).getStateFrom()
+                        .compareTo(rightSpecialList2.get(i).getStateFrom());
             }
         }
         return 0;

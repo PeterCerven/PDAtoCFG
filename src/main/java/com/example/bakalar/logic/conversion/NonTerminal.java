@@ -2,13 +2,16 @@ package com.example.bakalar.logic.conversion;
 
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
+import lombok.Builder;
 import lombok.Getter;
 
 import java.util.List;
 import java.util.Objects;
 
-import static com.example.bakalar.logic.Board.EPSILON;
+import static com.example.bakalar.logic.MainLogic.EPSILON;
 
+
+@Builder
 @Getter
 public class NonTerminal {
     private MySymbol symbol;

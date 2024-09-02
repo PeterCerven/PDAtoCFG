@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.example.bakalar.logic.Board.EPSILON;
+import static com.example.bakalar.logic.MainLogic.EPSILON;
 
 @Getter
 @Setter

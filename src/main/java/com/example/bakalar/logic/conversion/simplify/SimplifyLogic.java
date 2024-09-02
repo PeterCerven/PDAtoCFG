@@ -1,14 +1,11 @@
 package com.example.bakalar.logic.conversion.simplify;
 
 import com.example.bakalar.logic.conversion.CFGRule;
-import com.example.bakalar.logic.conversion.MySymbol;
 import com.example.bakalar.logic.conversion.NonTerminal;
 import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Getter
 public class SimplifyLogic {
@@ -36,13 +33,11 @@ public class SimplifyLogic {
 
     private GrammarComponents deepCopyGrammarComponents(GrammarComponents gc) {
         List<CFGRule> rules = new ArrayList<>();
-        for (CFGRule rule : gc.rules()) {
+        for (CFGRule rule : gc.getRules()) {
             rules.add(rule.getDeepCopy());
         }
-        NonTerminal startingSymbol = gc.startingSymbol().getDeepCopy();
-        Set<MySymbol> terminals = gc.terminals().stream().map(MySymbol::getDeepCopy).collect(Collectors.toSet());
-        Set<NonTerminal> nonTerminals = gc.nonTerminals().stream().map(NonTerminal::getDeepCopy).collect(Collectors.toSet());
-        return new GrammarComponents(rules, startingSymbol, terminals, nonTerminals);
+        NonTerminal startingSymbol = gc.getStartingSymbol().getDeepCopy();
+        return new GrammarComponents(rules, startingSymbol);
     }
 
 

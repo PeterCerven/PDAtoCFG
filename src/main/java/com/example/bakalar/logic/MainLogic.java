@@ -44,7 +44,7 @@ import static com.example.bakalar.logic.utility.StageUtils.setStageIcon;
 
 @Getter
 @Setter
-public class Board implements Serializable {
+public class MainLogic implements Serializable {
     public static final String EPSILON = "ε";
     public static final String GAMMA_CAPITAL = "Γ";
     public static final String SIGMA = "Σ";
@@ -77,8 +77,8 @@ public class Board implements Serializable {
     private boolean preventNodeCreation;
 
 
-    public Board(AnchorPane mainPane, DescribePDA describePDA, HistoryLogic historyLogic,
-                 Stage stage, ButtonBehaviour btnBeh, Slider slider, TextField sliderInput) {
+    public MainLogic(AnchorPane mainPane, DescribePDA describePDA, HistoryLogic historyLogic,
+                     Stage stage, ButtonBehaviour btnBeh, Slider slider, TextField sliderInput) {
         this.nodes = new ArrayList<>();
         this.describePDA = describePDA;
         this.arrows = new ArrayList<>();
@@ -126,8 +126,8 @@ public class Board implements Serializable {
         for (MyNode node : nodes) {
             for (Arrow arrow : node.getArrowsFrom()) {
                 for (TransitionInputs transitionInputs : arrow.getTransitions()) {
-                    transitions.add(new Transition(arrow.getFrom().getName(), transitionInputs.getRead(),
-                            transitionInputs.getPop(), arrow.getTo().getName(), transitionInputs.getPush()));
+                    transitions.add(new Transition(arrow.getNodeFrom().getName(), transitionInputs.getRead(),
+                            transitionInputs.getPop(), arrow.getNodeTo().getName(), transitionInputs.getPush()));
                 }
             }
         }
@@ -232,7 +232,7 @@ public class Board implements Serializable {
 
     private Arrow sameArrowExists(MyNode from, MyNode to) {
         for (Arrow arrow : arrows) {
-            if (arrow.getFrom() == from && arrow.getTo() == to) {
+            if (arrow.getNodeFrom() == from && arrow.getNodeTo() == to) {
                 return arrow;
             }
         }
@@ -241,7 +241,7 @@ public class Board implements Serializable {
 
     private boolean oppositeExists(MyNode from, MyNode to) {
         for (Arrow arrow : arrows) {
-            if (arrow.getFrom() == to && arrow.getTo() == from) {
+            if (arrow.getNodeFrom() == to && arrow.getNodeTo() == from) {
                 return true;
             }
         }
@@ -555,8 +555,8 @@ public class Board implements Serializable {
             for (TransitionInputs inputs : arrow.getTransitions()) {
                 ArrowModel arrowModel = new ArrowModel();
                 arrowModel.setArrowId(arrow.getID());
-                arrowModel.setFromNodeId(arrow.getFrom().getID());
-                arrowModel.setToNodeId(arrow.getTo().getID());
+                arrowModel.setFromNodeId(arrow.getNodeFrom().getID());
+                arrowModel.setToNodeId(arrow.getNodeTo().getID());
                 arrowModel.setTransition(inputs);
                 arrowModels.add(arrowModel);
                 if (arrow instanceof LineArrow lineArrow) {

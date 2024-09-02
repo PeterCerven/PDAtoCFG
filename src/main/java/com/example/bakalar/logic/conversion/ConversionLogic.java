@@ -25,11 +25,9 @@ import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
-import static com.example.bakalar.logic.Board.*;
+import static com.example.bakalar.logic.MainLogic.*;
 import static com.example.bakalar.logic.utility.ErrorPopUp.showErrorDialog;
 
 public class ConversionLogic {
@@ -43,6 +41,7 @@ public class ConversionLogic {
     private boolean showSteps = false;
     private List<RulesWindows> rulesWindows;
     private int currentIndex;
+    private List<CFGRule> allRules;
 
 
     public ConversionLogic(FileLogic fileLogic) {
@@ -72,36 +71,6 @@ public class ConversionLogic {
         showTransitionStage();
     }
 
-    private Set<NonTerminal> getAllNonTerminals() {
-        Set<NonTerminal> nonTerminals = new HashSet<>();
-        for (RulesWindows ruleWindow : rulesWindows) {
-            for (CFGRule rule : ruleWindow.getRules()) {
-                nonTerminals.add(rule.getLeftSide().getDeepCopy());
-                nonTerminals.addAll(rule.getRightSide().stream().map(NonTerminal::getDeepCopy).toList());
-            }
-        }
-        return nonTerminals;
-    }
-
-    private List<CFGRule> getAllRules() {
-        List<CFGRule> allRules = new ArrayList<>();
-        for (RulesWindows ruleWindow : rulesWindows) {
-            allRules.addAll(ruleWindow.getRules());
-        }
-        return allRules;
-    }
-
-    private Set<MySymbol> getAllTerminals() {
-        Set<MySymbol> terminals = new HashSet<>();
-        for (CFGRule rule : getAllRules()) {
-            if (rule.getTerminal() != null && !rule.getTerminal().getName().equals(EPSILON)) {
-                terminals.add(rule.getTerminal().getDeepCopy());
-            }
-        }
-        return terminals;
-    }
-
-
     private void setupTransitionStage(List<Transition> transitions) throws MyCustomException {
         for (Transition transition : transitions) {
             this.rulesWindows.add(convertTransitions(transition));
@@ -123,16 +92,22 @@ public class ConversionLogic {
         Button nextButton = conversionStage.getNextButton();
         Button showStepsButton = stepsWindow.getShowStepsButton();
 
-        GrammarComponents gc = new GrammarComponents(getAllRules(), new NonTerminal(STARTING_S), getAllTerminals(), getAllNonTerminals());
+        allRules = new ArrayList<>();
+        for (RulesWindows ruleWindow : rulesWindows) {
+            allRules.addAll(ruleWindow.getRules());
+        }
+
+
+        GrammarComponents gc = new GrammarComponents(allRules, new NonTerminal(STARTING_S));
 
         reduceButton.setOnAction(e -> informationWindow.swapCFGtoReduceAndBack(simplifyLogic, gc));
-        downloadButton.setOnAction(e -> fileLogic.saveToTextFile(getAllRules(), conversionStage.getStage()));
+        downloadButton.setOnAction(e -> fileLogic.saveToTextFile(allRules, conversionStage.getStage()));
         prevButton.setOnAction(e -> updateWindow(-1));
         nextButton.setOnAction(e -> updateWindow(1));
         showStepsButton.setOnAction(e -> steps());
 
 
-        describeCFG.updateAllDescribeCFG(getAllNonTerminals(), getAllTerminals(), getAllRules(), new MySymbol(STARTING_S));
+        describeCFG.updateAllDescribeCFG(gc);
         updateWindow(0);
         conversionStage.getStage().show();
     }
@@ -235,7 +210,7 @@ public class ConversionLogic {
 
         ruleStepLogic.addLastRightStep(leftSideStep3);
 
-        CFGRule cfgRule = new CFGRule(leftSide, terminal, rightSide, transition);
+        CFGRule cfgRule = new CFGRule(leftSide, terminal, rightSide);
         cfgRule.setSteps(ruleStepLogic.getStepRules());
 
         return cfgRule;
@@ -251,7 +226,7 @@ public class ConversionLogic {
         MySymbol terminal = new MySymbol(transition.getInputSymbolToRead().getName());
         List<NonTerminal> rightSide = new ArrayList<>();
         ruleStepLogic.createTerminalSteps();
-        CFGRule cfgRule = new CFGRule(leftSide, terminal, rightSide, transition);
+        CFGRule cfgRule = new CFGRule(leftSide, terminal, rightSide);
         cfgRule.setSteps(ruleStepLogic.getStepRules());
         return List.of(cfgRule);
     }
@@ -269,14 +244,14 @@ public class ConversionLogic {
         List<MySymbol> allStateSymbols = nodes.stream().map(node -> new MySymbol(node.getName())).toList();
         List<CFGRule> cfgRules = new ArrayList<>();
 
-        MySymbol startSymbol = new MySymbol(STARTING_S);
+        NonTerminal startSymbol = new NonTerminal(STARTING_S);
         MySymbol startStackSymbol = new MySymbol(STARTING_Z);
         for (MySymbol stateSymbol : allStateSymbols) {
             RuleStepLogic ruleStepLogic = new RuleStepLogic(transition);
             List<NonTerminal> rightSide = new ArrayList<>();
             rightSide.add(new SpecialNonTerminal(transition.getCurrentState(), startStackSymbol, stateSymbol));
             ruleStepLogic.createStartingSteps(STARTING_S, STARTING_Z, transition.getCurrentState().getName(), stateSymbol.getName());
-            CFGRule cfgRule = new CFGRule(startSymbol, null, rightSide, transition);
+            CFGRule cfgRule = new CFGRule(startSymbol, null, rightSide);
             cfgRule.setSteps(ruleStepLogic.getStepRules());
             cfgRules.add(cfgRule);
         }

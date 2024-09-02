@@ -12,14 +12,14 @@ public class SpecialNonTerminalSorter implements Comparator<NonTerminal> {
     @Override
     public int compare(NonTerminal o1, NonTerminal o2) {
         if (o1 instanceof SpecialNonTerminal so1 && o2 instanceof SpecialNonTerminal so2) {
-            if(so1.getStackSymbol().getName().compareTo(so2.getStackSymbol().getName()) != 0) {
-                return so1.getStackSymbol().getName().compareTo(so2.getStackSymbol().getName());
+            if(so1.getStack().getName().compareTo(so2.getStack().getName()) != 0) {
+                return so1.getStack().getName().compareTo(so2.getStack().getName());
             }
-            if (so1.getStateSymbolFrom().getName().compareTo(so2.getStateSymbolFrom().getName()) != 0) {
-                return so1.getStateSymbolFrom().getName().compareTo(so2.getStateSymbolFrom().getName());
+            if (so1.getStateFrom().getName().compareTo(so2.getStateFrom().getName()) != 0) {
+                return so1.getStateFrom().getName().compareTo(so2.getStateFrom().getName());
             }
-            if (so1.getStateSymbolTo().getName().compareTo(so2.getStateSymbolTo().getName()) != 0) {
-                return so1.getStateSymbolTo().getName().compareTo(so2.getStateSymbolTo().getName());
+            if (so1.getStateTo().getName().compareTo(so2.getStateTo().getName()) != 0) {
+                return so1.getStateTo().getName().compareTo(so2.getStateTo().getName());
             }
         }
         return o1.getSymbol().getName().compareTo(o2.getSymbol().getName());

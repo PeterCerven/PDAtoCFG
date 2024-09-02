@@ -18,8 +18,6 @@ module com.example.bakalar {
     exports com.example.bakalar.logic;
     exports com.example.bakalar.canvas.arrow;
     exports com.example.bakalar.canvas.node;
-    exports com.example.bakalar.logic.transitions;
-    opens com.example.bakalar.logic.transitions to javafx.fxml, lombok;
     exports com.example.bakalar.logic.conversion;
     opens com.example.bakalar.logic.conversion to javafx.fxml, lombok;
     exports com.example.bakalar.logic.history;

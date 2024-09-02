@@ -1,7 +1,7 @@
 package com.example.bakalar.canvas.arrow;
 
 import com.example.bakalar.canvas.node.MyNode;
-import com.example.bakalar.logic.Board;
+import com.example.bakalar.logic.MainLogic;
 import javafx.geometry.Point2D;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -12,7 +12,7 @@ import lombok.Getter;
 
 import java.util.List;
 
-import static com.example.bakalar.logic.Board.NODE_RADIUS;
+import static com.example.bakalar.logic.MainLogic.NODE_RADIUS;
 
 @Getter
 public class LineArrow extends Arrow {
@@ -28,8 +28,8 @@ public class LineArrow extends Arrow {
     private double endX;
     private double endY;
 
-    public LineArrow(MyNode from, MyNode to, Board board, List<TransitionInputs> transitionInputs) {
-        super(from, to, board, transitionInputs);
+    public LineArrow(MyNode from, MyNode to, MainLogic mainLogic, List<TransitionInputs> transitionInputs) {
+        super(from, to, mainLogic, transitionInputs);
 
         this.line = createLine();
         resetLine();
@@ -41,17 +41,16 @@ public class LineArrow extends Arrow {
     }
 
 
-
-    public LineArrow(MyNode from, MyNode to, double change, Board board, List<TransitionInputs> transitionInputs) {
-        this(from, to, board, transitionInputs);
+    public LineArrow(MyNode from, MyNode to, double change, MainLogic mainLogic, List<TransitionInputs> transitionInputs) {
+        this(from, to, mainLogic, transitionInputs);
         Point2D thirdPoint = getThirdPoint(change);
         this.controlPointChangeX = thirdPoint.getX() - (startX + endX) / 2.0;
         this.controlPointChangeY = thirdPoint.getY() - (startY + endY) / 2.0;
         this.updateObjects(true);
     }
 
-    public LineArrow(MyNode from, MyNode to, double controlPointChangeX, double controlPointChangeY, Board board, List<TransitionInputs> transitionInputs) {
-        this(from, to, board, transitionInputs);
+    public LineArrow(MyNode from, MyNode to, double controlPointChangeX, double controlPointChangeY, MainLogic mainLogic, List<TransitionInputs> transitionInputs) {
+        this(from, to, mainLogic, transitionInputs);
         this.controlPointChangeX = controlPointChangeX;
         this.controlPointChangeY = controlPointChangeY;
         this.updateObjects(true);
@@ -75,13 +74,13 @@ public class LineArrow extends Arrow {
 
 
     private void setLinePoints(boolean toEdge) {
-        startX = from.getAbsoluteCentrePosX();
-        startY = from.getAbsoluteCentrePosY();
-        endX = to.getAbsoluteCentrePosX();
-        endY = to.getAbsoluteCentrePosY();
+        startX = nodeFrom.getAbsoluteCentrePosX();
+        startY = nodeFrom.getAbsoluteCentrePosY();
+        endX = nodeTo.getAbsoluteCentrePosX();
+        endY = nodeTo.getAbsoluteCentrePosY();
 
         if (toEdge) {
-            Point2D toEdgePoint = getNodeEdgePoint(to, startX, startY);
+            Point2D toEdgePoint = getNodeEdgePoint(nodeTo, startX, startY);
             endX = toEdgePoint.getX();
             endY = toEdgePoint.getY();
         }
@@ -180,10 +179,10 @@ public class LineArrow extends Arrow {
     }
 
     @Override
-    public void erase(Board board) {
-        board.getArrows().remove(this);
-        this.getFrom().removeArrow(this);
-        this.getTo().removeArrow(this);
+    public void erase(MainLogic mainLogic) {
+        mainLogic.getArrows().remove(this);
+        this.getNodeFrom().removeArrow(this);
+        this.getNodeTo().removeArrow(this);
     }
 
     @Override
@@ -194,7 +193,7 @@ public class LineArrow extends Arrow {
     private QuadCurve createLine() {
         QuadCurve line = new QuadCurve();
         line.setViewOrder(1);
-        line.setStrokeWidth(NODE_RADIUS /  13.0);
+        line.setStrokeWidth(NODE_RADIUS / 13.0);
         line.setMouseTransparent(true);
         line.setFill(Color.TRANSPARENT);
         line.setStroke(Color.BLACK);
@@ -209,10 +208,10 @@ public class LineArrow extends Arrow {
     }
 
     private void resetLine() {
-        this.startX = from.getAbsoluteCentrePosX();
-        this.startY = from.getAbsoluteCentrePosY();
+        this.startX = nodeFrom.getAbsoluteCentrePosX();
+        this.startY = nodeFrom.getAbsoluteCentrePosY();
 
-        Point2D toEdgePoint = getNodeEdgePoint(to, startX, startY);
+        Point2D toEdgePoint = getNodeEdgePoint(nodeTo, startX, startY);
         endX = toEdgePoint.getX();
         endY = toEdgePoint.getY();
 
@@ -230,7 +229,7 @@ public class LineArrow extends Arrow {
     }
 
     private Circle createControlIndicator() {
-        Circle controlIndicator = new Circle(NODE_RADIUS / 6.0 ,  Color.WHITE);
+        Circle controlIndicator = new Circle(NODE_RADIUS / 6.0, Color.WHITE);
         controlIndicator.setStyle("-fx-cursor: hand");
         controlIndicator.setStroke(Color.BLACK);
         controlIndicator.setTranslateX(controlX);

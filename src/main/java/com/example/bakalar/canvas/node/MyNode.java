@@ -2,7 +2,7 @@ package com.example.bakalar.canvas.node;
 
 import com.example.bakalar.canvas.MyObject;
 import com.example.bakalar.canvas.arrow.Arrow;
-import com.example.bakalar.logic.Board;
+import com.example.bakalar.logic.MainLogic;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import static com.example.bakalar.logic.Board.NODE_RADIUS;
+import static com.example.bakalar.logic.MainLogic.NODE_RADIUS;
 
 @Getter
 @Setter
@@ -147,20 +147,20 @@ public class MyNode extends MyObject {
     }
 
     @Override
-    public void erase(Board board) {
+    public void erase(MainLogic mainLogic) {
         Iterator<Arrow> iterator = this.getAllArrows().iterator();
         while (iterator.hasNext()) {
             Arrow arrow1 = iterator.next();
-            if (arrow1.getFrom() == this) {
-                arrow1.getTo().removeArrow(arrow1);
+            if (arrow1.getNodeFrom() == this) {
+                arrow1.getNodeTo().removeArrow(arrow1);
             } else {
-                arrow1.getFrom().removeArrow(arrow1);
+                arrow1.getNodeFrom().removeArrow(arrow1);
             }
-            board.getArrows().remove(arrow1);
-            board.getMainPane().getChildren().remove(arrow1);
+            mainLogic.getArrows().remove(arrow1);
+            mainLogic.getMainPane().getChildren().remove(arrow1);
             iterator.remove();
         }
-        board.getNodes().remove(this);
+        mainLogic.getNodes().remove(this);
     }
 
     @Override

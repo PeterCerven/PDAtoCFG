@@ -5,7 +5,7 @@ import com.example.bakalar.canvas.arrow.LineArrow;
 import com.example.bakalar.canvas.arrow.SelfLoopArrow;
 import com.example.bakalar.canvas.arrow.TransitionInputs;
 import com.example.bakalar.canvas.node.MyNode;
-import com.example.bakalar.logic.Board;
+import com.example.bakalar.logic.MainLogic;
 import javafx.scene.control.Button;
 import lombok.Getter;
 import lombok.Setter;
@@ -21,7 +21,7 @@ public class HistoryLogic {
 
     private Stack<AppState> undoStack;
     private Stack<AppState> redoStack;
-    private Board board;
+    private MainLogic mainLogic;
     private Button undoButton;
     private Button redoButton;
 
@@ -40,7 +40,7 @@ public class HistoryLogic {
         List<NodeModel> nodeHistories = createNodeHistory(nodes);
         appState.setNodeModels(nodeHistories);
         appState.setArrowModels(arrowHistories);
-        appState.setNodeRadius(Board.NODE_RADIUS);
+        appState.setNodeRadius(MainLogic.NODE_RADIUS);
         return appState;
     }
 
@@ -49,10 +49,10 @@ public class HistoryLogic {
         for (Arrow arrow : arrows) {
             for (TransitionInputs transition : arrow.getTransitions()) {
                 if (arrow instanceof LineArrow la) {
-                    arrowHistories.add(new ArrowModel(la.getID(), la.getFrom().getID(), la.getTo().getID(),
+                    arrowHistories.add(new ArrowModel(la.getID(), la.getNodeFrom().getID(), la.getNodeTo().getID(),
                             transition.copy(), la.getControlPointChangeX(), la.getControlPointChangeY()));
                 } else if (arrow instanceof SelfLoopArrow sla) {
-                    arrowHistories.add(new ArrowModel(sla.getID(), sla.getFrom().getID(), sla.getTo().getID(), transition.copy()));
+                    arrowHistories.add(new ArrowModel(sla.getID(), sla.getNodeFrom().getID(), sla.getNodeTo().getID(), transition.copy()));
                 }
             }
         }
