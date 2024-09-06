@@ -19,9 +19,9 @@ import static com.example.bakalar.logic.MainLogic.EPSILON;
 @Setter
 @AllArgsConstructor
 public class GrammarComponents {
-    private final List<CFGRule> rules;
-    private final NonTerminal startingSymbol;
-    private final Set<MySymbol> terminals;
+    private List<CFGRule> rules;
+    private NonTerminal startingSymbol;
+    private Set<MySymbol> terminals;
     private Set<NonTerminal> nonTerminals;
 
     public GrammarComponents(List<CFGRule> rules, NonTerminal startingSymbol) {
