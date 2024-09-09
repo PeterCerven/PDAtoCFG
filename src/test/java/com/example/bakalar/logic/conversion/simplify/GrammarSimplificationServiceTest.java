@@ -9,6 +9,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -36,8 +37,8 @@ class GrammarSimplificationServiceTest {
                 .build();
     }
 
-    private static NonTerminal createNT(String name) {
-        return new NonTerminal(name);
+    private static NonTerminal createNT(String symbol) {
+        return new NonTerminal(symbol);
     }
 
     // Test data
@@ -80,7 +81,7 @@ class GrammarSimplificationServiceTest {
     // changeSpecialTerminalsToNonTerminals test data
     private static GrammarComponents inputSpecialNonTerminalGrammar() {
         return GrammarComponents.builder()
-                .rules(List.of(
+                .rules(new ArrayList<>(List.of(
                         createRule(createNT("S"), null,
                                 List.of(
                                         createSNT("A", "B", "C"),
@@ -100,14 +101,14 @@ class GrammarSimplificationServiceTest {
                                 List.of(
                                         createSNT("B", "C", "D"),
                                         createSNT("H", "I", "J")))
-                ))
+                )))
                 .startingSymbol(new NonTerminal("S"))
                 .build();
     }
 
     private static GrammarComponents expectedNonTerminalGrammar() {
         return GrammarComponents.builder()
-                .rules(List.of(
+                .rules(new ArrayList<>(List.of(
                         createRule(createNT("S"), null,
                                 List.of(
                                         createNT("C"),
@@ -127,7 +128,7 @@ class GrammarSimplificationServiceTest {
                                 List.of(
                                         createNT("D"),
                                         createNT("G")))
-                ))
+                )))
                 .startingSymbol(new NonTerminal("S"))
                 .build();
     }
@@ -135,7 +136,7 @@ class GrammarSimplificationServiceTest {
     // reductionOfCFG test data
     private static GrammarComponents inputNonReducedGrammar() {
         return GrammarComponents.builder()
-                .rules(List.of(
+                .rules(new ArrayList<>(List.of(
                         createRule(createNT("S"), null,
                                 List.of(
                                         createNT("A"),
@@ -156,41 +157,34 @@ class GrammarSimplificationServiceTest {
                                         createNT("A"))),
                         createRule(createNT("E"), "e",
                                 List.of())
-                ))
+                )))
                 .startingSymbol(new NonTerminal("S"))
                 .build();
     }
 
     private static GrammarComponents expectedReducedGrammar() {
         return GrammarComponents.builder()
-                .rules(List.of(
+                .rules(new ArrayList<>(List.of(
                         createRule(createNT("S"), null,
                                 List.of(
-                                        createNT("C"),
-                                        createNT("E"))),
-
-                        createRule(createNT("C"), "a",
-                                List.of(
-                                        createNT("E"),
-                                        createNT("H"))),
-
-                        createRule(createNT("I"), "b",
-                                List.of(
                                         createNT("A"),
-                                        createNT("F"))),
-
-                        createRule(createNT("B"), "c",
+                                        createNT("C")
+                                )),
+                        createRule(createNT("A"), "a",
                                 List.of(
-                                        createNT("D"),
-                                        createNT("G")))
-                ))
+                                )),
+
+                        createRule(createNT("C"), "c",
+                                List.of(
+                                ))
+                )))
                 .startingSymbol(new NonTerminal("S"))
                 .build();
     }
 
     private static GrammarComponents inputGrammarWithUnitProductions() {
         return GrammarComponents.builder()
-                .rules(List.of(
+                .rules(new ArrayList<>(List.of(
                         createRule(createNT("S"), null,
                                 List.of(
                                         createNT("X"),
@@ -202,7 +196,7 @@ class GrammarSimplificationServiceTest {
                         createRule(createNT("Y"), null,
                                 List.of(createNT("Z")
                                 )),
-                        createRule(createNT("y"), "b",
+                        createRule(createNT("Y"), "b",
                                 List.of(
                                 )),
                         createRule(createNT("Z"), null,
@@ -216,38 +210,32 @@ class GrammarSimplificationServiceTest {
                         createRule(createNT("N"), "a",
                                 List.of(
                                 ))
-                ))
+                )))
                 .startingSymbol(new NonTerminal("S"))
                 .build();
     }
 
     private static GrammarComponents expectedGrammarWithoutUnitProductions() {
         return GrammarComponents.builder()
-                .rules(List.of(
+                .rules(new ArrayList<>(List.of(
                         createRule(createNT("S"), null,
                                 List.of(
-                                        createNT("C"),
-                                        createNT("E")
+                                        createNT("X"),
+                                        createNT("Y")
                                 )),
 
-                        createRule(createNT("C"), "a",
+                        createRule(createNT("X"), "a",
                                 List.of(
-                                        createNT("E"),
-                                        createNT("H")
                                 )),
 
-                        createRule(createNT("I"), "b",
+                        createRule(createNT("Y"), "a",
                                 List.of(
-                                        createNT("A"),
-                                        createNT("F")
                                 )),
 
-                        createRule(createNT("B"), "c",
+                        createRule(createNT("Y"), "b",
                                 List.of(
-                                        createNT("D"),
-                                        createNT("G")
                                 ))
-                ))
+                )))
                 .startingSymbol(new NonTerminal("S"))
                 .build();
     }
@@ -255,7 +243,7 @@ class GrammarSimplificationServiceTest {
     // removalOfNullProductions test data
     private static GrammarComponents inputGrammarWithNullProductions() {
         return GrammarComponents.builder()
-                .rules(List.of(
+                .rules(new ArrayList<>(List.of(
                         createRule(createNT("S"), null,
                                 List.of(
                                         createNT("A"),
@@ -280,34 +268,72 @@ class GrammarSimplificationServiceTest {
                         createRule(createNT("C"), "c",
                                 List.of(
                                 ))
-                ))
+                )))
                 .startingSymbol(new NonTerminal("S"))
                 .build();
     }
 
     private static GrammarComponents expectedGrammarWithoutNullProductions() {
         return GrammarComponents.builder()
-                .rules(List.of(
+                .rules(new ArrayList<>(List.of(
                         createRule(createNT("S"), null,
                                 List.of(
-                                        createNT("C"),
-                                        createNT("E"))),
-
-                        createRule(createNT("C"), "a",
-                                List.of(
-                                        createNT("E"),
-                                        createNT("H"))),
-
-                        createRule(createNT("I"), "b",
+                                        createNT("A"),
+                                        createNT("B"),
+                                        createNT("A"),
+                                        createNT("C")
+                                )),
+                        createRule(createNT("S"), null,
                                 List.of(
                                         createNT("A"),
-                                        createNT("F"))),
-
-                        createRule(createNT("B"), "c",
+                                        createNT("B"),
+                                        createNT("C")
+                                )),
+                        createRule(createNT("S"), null,
                                 List.of(
-                                        createNT("D"),
-                                        createNT("G")))
-                ))
+                                        createNT("B"),
+                                        createNT("A"),
+                                        createNT("C")
+                                )),
+                        createRule(createNT("S"), null,
+                                List.of(
+                                        createNT("B"),
+                                        createNT("C")
+                                )),
+                        createRule(createNT("S"), null,
+                                List.of(
+                                        createNT("A"),
+                                        createNT("A"),
+                                        createNT("C")
+                                )),
+                        createRule(createNT("S"), null,
+                                List.of(
+                                        createNT("A"),
+                                        createNT("C")
+                                )),
+                        createRule(createNT("S"), null,
+                                List.of(
+                                        createNT("C")
+                                )),
+                        createRule(createNT("A"), "a",
+                                List.of(
+                                        createNT("A")
+                                )),
+                        createRule(createNT("A"), "a",
+                                List.of(
+                                )),
+                        createRule(createNT("B"), "b",
+                                List.of(
+                                        createNT("B")
+                                )),
+                        createRule(createNT("B"), "b",
+                                List.of(
+                                )),
+
+                        createRule(createNT("C"), "c",
+                                List.of(
+                                ))
+                )))
                 .startingSymbol(new NonTerminal("S"))
                 .build();
     }
@@ -339,18 +365,6 @@ class GrammarSimplificationServiceTest {
     }
 
     @ParameterizedTest
-    @DisplayName("Given grammar with unit productions," +
-            " When removal of unit production function is used," +
-            " Then return grammar without unit productions")
-    @MethodSource("provideTestDataForGrammarForRemovalOfUnitProduction")
-    void removalOfUnitProductions(GrammarComponents inputGrammar, GrammarComponents expectedGrammar) {
-        GrammarComponents newGC = grammarSimplificationService.removalOfUnitProductions(inputGrammar);
-        assertThat(newGC)
-                .usingRecursiveComparison()
-                .isEqualTo(expectedGrammar);
-    }
-
-    @ParameterizedTest
     @DisplayName("Given grammar with null productions," +
             " When removal of null production is used," +
             " Then return grammar without null productions")
@@ -359,6 +373,21 @@ class GrammarSimplificationServiceTest {
         GrammarComponents newGC = grammarSimplificationService.removalOfNullProductions(inputGrammar);
         assertThat(newGC)
                 .usingRecursiveComparison()
+                .isEqualTo(expectedGrammar);
+    }
+
+    @ParameterizedTest
+    @DisplayName("Given grammar with unit productions," +
+            " When removal of unit production function is used," +
+            " Then return grammar without unit productions")
+    @MethodSource("provideTestDataForGrammarForRemovalOfUnitProduction")
+    void removalOfUnitProductions(GrammarComponents inputGrammar, GrammarComponents expectedGrammar) {
+        GrammarComponents newGC = grammarSimplificationService.removalOfUnitProductions(inputGrammar);
+        System.out.println(newGC);
+        assertThat(newGC)
+                .usingRecursiveComparison()
+                .ignoringFields("rules.steps")
+                .ignoringCollectionOrderInFields("rules")
                 .isEqualTo(expectedGrammar);
     }
 

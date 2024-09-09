@@ -1,6 +1,7 @@
 package com.example.bakalar.logic.conversion.simplify;
 
 import com.example.bakalar.logic.conversion.CFGRule;
+import com.example.bakalar.logic.conversion.MySymbol;
 import com.example.bakalar.logic.conversion.NonTerminal;
 import com.example.bakalar.logic.conversion.SpecialNonTerminal;
 
@@ -59,35 +60,25 @@ public class GrammarSimplificationService {
     public GrammarComponents reductionOfCFG(GrammarComponents gc) {
         removeAllNonTerminalsThatDontDeriveTerminals(gc);
         removeAllRulesThatCannotBeReachedFromStart(gc);
+        removeObsoleteTerminalsAndNonTerminals(gc);
         return gc;
     }
 
-    private void removeAllRulesThatCannotBeReachedFromStart(GrammarComponents gc) {
-        List<CFGRule> allRules = gc.getRules();
-        NonTerminal startSymbol = gc.getStartingSymbol();
+    private void removeObsoleteTerminalsAndNonTerminals(GrammarComponents gc) {
         Set<NonTerminal> allowedNonTerminals = new HashSet<>();
-        int currentSize = 1;
-        int previousSize = 0;
-
-        allowedNonTerminals.add(startSymbol);
-
-        while (currentSize > previousSize) {
-            previousSize = currentSize;
-            for (CFGRule rule : allRules) {
-                if (allowedNonTerminals.contains(rule.getLeftSide())) {
-                    allowedNonTerminals.addAll(rule.getRightSide());
-                }
+        Set<MySymbol> allowedTerminals = new HashSet<>();
+        List<CFGRule> allRules = gc.getRules();
+        for (CFGRule rule : allRules) {
+            allowedNonTerminals.add(rule.getLeftSide());
+            allowedNonTerminals.addAll(rule.getRightSide());
+            if (rule.getTerminal() != null) {
+                allowedTerminals.add(rule.getTerminal());
             }
-            currentSize = allowedNonTerminals.size();
         }
-
-        allRules
-                .removeIf(
-                        rule -> !allowedNonTerminals.contains(rule.getLeftSide())
-                );
-
-
+        gc.setNonTerminals(allowedNonTerminals);
+        gc.setTerminals(allowedTerminals);
     }
+
 
     private void removeAllNonTerminalsThatDontDeriveTerminals(GrammarComponents gc) {
         Set<NonTerminal> allowedNonTerminals = new HashSet<>();
@@ -97,9 +88,9 @@ public class GrammarSimplificationService {
                 allowedNonTerminals.add(rule.getLeftSide());
             }
         }
-        int previousSize = allowedNonTerminals.size();
-        int currentSize = previousSize++;
-        while (previousSize < currentSize) {
+        int previousSize = 0;
+        int currentSize = allowedNonTerminals.size();
+        while (previousSize != currentSize) {
             previousSize = currentSize;
             HashSet<NonTerminal> toAdd = new HashSet<>();
             for (CFGRule rule : allRules) {
@@ -114,12 +105,63 @@ public class GrammarSimplificationService {
         allRules
                 .removeIf(
                         rule -> !allowedNonTerminals.contains(rule.getLeftSide())
-                                && !allowedNonTerminals.containsAll(rule.getRightSide())
+                                || !allowedNonTerminals.containsAll(rule.getRightSide())
                 );
     }
 
+    private void removeAllRulesThatCannotBeReachedFromStart(GrammarComponents gc) {
+        List<CFGRule> allRules = gc.getRules();
+        Set<NonTerminal> allowedNonTerminals = new HashSet<>();
+        NonTerminal startSymbol = gc.getStartingSymbol();
+        int currentSize = 1;
+        int previousSize = 0;
+
+        allowedNonTerminals.add(startSymbol);
+
+        while (currentSize != previousSize) {
+            previousSize = currentSize;
+            Set<NonTerminal> toAdd = new HashSet<>();
+            for (CFGRule rule : allRules) {
+                if (allowedNonTerminals.contains(rule.getLeftSide())) {
+                    toAdd.addAll(rule.getRightSide());
+                }
+            }
+            allowedNonTerminals.addAll(toAdd);
+            currentSize = allowedNonTerminals.size();
+        }
+
+        allRules
+                .removeIf(
+                        rule -> !allowedNonTerminals.contains(rule.getLeftSide())
+                );
+
+
+    }
+
     public GrammarComponents removalOfUnitProductions(GrammarComponents gc) {
-        // Logic...
+        List<CFGRule> allRules = gc.getRules();
+        int iteration = 0;
+        while (iteration < allRules.size()) {
+            List<CFGRule> rulesToAdd = new ArrayList<>();
+            List<CFGRule> rulesToRemove = new ArrayList<>();
+            CFGRule unitProductionRule = allRules.get(iteration++);
+            if (!(unitProductionRule.getRightSide().size() == 1 && unitProductionRule.getTerminal() == null
+                    || unitProductionRule.getRightSide().isEmpty() && unitProductionRule.getTerminal() != null)) {
+                continue;
+            }
+            for (CFGRule rule : allRules) {
+                if (rule.getRightSide().size() == 1 && rule.getRightSide().get(0).equals(unitProductionRule.getLeftSide()) && rule.getTerminal() == null) {
+                    rulesToAdd.add(new CFGRule(rule.getLeftSide(), unitProductionRule.getTerminal(), unitProductionRule.getRightSide()));
+                    rulesToRemove.add(rule);
+                    rulesToRemove.add(unitProductionRule);
+                    iteration = 0;
+                    break;
+                }
+            }
+            allRules.removeAll(rulesToRemove);
+            allRules.addAll(rulesToAdd);
+        }
+        removeObsoleteTerminalsAndNonTerminals(gc);
         return gc;
     }
 

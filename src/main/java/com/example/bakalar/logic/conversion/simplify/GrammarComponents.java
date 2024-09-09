@@ -70,4 +70,14 @@ public class GrammarComponents {
             return new GrammarComponents(rules, startingSymbol);
         }
     }
+
+    @Override
+    public String toString() {
+        return "GrammarComponents{" +
+                "rules=" + rules +
+                ", startingSymbol=" + startingSymbol +
+                ", terminals=" + terminals +
+                ", nonTerminals=" + nonTerminals +
+                '}';
+    }
 }

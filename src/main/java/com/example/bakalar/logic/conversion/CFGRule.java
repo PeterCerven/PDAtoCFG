@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+
 @Builder
 @Getter
 @Setter
@@ -18,7 +19,7 @@ public class CFGRule {
     private List<NonTerminal> rightSide;
     private List<StepRule> steps;
 
-    public CFGRule() {
+    public  CFGRule() {
         this.steps = new ArrayList<>();
         this.rightSide = new ArrayList<>();
     }
@@ -37,11 +38,19 @@ public class CFGRule {
         this.steps = steps;
     }
 
+    public CFGRule(NonTerminal leftSide, MySymbol terminal) {
+        this.leftSide = leftSide;
+        this.terminal = terminal;
+        this.rightSide = new ArrayList<>();
+        this.steps = new ArrayList<>();
+    }
+
     public CFGRule getDeepCopy() {
         CFGRule rule = new CFGRule();
         rule.setLeftSide(this.copyLeftSide());
         rule.setTerminal(this.copyTerminal());
         rule.setRightSide(this.copyRightSide());
+        rule.setSteps(new ArrayList<>(this.steps));
         return rule;
     }
 
