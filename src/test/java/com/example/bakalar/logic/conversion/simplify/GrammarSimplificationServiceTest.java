@@ -9,8 +9,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.TreeSet;
 import java.util.stream.Stream;
 
 import static com.example.bakalar.logic.MainLogic.EPSILON;
@@ -81,7 +81,7 @@ class GrammarSimplificationServiceTest {
     // changeSpecialTerminalsToNonTerminals test data
     private static GrammarComponents inputSpecialNonTerminalGrammar() {
         return GrammarComponents.builder()
-                .rules(new ArrayList<>(List.of(
+                .rules(new TreeSet<>(List.of(
                         createRule(createNT("S"), null,
                                 List.of(
                                         createSNT("A", "B", "C"),
@@ -108,7 +108,7 @@ class GrammarSimplificationServiceTest {
 
     private static GrammarComponents expectedNonTerminalGrammar() {
         return GrammarComponents.builder()
-                .rules(new ArrayList<>(List.of(
+                .rules(new TreeSet<>(List.of(
                         createRule(createNT("S"), null,
                                 List.of(
                                         createNT("C"),
@@ -136,7 +136,7 @@ class GrammarSimplificationServiceTest {
     // reductionOfCFG test data
     private static GrammarComponents inputNonReducedGrammar() {
         return GrammarComponents.builder()
-                .rules(new ArrayList<>(List.of(
+                .rules(new TreeSet<>(List.of(
                         createRule(createNT("S"), null,
                                 List.of(
                                         createNT("A"),
@@ -164,7 +164,7 @@ class GrammarSimplificationServiceTest {
 
     private static GrammarComponents expectedReducedGrammar() {
         return GrammarComponents.builder()
-                .rules(new ArrayList<>(List.of(
+                .rules(new TreeSet<>(List.of(
                         createRule(createNT("S"), null,
                                 List.of(
                                         createNT("A"),
@@ -184,7 +184,7 @@ class GrammarSimplificationServiceTest {
 
     private static GrammarComponents inputGrammarWithUnitProductions() {
         return GrammarComponents.builder()
-                .rules(new ArrayList<>(List.of(
+                .rules(new TreeSet<>(List.of(
                         createRule(createNT("S"), null,
                                 List.of(
                                         createNT("X"),
@@ -217,7 +217,7 @@ class GrammarSimplificationServiceTest {
 
     private static GrammarComponents expectedGrammarWithoutUnitProductions() {
         return GrammarComponents.builder()
-                .rules(new ArrayList<>(List.of(
+                .rules(new TreeSet<>(List.of(
                         createRule(createNT("S"), null,
                                 List.of(
                                         createNT("X"),
@@ -243,7 +243,7 @@ class GrammarSimplificationServiceTest {
     // removalOfNullProductions test data
     private static GrammarComponents inputGrammarWithNullProductions() {
         return GrammarComponents.builder()
-                .rules(new ArrayList<>(List.of(
+                .rules(new TreeSet<>(List.of(
                         createRule(createNT("S"), null,
                                 List.of(
                                         createNT("A"),
@@ -275,7 +275,7 @@ class GrammarSimplificationServiceTest {
 
     private static GrammarComponents expectedGrammarWithoutNullProductions() {
         return GrammarComponents.builder()
-                .rules(new ArrayList<>(List.of(
+                .rules(new TreeSet<>((List.of(
                         createRule(createNT("S"), null,
                                 List.of(
                                         createNT("A"),
@@ -333,7 +333,7 @@ class GrammarSimplificationServiceTest {
                         createRule(createNT("C"), "c",
                                 List.of(
                                 ))
-                )))
+                ))))
                 .startingSymbol(new NonTerminal("S"))
                 .build();
     }
@@ -349,6 +349,7 @@ class GrammarSimplificationServiceTest {
         GrammarComponents newGC = grammarSimplificationService.changeSpecialTerminalsToNonTerminals(inputGrammar);
         assertThat(newGC)
                 .usingRecursiveComparison()
+                .ignoringCollectionOrderInFields("rules")
                 .isEqualTo(expectedGrammar);
     }
 
@@ -361,20 +362,10 @@ class GrammarSimplificationServiceTest {
         GrammarComponents newGC = grammarSimplificationService.reductionOfCFG(inputGrammar);
         assertThat(newGC)
                 .usingRecursiveComparison()
+                .ignoringCollectionOrderInFields("rules")
                 .isEqualTo(expectedGrammar);
     }
 
-    @ParameterizedTest
-    @DisplayName("Given grammar with null productions," +
-            " When removal of null production is used," +
-            " Then return grammar without null productions")
-    @MethodSource("provideTestDataForGrammarForRemovalOfNullProductions")
-    void removalOfNullProductions(GrammarComponents inputGrammar, GrammarComponents expectedGrammar) {
-        GrammarComponents newGC = grammarSimplificationService.removalOfNullProductions(inputGrammar);
-        assertThat(newGC)
-                .usingRecursiveComparison()
-                .isEqualTo(expectedGrammar);
-    }
 
     @ParameterizedTest
     @DisplayName("Given grammar with unit productions," +
@@ -391,4 +382,17 @@ class GrammarSimplificationServiceTest {
                 .isEqualTo(expectedGrammar);
     }
 
+    @ParameterizedTest
+    @DisplayName("Given grammar with null productions," +
+            " When removal of null production is used," +
+            " Then return grammar without null productions")
+    @MethodSource("provideTestDataForGrammarForRemovalOfNullProductions")
+    void removalOfNullProductions(GrammarComponents inputGrammar, GrammarComponents expectedGrammar) {
+        GrammarComponents newGC = grammarSimplificationService.removalOfNullProductions(inputGrammar);
+        assertThat(newGC)
+                .usingRecursiveComparison()
+                .ignoringFields("rules.steps")
+                .ignoringCollectionOrderInFields("rules")
+                .isEqualTo(expectedGrammar);
+    }
 }

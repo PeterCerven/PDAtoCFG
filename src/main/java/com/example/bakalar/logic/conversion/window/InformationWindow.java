@@ -4,7 +4,6 @@ import com.example.bakalar.logic.conversion.CFGRule;
 import com.example.bakalar.logic.conversion.simplify.GrammarComponents;
 import com.example.bakalar.logic.conversion.simplify.SimplifyLogic;
 import com.example.bakalar.logic.utility.DescribeCFG;
-import com.example.bakalar.logic.utility.sorters.RuleSorter;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -133,7 +132,6 @@ public class InformationWindow {
             VBox vbox = new VBox();
             vbox.getChildren().clear();
             simplifyLogic.getGrammarComponents().get(1).getRules().stream()
-                    .sorted(new RuleSorter())
                     .map(CFGRule::toString)
                     .map(TextField::new)
                     .peek(textField -> textField.setFont(new Font("Arial",18)))

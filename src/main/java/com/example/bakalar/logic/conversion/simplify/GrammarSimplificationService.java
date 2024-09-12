@@ -6,12 +6,15 @@ import com.example.bakalar.logic.conversion.NonTerminal;
 import com.example.bakalar.logic.conversion.SpecialNonTerminal;
 
 import java.util.*;
+import java.util.stream.Collectors;
+
+import static com.example.bakalar.logic.MainLogic.EPSILON;
 
 public class GrammarSimplificationService {
 
     public GrammarComponents changeSpecialTerminalsToNonTerminals(GrammarComponents gc) {
         Set<NonTerminal> allNonTerminals = gc.getNonTerminals();
-        List<CFGRule> allRules = gc.getRules();
+        Set<CFGRule> allRules = gc.getRules();
 
         char namingLetter = 'A';
         String prohibitedLetters = "SZ";
@@ -67,7 +70,7 @@ public class GrammarSimplificationService {
     private void removeObsoleteTerminalsAndNonTerminals(GrammarComponents gc) {
         Set<NonTerminal> allowedNonTerminals = new HashSet<>();
         Set<MySymbol> allowedTerminals = new HashSet<>();
-        List<CFGRule> allRules = gc.getRules();
+        Set<CFGRule> allRules = gc.getRules();
         for (CFGRule rule : allRules) {
             allowedNonTerminals.add(rule.getLeftSide());
             allowedNonTerminals.addAll(rule.getRightSide());
@@ -82,7 +85,7 @@ public class GrammarSimplificationService {
 
     private void removeAllNonTerminalsThatDontDeriveTerminals(GrammarComponents gc) {
         Set<NonTerminal> allowedNonTerminals = new HashSet<>();
-        List<CFGRule> allRules = gc.getRules();
+        Set<CFGRule> allRules = gc.getRules();
         for (CFGRule rule : allRules) {
             if (rule.getTerminal() != null) {
                 allowedNonTerminals.add(rule.getLeftSide());
@@ -110,7 +113,7 @@ public class GrammarSimplificationService {
     }
 
     private void removeAllRulesThatCannotBeReachedFromStart(GrammarComponents gc) {
-        List<CFGRule> allRules = gc.getRules();
+        Set<CFGRule> allRules = gc.getRules();
         Set<NonTerminal> allowedNonTerminals = new HashSet<>();
         NonTerminal startSymbol = gc.getStartingSymbol();
         int currentSize = 1;
@@ -139,17 +142,18 @@ public class GrammarSimplificationService {
     }
 
     public GrammarComponents removalOfUnitProductions(GrammarComponents gc) {
-        List<CFGRule> allRules = gc.getRules();
+        Set<CFGRule> allRules = gc.getRules();
+        List<CFGRule> allRulesList = new ArrayList<>(allRules);
         int iteration = 0;
-        while (iteration < allRules.size()) {
-            List<CFGRule> rulesToAdd = new ArrayList<>();
-            List<CFGRule> rulesToRemove = new ArrayList<>();
-            CFGRule unitProductionRule = allRules.get(iteration++);
+        while (iteration < allRulesList.size()) {
+            Set<CFGRule> rulesToAdd = new HashSet<>();
+            Set<CFGRule> rulesToRemove = new HashSet<>();
+            CFGRule unitProductionRule = allRulesList.get(iteration++);
             if (!(unitProductionRule.getRightSide().size() == 1 && unitProductionRule.getTerminal() == null
                     || unitProductionRule.getRightSide().isEmpty() && unitProductionRule.getTerminal() != null)) {
                 continue;
             }
-            for (CFGRule rule : allRules) {
+            for (CFGRule rule : allRulesList) {
                 if (rule.getRightSide().size() == 1 && rule.getRightSide().get(0).equals(unitProductionRule.getLeftSide()) && rule.getTerminal() == null) {
                     rulesToAdd.add(new CFGRule(rule.getLeftSide(), unitProductionRule.getTerminal(), unitProductionRule.getRightSide()));
                     rulesToRemove.add(rule);
@@ -158,15 +162,63 @@ public class GrammarSimplificationService {
                     break;
                 }
             }
-            allRules.removeAll(rulesToRemove);
-            allRules.addAll(rulesToAdd);
+            allRulesList.removeAll(rulesToRemove);
+            allRulesList.addAll(rulesToAdd);
         }
+        gc.setRules(new TreeSet<>(allRulesList));
         removeObsoleteTerminalsAndNonTerminals(gc);
         return gc;
     }
 
     public GrammarComponents removalOfNullProductions(GrammarComponents gc) {
-        // Logic...
+        Set<CFGRule> allRules = gc.getRules();
+        Set<CFGRule> nullRules = allRules.stream()
+                .filter(rule ->
+                        rule.getRightSide().isEmpty()
+                                && rule.getTerminal() != null
+                                && rule.getTerminal().getName().equals(EPSILON))
+                .collect(Collectors.toSet());
+        for (CFGRule rule : nullRules) {
+            allRules.remove(rule);
+            Set<CFGRule> newRules = new HashSet<>();
+            for (CFGRule ruleToChange : allRules) {
+                if (ruleToChange.getRightSide().contains(rule.getLeftSide())) {
+                    newRules.addAll(createRulesFromNullProductions(rule.getLeftSide(), ruleToChange));
+                }
+            }
+            allRules.addAll(newRules);
+        }
+        removeObsoleteTerminalsAndNonTerminals(gc);
         return gc;
+    }
+
+    private Set<CFGRule> createRulesFromNullProductions(NonTerminal letterToNull, CFGRule rule) {
+        List<NonTerminal> rightSideToChange = rule.getRightSide();
+        Set<CFGRule> rulesToAdd = new HashSet<>();
+        List<Integer> indexes = new ArrayList<>();
+        for (int i = rightSideToChange.size() - 1; i >= 0; i--) {
+            if (rightSideToChange.get(i).equals(letterToNull)) {
+                indexes.add(i);
+            }
+        }
+        int numberOfPossibleCombinations = (int) Math.pow(2, indexes.size());
+        for (int i = 0; i < numberOfPossibleCombinations; i++) {
+            List<NonTerminal> newRightSide = new ArrayList<>(rightSideToChange);
+            int index = 0;
+            boolean changed = false;
+            for (int j = indexes.size() - 1; j >= 0; j--) {
+                if ((i & (1 << j)) == 0) {
+                    newRightSide.remove((int) indexes.get(index));
+                    changed = true;
+                }
+                index++;
+            }
+            if (changed) {
+                rulesToAdd.add(new CFGRule(new NonTerminal(rule.getLeftSide().getSymbol().getName()), rule.getTerminal(), newRightSide));
+            }
+        }
+
+
+        return rulesToAdd;
     }
 }

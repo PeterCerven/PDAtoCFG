@@ -9,7 +9,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import static com.example.bakalar.logic.MainLogic.EPSILON;
@@ -19,12 +18,12 @@ import static com.example.bakalar.logic.MainLogic.EPSILON;
 @Setter
 @AllArgsConstructor
 public class GrammarComponents {
-    private List<CFGRule> rules;
+    private Set<CFGRule> rules;
     private NonTerminal startingSymbol;
     private Set<MySymbol> terminals;
     private Set<NonTerminal> nonTerminals;
 
-    public GrammarComponents(List<CFGRule> rules, NonTerminal startingSymbol) {
+    public GrammarComponents(Set<CFGRule> rules, NonTerminal startingSymbol) {
         this.rules = rules;
         this.startingSymbol = startingSymbol;
         this.terminals = setTerminalsFromRules();

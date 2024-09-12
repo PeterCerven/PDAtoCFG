@@ -24,8 +24,7 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import static com.example.bakalar.logic.MainLogic.*;
 import static com.example.bakalar.logic.utility.ErrorPopUp.showErrorDialog;
@@ -41,7 +40,7 @@ public class ConversionLogic {
     private boolean showSteps = false;
     private List<RulesWindows> rulesWindows;
     private int currentIndex;
-    private List<CFGRule> allRules;
+    private Set<CFGRule> allRules;
 
 
     public ConversionLogic(FileLogic fileLogic) {
@@ -92,7 +91,7 @@ public class ConversionLogic {
         Button nextButton = conversionStage.getNextButton();
         Button showStepsButton = stepsWindow.getShowStepsButton();
 
-        allRules = new ArrayList<>();
+        allRules = new TreeSet<>();
         for (RulesWindows ruleWindow : rulesWindows) {
             allRules.addAll(ruleWindow.getRules());
         }

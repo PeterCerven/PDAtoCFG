@@ -3,7 +3,6 @@ package com.example.bakalar.files;
 import com.example.bakalar.logic.conversion.CFGRule;
 import com.example.bakalar.logic.history.AppState;
 import com.example.bakalar.logic.utility.ErrorPopUp;
-import com.example.bakalar.logic.utility.sorters.RuleSorter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -11,7 +10,7 @@ import javafx.stage.Stage;
 import java.io.File;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
+import java.util.Set;
 
 import static com.example.bakalar.logic.utility.ErrorPopUp.showErrorDialog;
 
@@ -74,7 +73,7 @@ public class FileLogic {
         return fileChooser.showOpenDialog(primaryStage);
     }
 
-    public void saveToTextFile(List<CFGRule> allRules, Stage informationStage) {
+    public void saveToTextFile(Set<CFGRule> allRules, Stage informationStage) {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Save File");
 
@@ -87,7 +86,7 @@ public class FileLogic {
             try {
                 PrintWriter writer = new PrintWriter(file, StandardCharsets.UTF_8);
 
-                for (CFGRule rule : allRules.stream().sorted(new RuleSorter()).toList()) {
+                for (CFGRule rule : allRules) {
                     writer.println(rule.toString());
                 }
                 writer.close();

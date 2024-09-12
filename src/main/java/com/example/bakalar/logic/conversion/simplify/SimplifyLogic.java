@@ -6,6 +6,8 @@ import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 @Getter
 public class SimplifyLogic {
@@ -32,7 +34,7 @@ public class SimplifyLogic {
     }
 
     private GrammarComponents deepCopyGrammarComponents(GrammarComponents gc) {
-        List<CFGRule> rules = new ArrayList<>();
+        Set<CFGRule> rules = new TreeSet<>();
         for (CFGRule rule : gc.getRules()) {
             rules.add(rule.getDeepCopy());
         }

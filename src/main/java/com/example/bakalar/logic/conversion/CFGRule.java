@@ -9,11 +9,13 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import static com.example.bakalar.logic.MainLogic.STARTING_S;
+
 
 @Builder
 @Getter
 @Setter
-public class CFGRule {
+public class CFGRule implements Comparable<CFGRule> {
     private NonTerminal leftSide;
     private MySymbol terminal;
     private List<NonTerminal> rightSide;
@@ -103,5 +105,111 @@ public class CFGRule {
     @Override
     public String toString() {
         return leftSide + " -> " + (terminal == null ? "" : terminal) + rightSide.stream().map(NonTerminal::toString).collect(Collectors.joining());
+    }
+
+
+    @Override
+    public int compareTo(CFGRule other) {
+        NonTerminal left1 = this.getLeftSide();
+        NonTerminal left2 = other.getLeftSide();
+
+        List<NonTerminal> rightList1 = this.getRightSide();
+        List<NonTerminal> rightList2 = other.getRightSide();
+
+        MySymbol terminal1 = this.getTerminal();
+        MySymbol terminal2 = other.getTerminal();
+
+        // Left Side NonTerminal
+        if (!(left1 instanceof SpecialNonTerminal) && !(left2 instanceof SpecialNonTerminal)) {
+            // Same left Side
+            if (left1.getSymbol().equals(left2.getSymbol())) {
+                // empty check
+                if (rightList1.isEmpty() && rightList2.isEmpty()) {
+                    if (terminal1 == null) {
+                        return 1;
+                    }
+                    if (terminal2 == null) {
+                        return -1;
+                    }
+                    return terminal1.compareTo(terminal2);
+                }
+
+
+                // Different left Side    
+            } else {
+                if (left1.getSymbol().getName().equals(STARTING_S)) {
+                    return 1;
+                }
+                if (left2.getSymbol().getName().equals(STARTING_S)) {
+                    return -1;
+                }
+                return left1.getSymbol().compareTo(left2.getSymbol());
+            }
+
+        }
+
+        // Comparing LeftSide between SpecialNonTerminal and NonTerminal
+        if (!(left1 instanceof SpecialNonTerminal leftSpecial1)) {
+            return -1;
+        }
+        if (!(left2 instanceof SpecialNonTerminal leftSpecial2)) {
+            return 1;
+        }
+
+        // converting to SpecialNonTerminal
+        List<SpecialNonTerminal> rightSpecialList1 = new ArrayList<>();
+        List<SpecialNonTerminal> rightSpecialList2 = new ArrayList<>();
+
+
+        for (NonTerminal nonTerminal : rightList1) {
+            if (nonTerminal instanceof SpecialNonTerminal snt) {
+                rightSpecialList1.add(snt);
+            }
+        }
+
+        for (NonTerminal nonTerminal : rightList2) {
+            if (nonTerminal instanceof SpecialNonTerminal snt) {
+                rightSpecialList2.add(snt);
+            }
+        }
+
+        // SpecialNonTerminal Comparison
+        if (!leftSpecial1.getStateFrom().equals(leftSpecial2.getStateFrom())) {
+            return leftSpecial1.getStateFrom()
+                    .compareTo(leftSpecial2.getStateFrom());
+        }
+        if (!rightList1.isEmpty() && !rightList2.isEmpty()) {
+            if (!rightSpecialList1.get(0).getStateFrom().equals(rightSpecialList2.get(0).getStateFrom())) {
+                return rightSpecialList1.get(0).getStateFrom()
+                        .compareTo(rightSpecialList2.get(0).getStateFrom());
+            }
+        }
+        if (rightSpecialList1.size() != rightSpecialList2.size()) {
+            return rightSpecialList2.size() - rightSpecialList1.size();
+        }
+        if (!terminal1.equals(terminal2)) {
+            return this.getTerminal().compareTo(other.getTerminal());
+        }
+        if (!leftSpecial1.getStack().equals(leftSpecial2.getStack())) {
+            return leftSpecial1.getStack()
+                    .compareTo(leftSpecial2.getStack());
+        }
+        if (!leftSpecial1.getStateTo().equals(leftSpecial2.getStateTo())) {
+            return leftSpecial1.getStateTo()
+                    .compareTo(leftSpecial2.getStateTo());
+        }
+        for (int i = 0; i < rightSpecialList1.size(); i++) {
+            if (!rightSpecialList1.get(i).getStack().equals(rightSpecialList2.get(i).getStack())) {
+                return rightSpecialList1.get(i).getStack()
+                        .compareTo(rightSpecialList2.get(i).getStack());
+            }
+        }
+        for (int i = 1; i < rightSpecialList1.size(); i++) {
+            if (!rightSpecialList1.get(i).getStateFrom().equals(rightSpecialList2.get(i).getStateFrom())) {
+                return rightSpecialList1.get(i).getStateFrom()
+                        .compareTo(rightSpecialList2.get(i).getStateFrom());
+            }
+        }
+        return 0;
     }
 }

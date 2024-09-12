@@ -4,7 +4,6 @@ import com.example.bakalar.logic.conversion.CFGRule;
 import com.example.bakalar.logic.conversion.MySymbol;
 import com.example.bakalar.logic.conversion.NonTerminal;
 import com.example.bakalar.logic.conversion.simplify.GrammarComponents;
-import com.example.bakalar.logic.utility.sorters.RuleSorter;
 import com.example.bakalar.logic.utility.sorters.SpecialNonTerminalSorter;
 import javafx.geometry.Pos;
 import javafx.scene.control.TextField;
@@ -12,7 +11,6 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import lombok.Getter;
 
-import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -34,10 +32,9 @@ public class DescribeCFG {
         updateStartSymbol(gc.getStartingSymbol());
         updateRules(gc.getRules());
     }
-    private void updateRules(List<CFGRule> rules) {
+    private void updateRules(Set<CFGRule> rules) {
         rulesContainer.getChildren().clear();
         rules.stream()
-                .sorted(new RuleSorter())
                 .map(CFGRule::toString)
                 .map(TextField::new)
                 .peek(textField -> textField.setFont(new Font(18)))
