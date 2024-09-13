@@ -64,6 +64,10 @@ public class Transition {
         return symbolsToPush.stream().map(MySymbol::getName).collect(Collectors.joining());
     }
 
+    public Transition deepCopy() {
+        return new Transition(currentState.getName(), inputSymbolToRead.getName(), symbolToPop.getName(), nextState.getName(), getSymbolsToPushAsString());
+    }
+
     public List<Text> createTextFromStep() {
         int size = 25;
         List<Text> texts = new ArrayList<>();

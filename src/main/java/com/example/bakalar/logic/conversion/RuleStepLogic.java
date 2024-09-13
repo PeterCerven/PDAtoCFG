@@ -19,7 +19,7 @@ public class RuleStepLogic {
         templateRule = new CFGRule();
         templateRule.setLeftSide(new SpecialNonTerminal("_", "_", "_"));
         templateRule.setTerminal(new MySymbol("_"));
-        for (MySymbol symbol : transition.getSymbolsToPush()) {
+        for (MySymbol ignored : transition.getSymbolsToPush()) {
             templateRule.getRightSide().add(new SpecialNonTerminal("_", "_", "_"));
         }
         String helpingComment = "Počet pravidiel závisí od počtu stavov zásobníkového automatu a od počtu novo pridaných symbolov na zásobník." +
@@ -73,7 +73,7 @@ public class RuleStepLogic {
         fifthStep.setTerminal(new MySymbol(transition.getInputSymbolToRead(), Color.RED));
         fifthStep.setTransition(new Transition(transition.getCurrentState(), new MySymbol(transition.getInputSymbolToRead().getName(), Color.RED),
                 transition.getSymbolToPop(), transition.getNextState(), transition.getSymbolsToPushAsString()));
-        String helpingComment = "";
+        String helpingComment;
         if (transition.getInputSymbolToRead().getName().equals("ε")) {
             helpingComment = "Pridávame prázdny symbol epsilon.";
         } else {
@@ -127,8 +127,7 @@ public class RuleStepLogic {
         // transition step
 
         String helpingComment = "";
-        Transition newTransition = new Transition(transition.getCurrentState().getName(), transition.getInputSymbolToRead().getName(),
-                transition.getSymbolToPop().getName(), transition.getNextState().getName(), transition.getSymbolsToPushAsString());
+        Transition newTransition = transition.deepCopy();
         if (symbol.equals("current")) {
             newTransition.setCurrentState(new MySymbol(leftSide.getStateFrom().getName(), Color.RED));
             helpingComment = "Do ľavej strany pravidla pridávame nový symbol súčastného stavu.";
@@ -146,8 +145,7 @@ public class RuleStepLogic {
     public void addTerminal(MySymbol terminal) {
         // transition step
         MySymbol myTerminal = new MySymbol(terminal.getName(), Color.RED);
-        Transition newTransition = new Transition(transition.getCurrentState().getName(), transition.getInputSymbolToRead().getName(),
-                transition.getSymbolToPop().getName(), transition.getNextState().getName(), transition.getSymbolsToPushAsString());
+        Transition newTransition = transition.deepCopy();
         newTransition.setInputSymbolToRead(terminal);
 
         // rule step
@@ -161,8 +159,7 @@ public class RuleStepLogic {
 
     public void addRightSideStackSymbols(List<MySymbol> stackSymbols, Color color) {
         // transition step
-        Transition newTransition = new Transition(transition.getCurrentState().getName(), transition.getInputSymbolToRead().getName(),
-                transition.getSymbolToPop().getName(), transition.getNextState().getName(), transition.getSymbolsToPushAsString());
+        Transition newTransition = transition.deepCopy();
         List<MySymbol> newStackSymbols = new ArrayList<>();
         for (MySymbol stackSymbol : stackSymbols) {
             MySymbol newStackSymbol = new MySymbol(stackSymbol.getName(), color);
@@ -188,20 +185,19 @@ public class RuleStepLogic {
 
     public void addFirstRightSideStep(MySymbol name) {
         // transition step
-        Transition newTransition = new Transition(transition.getCurrentState().getName(), transition.getInputSymbolToRead().getName(),
-                transition.getSymbolToPop().getName(), transition.getNextState().getName(), transition.getSymbolsToPushAsString());
+        Transition newTransition = transition.deepCopy();
         newTransition.setNextState(new MySymbol(name.getName(), Color.RED));
 
         // rule step
         templateRule.resetFontColor();
         NonTerminal firstNonTerminal = templateRule.getRightSide().get(0);
         if (firstNonTerminal instanceof  SpecialNonTerminal spt) {
-            spt.setStateTo(name);
+            spt.setStateFrom(name);
         }
         NonTerminal rightSideNonTerminal = templateRule.getRightSide().get(templateRule.getRightSide().size() - 1);
         NonTerminal leftSide = templateRule.getLeftSide();
         if (rightSideNonTerminal instanceof SpecialNonTerminal spt && leftSide instanceof SpecialNonTerminal spt2) {
-            spt.setStateTo(spt2.getStateTo());
+            spt.setStateFrom(spt2.getStateTo());
         }
 
         String helpingComment = "Na začiatok pravej strany pravidla pridáme symbol stavu do ktorého prechádzame.";
@@ -211,14 +207,13 @@ public class RuleStepLogic {
 
     public void addAllPossibilities(SpecialNonTerminal leftSide, List<MySymbol> tableOptions) {
         // transition step
-        Transition newTransition = new Transition(transition.getCurrentState().getName(), transition.getInputSymbolToRead().getName(),
-                transition.getSymbolToPop().getName(), transition.getNextState().getName(), transition.getSymbolsToPushAsString());
+        Transition newTransition = transition.deepCopy();
 
         // rule step
         templateRule.resetFontColor();
         templateRule.setLeftSide(leftSide);
         for (MySymbol tableOption : tableOptions) {
-            if (templateRule.copyRightSide().get(tableOption.getIndex()) instanceof SpecialNonTerminal spt) {
+            if (templateRule.getRightSide().get(tableOption.getIndex()) instanceof SpecialNonTerminal spt) {
                 spt.setStateTo(tableOption);
             }
         }
@@ -229,8 +224,7 @@ public class RuleStepLogic {
 
     public void addPossibilitiesAnotherSide(List<MySymbol> tableOptions) {
         // transition step
-        Transition newTransition = new Transition(transition.getCurrentState().getName(), transition.getInputSymbolToRead().getName(),
-                transition.getSymbolToPop().getName(), transition.getNextState().getName(), transition.getSymbolsToPushAsString());
+        Transition newTransition = transition.deepCopy();
 
         // rule step
         templateRule.resetFontColor();
@@ -247,8 +241,7 @@ public class RuleStepLogic {
 
     public void addLastRightStep(SpecialNonTerminal leftSide) {
         // transition step
-        Transition newTransition = new Transition(transition.getCurrentState().getName(), transition.getInputSymbolToRead().getName(), transition.getSymbolToPop().getName(),
-                transition.getNextState().getName(), transition.getSymbolsToPushAsString());
+        Transition newTransition = transition.deepCopy();
 
         // rule step
         templateRule.resetFontColor();
