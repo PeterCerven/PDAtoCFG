@@ -82,7 +82,7 @@ public class DescribePDA {
         Set<String> stackAlphabet = new HashSet<>();
         stackAlphabet.add(STARTING_Z);
         for (Arrow arrow : arrows) {
-            for (TransitionInputs transitionInputs : arrow.getTransitions()) {
+            for (TransitionInputs transitionInputs : arrow.getArrowSymbolContainerHandler().getTransitions()) {
                 String pushString = transitionInputs.getPush();
                 String popString = transitionInputs.getPop();
                 if (!popString.equals(EPSILON))

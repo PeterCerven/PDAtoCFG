@@ -22,7 +22,6 @@ public abstract class Arrow extends MyObject {
     private static final double VIEW_ORDER_ARROW_HEAD = 1;
 
     protected VBox symbolContainers;
-    private List<TransitionInputs> transitions;
     protected MyNode nodeFrom;
     protected MyNode nodeTo;
     protected Polygon arrowHead;
@@ -34,7 +33,6 @@ public abstract class Arrow extends MyObject {
 
     public Arrow(MyNode nodeFrom, MyNode nodeTo, MainLogic mainLogic, List<TransitionInputs> transitions) {
         super();
-        this.transitions = transitions;
         this.symbolContainers = new VBox();
         this.arrowSymbolContainerHandler = new ArrowSymbolContainerHandler(mainLogic, transitions, symbolContainers, this);
         this.nodeFrom = nodeFrom;

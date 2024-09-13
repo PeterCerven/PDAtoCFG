@@ -47,8 +47,6 @@ import static com.example.bakalar.logic.utility.StageUtils.setStageIcon;
 public class MainLogic implements Serializable {
     public static final String EPSILON = "ε";
     public static final String GAMMA_CAPITAL = "Γ";
-    public static final String SIGMA = "Σ";
-    public static final String DELTA_LOWER = "δ";
     public static final String STARTING_Z = "Z";
     public static final String STARTING_S = "S";
     private static final double DRAG_THRESHOLD = 20;
@@ -125,7 +123,7 @@ public class MainLogic implements Serializable {
         List<Transition> transitions = new ArrayList<>();
         for (MyNode node : nodes) {
             for (Arrow arrow : node.getArrowsFrom()) {
-                for (TransitionInputs transitionInputs : arrow.getTransitions()) {
+                for (TransitionInputs transitionInputs : arrow.getArrowSymbolContainerHandler().getTransitions()) {
                     transitions.add(new Transition(arrow.getNodeFrom().getName(), transitionInputs.getRead(),
                             transitionInputs.getPop(), arrow.getNodeTo().getName(), transitionInputs.getPush()));
                 }
@@ -552,7 +550,7 @@ public class MainLogic implements Serializable {
 
         List<ArrowModel> arrowModels = new ArrayList<>();
         for (Arrow arrow : arrows) {
-            for (TransitionInputs inputs : arrow.getTransitions()) {
+            for (TransitionInputs inputs : arrow.getArrowSymbolContainerHandler().getTransitions()) {
                 ArrowModel arrowModel = new ArrowModel();
                 arrowModel.setArrowId(arrow.getID());
                 arrowModel.setFromNodeId(arrow.getNodeFrom().getID());

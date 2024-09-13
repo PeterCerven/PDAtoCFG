@@ -26,8 +26,8 @@ public class ArrowSymbolContainerHandler {
     private final MainLogic mainLogic;
     @Getter
     private List<TransitionInputs> transitions;
-    private VBox symbolsContainer;
-    private Arrow arrow;
+    private final VBox symbolsContainer;
+    private final Arrow arrow;
 
     public ArrowSymbolContainerHandler(MainLogic mainLogic, List<TransitionInputs> transitionInputs, VBox symbolsContainer, Arrow arrow) {
         this.symbolsContainer = symbolsContainer;

@@ -47,7 +47,7 @@ public class HistoryLogic {
     private List<ArrowModel> createArrowHistory(List<Arrow> arrows) {
         List<ArrowModel> arrowHistories = new ArrayList<>();
         for (Arrow arrow : arrows) {
-            for (TransitionInputs transition : arrow.getTransitions()) {
+            for (TransitionInputs transition : arrow.getArrowSymbolContainerHandler().getTransitions()) {
                 if (arrow instanceof LineArrow la) {
                     arrowHistories.add(new ArrowModel(la.getID(), la.getNodeFrom().getID(), la.getNodeTo().getID(),
                             transition.copy(), la.getControlPointChangeX(), la.getControlPointChangeY()));
