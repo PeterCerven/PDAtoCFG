@@ -56,6 +56,10 @@ class GrammarSimplificationServiceTest {
                 arguments(
                         inputNonReducedGrammar(),
                         expectedReducedGrammar()
+                ),
+                arguments(
+                        inputNonReducedGrammar2(),
+                        expectedReducedGrammar2()
                 )
         );
     }
@@ -177,6 +181,48 @@ class GrammarSimplificationServiceTest {
                         createRule(createNT("C"), "c",
                                 List.of(
                                 ))
+                )))
+                .startingSymbol(new NonTerminal("S"))
+                .build();
+    }
+
+    private static GrammarComponents inputNonReducedGrammar2() {
+        return GrammarComponents.builder()
+                .rules(new TreeSet<>(List.of(
+                        createRule(createNT("S"), "a",
+                                List.of(
+                                        createNT("S")
+                                )
+                        ),
+                        createRule(createNT("S"), EPSILON,
+                                List.of(
+                                )
+                        ),
+                        createRule(createNT("S"), null,
+                                List.of(
+                                        createNT("A")
+                                )),
+                        createRule(createNT("A"), "a",
+                                List.of(
+                                        createNT("A")
+                                ))
+                )))
+                .startingSymbol(new NonTerminal("S"))
+                .build();
+    }
+
+    private static GrammarComponents expectedReducedGrammar2() {
+        return GrammarComponents.builder()
+                .rules(new TreeSet<>(List.of(
+                        createRule(createNT("S"), "a",
+                                List.of(
+                                        createNT("S")
+                                )
+                        ),
+                        createRule(createNT("S"), EPSILON,
+                                List.of(
+                                )
+                        )
                 )))
                 .startingSymbol(new NonTerminal("S"))
                 .build();

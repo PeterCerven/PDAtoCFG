@@ -33,19 +33,6 @@ public class CFGRule implements Comparable<CFGRule> {
         this.steps = new ArrayList<>();
     }
 
-    public CFGRule(NonTerminal leftSide, MySymbol terminal, List<NonTerminal> rightSide, List<StepRule> steps) {
-        this.leftSide = leftSide;
-        this.terminal = terminal;
-        this.rightSide = rightSide;
-        this.steps = steps;
-    }
-
-    public CFGRule(NonTerminal leftSide, MySymbol terminal) {
-        this.leftSide = leftSide;
-        this.terminal = terminal;
-        this.rightSide = new ArrayList<>();
-        this.steps = new ArrayList<>();
-    }
 
     public CFGRule getDeepCopy() {
         CFGRule rule = new CFGRule();
@@ -84,6 +71,14 @@ public class CFGRule implements Comparable<CFGRule> {
         for (NonTerminal nonTerminal : rightSide) {
             nonTerminal.resetColor();
         }
+    }
+    public List<String> getRightSideString() {
+        List<String> rightSideString = new ArrayList<>();
+        rightSideString.add(terminal == null ? "" : terminal.getName());
+        for (NonTerminal nonTerminal : rightSide) {
+            rightSideString.add(nonTerminal.getSymbol().getName());
+        }
+        return rightSideString;
     }
 
     @Override

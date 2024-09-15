@@ -19,7 +19,7 @@ public class SimplifyLogic {
         this.grammarComponents = new ArrayList<>();
     }
 
-    public void simplify(GrammarComponents gc) {
+    public GrammarComponents simplify(GrammarComponents gc) {
         this.grammarComponents = new ArrayList<>();
         grammarComponents.add(gc);
 
@@ -31,6 +31,7 @@ public class SimplifyLogic {
         grammarComponents.add(gc);
         gc = gss.removalOfNullProductions(deepCopyGrammarComponents(gc));
         grammarComponents.add(gc);
+        return gc;
     }
 
     private GrammarComponents deepCopyGrammarComponents(GrammarComponents gc) {

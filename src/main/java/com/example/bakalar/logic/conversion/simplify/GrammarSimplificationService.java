@@ -74,7 +74,7 @@ public class GrammarSimplificationService {
         for (CFGRule rule : allRules) {
             allowedNonTerminals.add(rule.getLeftSide());
             allowedNonTerminals.addAll(rule.getRightSide());
-            if (rule.getTerminal() != null) {
+            if (rule.getTerminal() != null && !rule.getTerminal().getName().equals(EPSILON)) {
                 allowedTerminals.add(rule.getTerminal());
             }
         }
@@ -87,7 +87,7 @@ public class GrammarSimplificationService {
         Set<NonTerminal> allowedNonTerminals = new HashSet<>();
         Set<CFGRule> allRules = gc.getRules();
         for (CFGRule rule : allRules) {
-            if (rule.getTerminal() != null) {
+            if (rule.getTerminal() != null && rule.getRightSide().isEmpty()) {
                 allowedNonTerminals.add(rule.getLeftSide());
             }
         }

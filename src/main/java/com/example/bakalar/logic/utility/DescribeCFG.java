@@ -3,6 +3,7 @@ package com.example.bakalar.logic.utility;
 import com.example.bakalar.logic.conversion.CFGRule;
 import com.example.bakalar.logic.conversion.MySymbol;
 import com.example.bakalar.logic.conversion.NonTerminal;
+import com.example.bakalar.logic.conversion.SpecialNonTerminal;
 import com.example.bakalar.logic.conversion.simplify.GrammarComponents;
 import com.example.bakalar.logic.utility.sorters.SpecialNonTerminalSorter;
 import javafx.geometry.Pos;
@@ -11,7 +12,8 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import lombok.Getter;
 
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Getter
 public class DescribeCFG {
@@ -33,13 +35,43 @@ public class DescribeCFG {
         updateRules(gc.getRules());
     }
     private void updateRules(Set<CFGRule> rules) {
+        if (!rules.isEmpty() && rules.stream().map(CFGRule::getRightSide).anyMatch(rightSide -> rightSide.stream().anyMatch(symbol -> symbol instanceof SpecialNonTerminal))) {
+            rulesContainer.getChildren().clear();
+            rules.stream()
+                    .map(CFGRule::toString)
+                    .map(TextField::new)
+                    .peek(textField -> textField.setFont(new Font(18)))
+                    .peek(textField -> textField.setEditable(false))
+                    .forEach(rulesContainer.getChildren()::add);
+            return;
+        }
         rulesContainer.getChildren().clear();
-        rules.stream()
-                .map(CFGRule::toString)
+        List<String> rulesList = getRulesList(rules);
+        rulesList.stream()
                 .map(TextField::new)
                 .peek(textField -> textField.setFont(new Font(18)))
                 .peek(textField -> textField.setEditable(false))
                 .forEach(rulesContainer.getChildren()::add);
+    }
+
+    private List<String> getRulesList(Set<CFGRule> rules) {
+        List<String> listOfRules  = new ArrayList<>();
+        Map<NonTerminal, List<List<String>>> groupedRules = rules.stream()
+                .collect(Collectors.groupingBy(
+                        CFGRule::getLeftSide,
+                        Collectors.mapping(CFGRule::getRightSideString, Collectors.toList())
+                ));
+        for (Map.Entry<NonTerminal, List<List<String>>> entry : groupedRules.entrySet()) {
+            StringBuilder sb = new StringBuilder(entry.getKey() + " -> ");
+            StringJoiner sj = new StringJoiner("|");
+
+            for (List<String> list : entry.getValue()) {
+                sj.add(String.join("",list));
+            }
+            sb.append(sj);
+            listOfRules.add(sb.toString());
+        }
+        return listOfRules;
     }
 
     private void updateStartSymbol(NonTerminal startingS) {

@@ -1,6 +1,5 @@
 package com.example.bakalar.logic.conversion.window;
 
-import com.example.bakalar.logic.conversion.CFGRule;
 import com.example.bakalar.logic.conversion.simplify.GrammarComponents;
 import com.example.bakalar.logic.conversion.simplify.SimplifyLogic;
 import com.example.bakalar.logic.utility.DescribeCFG;
@@ -21,12 +20,11 @@ public class InformationWindow {
     private final BorderPane informationPane;
     private final Button downloadBtn;
     private final Button reduceBtn;
-    private boolean isReduced = false;
     private final ScrollPane nonTerminalsScrollPane;
     private final VBox rightPanel;
     private final Label label;
-    private final ScrollPane ruleBoxStepsScrollPane;
     private final ScrollPane ruleBoxScrollPane;
+    private boolean isReduced = false;
 
     public InformationWindow() {
         describeCFG = new DescribeCFG();
@@ -55,13 +53,6 @@ public class InformationWindow {
         HBox.setHgrow(spacer, Priority.ALWAYS);
         hBox.getChildren().addAll(reduceBtn, spacer, downloadBtn);
 
-        ruleBoxStepsScrollPane = new ScrollPane();
-        ruleBoxStepsScrollPane.setFitToWidth(true);
-        ruleBoxStepsScrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-        ruleBoxStepsScrollPane.setPadding(new Insets(10));
-        ruleBoxStepsScrollPane.setStyle("-fx-background-color: #f4f4f4; ");
-
-
         ruleBoxScrollPane = new ScrollPane();
         ruleBoxScrollPane.setFitToWidth(true);
         ruleBoxScrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
@@ -71,7 +62,7 @@ public class InformationWindow {
 
 
         VBox contentPane = new VBox();
-        contentPane.getChildren().addAll(ruleBoxScrollPane, ruleBoxStepsScrollPane);
+        contentPane.getChildren().addAll(ruleBoxScrollPane);
 
 
         label = new Label("Neterminálne symboly:");
@@ -123,39 +114,14 @@ public class InformationWindow {
         if (isReduced) {
             reduceBtn.setText("Ukáž zredukovanú gramatiku");
             isReduced = false;
-            ruleBoxStepsScrollPane.setContent(null);
-            showOriginalCFG();
+            describeCFG.updateAllDescribeCFG(gc);
         } else {
             reduceBtn.setText("Ukáž pôvodnú gramatiku");
             isReduced = true;
-            simplifyLogic.simplify(gc);
-            VBox vbox = new VBox();
-            vbox.getChildren().clear();
-            simplifyLogic.getGrammarComponents().get(1).getRules().stream()
-                    .map(CFGRule::toString)
-                    .map(TextField::new)
-                    .peek(textField -> textField.setFont(new Font("Arial",18)))
-                    .peek(textField -> textField.setEditable(false))
-                    .forEach(vbox.getChildren()::add);
-            vbox.getChildren().addAll();
-            ruleBoxStepsScrollPane.setContent(vbox);
-            nonTerminalsScrollPane.setContent(describeCFG.getNonTerminals());
-            rightPanel.getChildren().clear();
-            rightPanel.getChildren().add(describeCFG.getStartSymbol());
-            rightPanel.getChildren().add(describeCFG.getTerminals());
-            rightPanel.getChildren().add(label);
-            rightPanel.getChildren().add(nonTerminalsScrollPane);
+            GrammarComponents gcSimple = simplifyLogic.simplify(gc);
+            describeCFG.updateAllDescribeCFG(gcSimple);
         }
     }
 
-    private void showOriginalCFG() {
-        ruleBoxScrollPane.setContent(describeCFG.getRulesContainer());
-        nonTerminalsScrollPane.setContent(describeCFG.getNonTerminals());
-        rightPanel.getChildren().clear();
-        rightPanel.getChildren().add(describeCFG.getStartSymbol());
-        rightPanel.getChildren().add(describeCFG.getTerminals());
-        rightPanel.getChildren().add(label);
-        rightPanel.getChildren().add(nonTerminalsScrollPane);
-    }
 
 }
