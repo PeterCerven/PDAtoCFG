@@ -40,7 +40,6 @@ public class ConversionLogic {
     private boolean showSteps = false;
     private List<RulesWindows> rulesWindows;
     private int currentIndex;
-    private Set<CFGRule> allRules;
 
 
     public ConversionLogic(FileLogic fileLogic) {
@@ -91,22 +90,23 @@ public class ConversionLogic {
         Button nextButton = conversionStage.getNextButton();
         Button showStepsButton = stepsWindow.getShowStepsButton();
 
-        allRules = new TreeSet<>();
+        Set<CFGRule> allRules = new TreeSet<>();
         for (RulesWindows ruleWindow : rulesWindows) {
             allRules.addAll(ruleWindow.getRules());
         }
 
 
-        GrammarComponents gc = new GrammarComponents(allRules, new NonTerminal(STARTING_S));
+        GrammarComponents grammar = new GrammarComponents(allRules, new NonTerminal(STARTING_S));
+        GrammarComponents simplifiedGrammar = simplifyLogic.simplify(grammar);
 
-        reduceButton.setOnAction(e -> informationWindow.swapCFGtoReduceAndBack(simplifyLogic, gc));
-        downloadButton.setOnAction(e -> fileLogic.saveToTextFile(allRules, conversionStage.getStage()));
+        reduceButton.setOnAction(e -> informationWindow.swapCFGtoReduceAndBack(simplifiedGrammar, grammar));
+        downloadButton.setOnAction(e -> fileLogic.saveToTextFile(grammar, simplifiedGrammar,  conversionStage.getStage()));
         prevButton.setOnAction(e -> updateWindow(-1));
         nextButton.setOnAction(e -> updateWindow(1));
         showStepsButton.setOnAction(e -> steps());
 
 
-        describeCFG.updateAllDescribeCFG(gc);
+        describeCFG.updateAllDescribeCFG(grammar);
         updateWindow(0);
         conversionStage.getStage().show();
     }
@@ -123,9 +123,7 @@ public class ConversionLogic {
             case TERMINAL -> {
                 return new RulesWindows(terminalMove(transition), transition, WindowType.TERMINAL);
             }
-            default -> {
-                throw new MyCustomException("Nepodporovaný typ prechodovej funkcie.");
-            }
+            default -> throw new MyCustomException("Nepodporovaný typ prechodovej funkcie.");
         }
     }
 

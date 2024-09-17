@@ -1,5 +1,6 @@
 package com.example.bakalar.logic.conversion;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -15,6 +16,7 @@ import static com.example.bakalar.logic.MainLogic.STARTING_S;
 @Builder
 @Getter
 @Setter
+@AllArgsConstructor
 public class CFGRule implements Comparable<CFGRule> {
     private NonTerminal leftSide;
     private MySymbol terminal;
@@ -32,7 +34,6 @@ public class CFGRule implements Comparable<CFGRule> {
         this.rightSide = rightSide;
         this.steps = new ArrayList<>();
     }
-
 
     public CFGRule getDeepCopy() {
         CFGRule rule = new CFGRule();

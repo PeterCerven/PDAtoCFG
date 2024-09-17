@@ -1,7 +1,6 @@
 package com.example.bakalar.logic.conversion.window;
 
 import com.example.bakalar.logic.conversion.simplify.GrammarComponents;
-import com.example.bakalar.logic.conversion.simplify.SimplifyLogic;
 import com.example.bakalar.logic.utility.DescribeCFG;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -24,6 +23,7 @@ public class InformationWindow {
     private final VBox rightPanel;
     private final Label label;
     private final ScrollPane ruleBoxScrollPane;
+
     private boolean isReduced = false;
 
     public InformationWindow() {
@@ -110,7 +110,7 @@ public class InformationWindow {
         startSymbol.setFont(new Font(18));
     }
 
-    public void swapCFGtoReduceAndBack(SimplifyLogic simplifyLogic, GrammarComponents gc) {
+    public void swapCFGtoReduceAndBack(GrammarComponents simplifiedGrammar, GrammarComponents gc) {
         if (isReduced) {
             reduceBtn.setText("Ukáž zredukovanú gramatiku");
             isReduced = false;
@@ -118,8 +118,7 @@ public class InformationWindow {
         } else {
             reduceBtn.setText("Ukáž pôvodnú gramatiku");
             isReduced = true;
-            GrammarComponents gcSimple = simplifyLogic.simplify(gc);
-            describeCFG.updateAllDescribeCFG(gcSimple);
+            describeCFG.updateAllDescribeCFG(simplifiedGrammar);
         }
     }
 

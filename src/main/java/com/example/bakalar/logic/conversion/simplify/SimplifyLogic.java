@@ -31,6 +31,7 @@ public class SimplifyLogic {
         grammarComponents.add(gc);
         gc = gss.removalOfNullProductions(deepCopyGrammarComponents(gc));
         grammarComponents.add(gc);
+        gc = gss.reductionOfCFG(deepCopyGrammarComponents(gc));
         return gc;
     }
 
