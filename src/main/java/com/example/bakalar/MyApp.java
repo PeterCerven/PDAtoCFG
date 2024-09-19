@@ -23,8 +23,6 @@ public class MyApp extends Application {
         String styles = Objects.requireNonNull(getClass().getResource("/css/styles.css")).toExternalForm();
         scene.getStylesheets().add(styles);
 
-
-
         setStageIcon(stage);
         stage.setTitle("Konverzia PDA na CFG");
         stage.setScene(scene);
