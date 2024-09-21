@@ -14,7 +14,7 @@ import static com.example.bakalar.logic.utility.StageUtils.setStageIcon;
 public class MyApp extends Application {
     @Override
     public void start(Stage stage) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(MyApp.class.getResource("my-scene.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("my-scene.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
         MainController controller = fxmlLoader.getController();
         controller.setStage(stage);
