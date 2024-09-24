@@ -10,7 +10,7 @@ PDAtoCFG is a didactic desktop application developed as part of a bachelor’s t
 - **File Saving:** Users can save the application state or grammar rules to a file.
 
 ### Installation
-You can download the application from [here](https://github.com/PeterCerven/PDAtoCFG/releases/tag/v1.0). PDAtoCFG can be installed using the provided installer file `PDAtoCFG.exe` for Windows or by using the Jar file if the user has [Java 19 or higher](https://www.oracle.com/java/technologies/downloads/) installed. To launch the application, double-click on the application icon.
+You can download the application from [here](https://github.com/PeterCerven/PDAtoCFG/releases/tag/v1.0). PDAtoCFG can be installed using the provided installer file `PDAtoCFG.exe` for Windows or by using the Jar file if the user has [Java 21 or higher](https://www.oracle.com/java/technologies/downloads/) installed. To launch the application, double-click on the application icon.
 
 ### Usage
 The application includes a user manual under __Menu -> Help -> Control__. This will open a window demonstrating the usage and features of the application. There are also several keyboard shortcuts and mouse functions to make using the application easier:
@@ -46,7 +46,7 @@ PDAtoCFG je didaktická, desktopová aplikácia vytvorená ako súčasť bakalá
 
 ### Inštalácia
 Link na stiahnutie aplikácie je k dispozícii [tu](https://github.com/PeterCerven/PDAtoCFG/releases/tag/v1.0).
-Aplikáciu PDAtoCFG je možné nainštalovať pomocou priloženého inštalačného súboru `PDAtoCFG.exe` ak je používateľ na operačnom systéme Windows, alebo môže použiť súbor Jar, ak má nainštalovanú verziu [javy 19 a vyššiu](https://www.oracle.com/java/technologies/downloads/). Pre spustenie aplikácie dvojklik na ikonku aplikácie.
+Aplikáciu PDAtoCFG je možné nainštalovať pomocou priloženého inštalačného súboru `PDAtoCFG.exe` ak je používateľ na operačnom systéme Windows, alebo môže použiť súbor Jar, ak má nainštalovanú verziu [javy 21 a vyššiu](https://www.oracle.com/java/technologies/downloads/). Pre spustenie aplikácie dvojklik na ikonku aplikácie.
 
 ### Používanie
 Aplikácia obsahuje v lište: __Menu -> Pomoc -> Ovládanie__ používateľskú príručku. Používateľovi sa otvorí okno, kde bude demonštrované použitie a funkcie aplikácie. Aplikácia tiež disponuje niekoľkými klávesovými skratkami a funkciami po kliknutí myšou, ktoré uľahčujú používanie aplikácie.
