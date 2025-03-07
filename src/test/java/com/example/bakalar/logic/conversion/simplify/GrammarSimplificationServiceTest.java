@@ -5,6 +5,7 @@ import com.example.bakalar.logic.conversion.MySymbol;
 import com.example.bakalar.logic.conversion.NonTerminal;
 import com.example.bakalar.logic.conversion.SpecialNonTerminal;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -440,5 +441,16 @@ class GrammarSimplificationServiceTest {
                 .ignoringFields("rules.steps")
                 .ignoringCollectionOrderInFields("rules")
                 .isEqualTo(expectedGrammar);
+    }
+
+    @Test
+    void templateTest() {
+        // With Given Data
+
+
+        // When Function is called
+
+
+        // Then assert result
     }
 }

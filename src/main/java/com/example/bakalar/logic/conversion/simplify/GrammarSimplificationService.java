@@ -16,7 +16,7 @@ public class GrammarSimplificationService {
         Set<NonTerminal> allNonTerminals = gc.getNonTerminals();
         Set<CFGRule> allRules = gc.getRules();
 
-        char namingLetter = 'A';
+        int namingLetter = 65;
         String prohibitedLetters = "SZ";
 
         Map<SpecialNonTerminal, NonTerminal> nameForTerminals = new HashMap<>();
@@ -24,10 +24,7 @@ public class GrammarSimplificationService {
 
         for (NonTerminal nonTerminal : allNonTerminals) {
             if (nonTerminal instanceof SpecialNonTerminal snt) {
-                if (prohibitedLetters.contains(Character.toString(namingLetter))) {
-                    namingLetter++;
-                }
-                nameForTerminals.put(snt, new NonTerminal(String.valueOf(namingLetter++)));
+                nameForTerminals.put(snt, new NonTerminal(getNewNonTerminalName(namingLetter++, prohibitedLetters)));
             } else {
                 newNonTerminals.add(nonTerminal);
             }
@@ -58,6 +55,24 @@ public class GrammarSimplificationService {
             }
         }
         return gc;
+    }
+
+    private String getNewNonTerminalName(int namingLetter, String prohibitedLetters) {
+        int index = 8320;
+        if (prohibitedLetters.contains(Character.toString(namingLetter))) {
+            namingLetter++;
+        }
+        int temp = namingLetter;
+        int diff = 'Z' - 'A' + 1;
+        while (temp > 90) {
+            temp -= diff;
+            index++;
+            if (prohibitedLetters.contains(Character.toString(temp))) {
+                temp++;
+            }
+        }
+
+        return index == 8320 ? String.valueOf((char) temp) : (char) namingLetter + "" + (char) index;
     }
 
     public GrammarComponents reductionOfCFG(GrammarComponents gc) {
@@ -154,7 +169,7 @@ public class GrammarSimplificationService {
                 continue;
             }
             for (CFGRule rule : allRulesList) {
-                if (rule.getRightSide().size() == 1 && rule.getRightSide().get(0).equals(unitProductionRule.getLeftSide()) && rule.getTerminal() == null) {
+                if (rule.getRightSide().size() == 1 && rule.getRightSide().getFirst().equals(unitProductionRule.getLeftSide()) && rule.getTerminal() == null) {
                     rulesToAdd.add(new CFGRule(rule.getLeftSide(), unitProductionRule.getTerminal(), unitProductionRule.getRightSide()));
                     rulesToRemove.add(rule);
                     rulesToRemove.add(unitProductionRule);
