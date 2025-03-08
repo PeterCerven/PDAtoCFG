@@ -5,7 +5,6 @@ import com.example.bakalar.logic.conversion.MySymbol;
 import com.example.bakalar.logic.conversion.NonTerminal;
 import com.example.bakalar.logic.conversion.SpecialNonTerminal;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -61,6 +60,14 @@ class GrammarSimplificationServiceTest {
                 arguments(
                         inputNonReducedGrammar2(),
                         expectedReducedGrammar2()
+                ),
+                arguments(
+                        expectedReducedGrammar(),
+                        expectedReducedGrammar()
+                ),
+                arguments(
+                        expectedReducedGrammar2(),
+                        expectedReducedGrammar2()
                 )
         );
     }
@@ -69,6 +76,10 @@ class GrammarSimplificationServiceTest {
         return Stream.of(
                 arguments(
                         inputGrammarWithUnitProductions(),
+                        expectedGrammarWithoutUnitProductions()
+                ),
+                arguments(
+                        expectedGrammarWithoutUnitProductions(),
                         expectedGrammarWithoutUnitProductions()
                 )
         );
@@ -79,9 +90,14 @@ class GrammarSimplificationServiceTest {
                 arguments(
                         inputGrammarWithNullProductions(),
                         expectedGrammarWithoutNullProductions()
+                ),
+                arguments(
+                        expectedGrammarWithoutNullProductions(),
+                        expectedGrammarWithoutNullProductions()
                 )
         );
     }
+
 
     // changeSpecialTerminalsToNonTerminals test data
     private static GrammarComponents inputSpecialNonTerminalGrammar() {
@@ -287,34 +303,23 @@ class GrammarSimplificationServiceTest {
                 .build();
     }
 
+
+
     // removalOfNullProductions test data
     private static GrammarComponents inputGrammarWithNullProductions() {
         return GrammarComponents.builder()
                 .rules(new TreeSet<>(List.of(
-                        createRule(createNT("S"), null,
-                                List.of(
+                        createRule(createNT("S"), null, List.of(
                                         createNT("A"),
                                         createNT("B"),
                                         createNT("A"),
                                         createNT("C")
                                 )),
-                        createRule(createNT("A"), "a",
-                                List.of(
-                                        createNT("A")
-                                )),
-                        createRule(createNT("A"), EPSILON,
-                                List.of(
-                                )),
-                        createRule(createNT("B"), "b",
-                                List.of(
-                                        createNT("B")
-                                )),
-                        createRule(createNT("B"), EPSILON,
-                                List.of(
-                                )),
-                        createRule(createNT("C"), "c",
-                                List.of(
-                                ))
+                        createRule(createNT("A"), "a", List.of(createNT("A"))),
+                        createRule(createNT("A"), EPSILON, List.of()),
+                        createRule(createNT("B"), "b", List.of(createNT("B"))),
+                        createRule(createNT("B"), EPSILON, List.of()),
+                        createRule(createNT("C"), "c", List.of())
                 )))
                 .startingSymbol(new NonTerminal("S"))
                 .build();
@@ -393,7 +398,14 @@ class GrammarSimplificationServiceTest {
             " then return NonTerminals")
     @MethodSource("provideTestDataForGrammarForChangingToNonTerminalFromSpecialNonTerminal")
     void changeSpecialTerminalsToNonTerminals(GrammarComponents inputGrammar, GrammarComponents expectedGrammar) {
+//        Given
+
+
+//        When
         GrammarComponents newGC = grammarSimplificationService.changeSpecialTerminalsToNonTerminals(inputGrammar);
+
+
+//        Then
         assertThat(newGC)
                 .usingRecursiveComparison()
                 .ignoringCollectionOrderInFields("rules")
@@ -441,16 +453,5 @@ class GrammarSimplificationServiceTest {
                 .ignoringFields("rules.steps")
                 .ignoringCollectionOrderInFields("rules")
                 .isEqualTo(expectedGrammar);
-    }
-
-    @Test
-    void templateTest() {
-        // With Given Data
-
-
-        // When Function is called
-
-
-        // Then assert result
     }
 }
